@@ -15,7 +15,7 @@ namespace Kudos.DataBases.Controllers
             return new MySqlConnectionStringBuilder()
             {
                 Logging = Config.IsLoggingEnabled,
-                Keepalive = 1,
+                Keepalive = Config.KeepAlive,
                 Server = Config.Host,
                 UserID = Config.UserName,
                 Password = Config.UserPassword,

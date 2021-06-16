@@ -9,9 +9,6 @@ namespace Kudos.DataBases.Models.Configs
         private Text
             _tHost;
 
-        private MySqlConnectionProtocol
-            _eConnectionProtocol;
-
         public Text Host
         {
             set
@@ -23,6 +20,8 @@ namespace Kudos.DataBases.Models.Configs
                 return _tHost;
             }
         }
+        
+        public UInt32 KeepAlive { get; set; }
         public MySqlConnectionProtocol ConnectionProtocol { get; set; }
         public UInt16 Port { get; set; }
         public Boolean IsSessionPoolInteractive { get; set; }
