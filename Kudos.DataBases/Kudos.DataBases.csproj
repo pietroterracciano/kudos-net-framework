@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\MSSQLDBController.cs" />
+    <Compile Remove="Models\Configs\MSSQLDBConfigModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.25" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
+    <ProjectReference Include="..\Kudos\Kudos.csproj" />
+  </ItemGroup>
+
+</Project>

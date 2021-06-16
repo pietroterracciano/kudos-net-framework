@@ -1,0 +1,498 @@
+﻿using Kudos.DataBases.Models;
+using Kudos.DataBases.Models.Configs;
+using Kudos.DataBases.Models.Results;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
+namespace Kudos.DataBases.Controllers
+{
+    public abstract class ADBController<DBConfigModelType, DbConnectionType, DbConnectionStringBuilderType> 
+        where DBConfigModelType : ADBConfigModel, new()
+        where DbConnectionType : DbConnection, new()
+        where DbConnectionStringBuilderType : DbConnectionStringBuilder
+    {
+        private DBErrorModel
+            _mLastError;
+
+        private DBConfigModelType
+            _mConfig;
+
+        private DbConnectionType
+            _oConnection;
+
+        private DbCommand
+            _oCommand;
+
+        private Boolean
+            _bIsExecutingCommand;
+
+        public DBConfigModelType Config
+        {
+            get { return _mConfig; }
+        }
+
+        public ADBController()
+        {
+            _mConfig = new DBConfigModelType();
+        }
+
+        protected abstract DbConnectionStringBuilderType OnConnectionStringBuilderCreation();
+
+        #region Connection
+
+        #region public Boolean OpenConnection()
+
+        public Boolean OpenConnection()
+        {
+            ClearLastError();
+
+            if (IsConnectionOpened())
+            {
+                SetLastError(0, "Connection is already opened");
+                return false;
+            }
+
+            #region Create and verify ConnectionStringBuilder
+
+            DbConnectionStringBuilder
+                oConnectionStringBuilder = OnConnectionStringBuilderCreation();
+
+            String
+                sConnectionString = oConnectionStringBuilder != null ? oConnectionStringBuilder.ToString() : null;
+
+            if (sConnectionString == null)
+            {
+                SetLastError(0, "Impossible to create ConnectionString");
+                return false;
+            }
+
+            #endregion
+
+            #region Create, verify Connection
+
+            _oConnection = new DbConnectionType()
+            {
+                ConnectionString = sConnectionString
+            };
+
+            if (_oConnection == null)
+            {
+                SetLastError(0, "Impossible to create ConnectionHandler");
+                return false;
+            }
+
+            #endregion
+
+            try
+            {
+                _oConnection.Open();
+            }
+            catch (Exception oException)
+            {
+                SetLastError(0, oException.Message);
+            }
+
+            if (!IsConnectionStatusWhole())
+            {
+                SetLastError(0, "Impossible to establish a Connection");
+                return false;
+            }
+
+            _oCommand = _oConnection.CreateCommand();
+
+            return true;
+        }
+
+        public Task<Boolean> OpenConnectionAsync()
+        {
+            return Task.Run(
+                delegate ()
+                {
+                    return OpenConnection();
+                }
+            );
+        }
+
+        #endregion
+
+        #region public Boolean CloseConnection()
+
+        public Boolean CloseConnection()
+        {
+            ClearLastError();
+
+            if (IsConnectionClosed())
+            {
+                SetLastError(0, "Connection is already closed");
+                return false;
+            }
+
+            try { _oConnection.Close(); } catch { }
+
+            if (!IsConnectionClosed())
+            {
+                SetLastError(0, "Impossible to close Connection");
+                return false;
+            }
+
+            RollbackTransaction();
+
+            if (_oCommand != null)
+            {
+                if (_bIsExecutingCommand)
+                    try
+                    {
+                        _oCommand.Cancel();
+                    }
+                    catch
+                    {
+                    }
+
+                try
+                {
+                    _oCommand.Dispose();
+                }
+                catch
+                {
+
+                }
+            }
+
+            _oCommand = null;
+            _oConnection = null;
+
+            return true;
+        }
+
+        public Task<Boolean> CloseConnectionAsync()
+        {
+            return Task.Run(
+                delegate ()
+                {
+                    return CloseConnection();
+                }
+            );
+        }
+
+        #endregion
+
+        #region Status
+
+        protected Boolean IsConnectionStatusWhole()
+        {
+            return
+                _oConnection != null
+                && (
+                    _oConnection.State == ConnectionState.Open
+                    || _oConnection.State == ConnectionState.Fetching
+                    || _oConnection.State == ConnectionState.Executing
+                );
+        }
+
+
+        public Boolean IsConnectionOpened()
+        {
+            return
+                IsConnectionStatusWhole()
+                && _oCommand != null;
+        }
+
+        public Boolean IsConnectionBroken()
+        {
+            return
+                _oConnection != null
+                && (
+                    _oConnection.State == ConnectionState.Broken
+                    || _oCommand == null
+                );
+        }
+
+        public Boolean IsConnectionClosed()
+        {
+            return
+                _oConnection == null
+                || _oConnection.State == ConnectionState.Closed;
+        }
+
+        #endregion
+
+        #endregion
+
+        protected void ClearLastError()
+        {
+            _mLastError = null;
+        }
+
+        protected bool SetLastError(Int32 iErrorID, String sErrorMessage)
+        {
+            if (_mLastError != null)
+                return false;
+            
+            _mLastError = new DBErrorModel(iErrorID, sErrorMessage);
+            return true;
+        }
+
+        #region public Boolean ChangeDatabase()
+
+        public Boolean ChangeDatabase(String sDatabaseName)
+        {
+            if (!IsConnectionOpened() || String.IsNullOrWhiteSpace(sDatabaseName))
+                return false;
+
+            _oConnection.ChangeDatabase(sDatabaseName);
+            return true;
+        }
+
+        public Task<Boolean> ChangeDatabaseAsync(String sDatabaseName)
+        {
+            return Task.Run(
+                delegate ()
+                {
+                    return ChangeDatabase(sDatabaseName);
+                }
+            );
+        }
+
+        #endregion
+
+        #region Transaction
+
+        public Boolean IsIntoTransaction()
+        {
+            return
+                IsConnectionOpened()
+                && _oCommand.Transaction != null;
+        }
+
+        public Boolean BeginTransaction()
+        {
+            if (IsConnectionOpened() && !IsIntoTransaction())
+                try
+                {
+                    return (_oCommand.Transaction = _oConnection.BeginTransaction()) != null;
+                }
+                catch
+                {
+                    SetLastError(0, "Impossible to begin Transaction");
+                }
+
+            return false;
+        }
+
+        public Boolean CommitTransaction()
+        {
+            if (IsConnectionOpened() && IsIntoTransaction())
+                try
+                {
+                    _oCommand.Transaction.Commit();
+                    _oCommand.Transaction.Dispose();
+                    _oCommand.Transaction = null;
+                    return true;
+                }
+                catch
+                {
+                    SetLastError(0, "Impossible to commit Transaction");
+                }
+
+            return false;
+        }
+
+        public Boolean RollbackTransaction()
+        {
+            if (IsConnectionOpened() && IsIntoTransaction())
+                try
+                {
+                    _oCommand.Transaction.Rollback();
+                    _oCommand.Transaction.Dispose();
+                    _oCommand.Transaction = null;
+                }
+                catch
+                {
+                    SetLastError(0, "Impossible to rollback Transaction");
+                }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Command
+
+        private Boolean PrepareCommand(ref String sCommand, ref Dictionary<String, Object> dCommandParameters)
+        {
+            ClearLastError();
+
+            if (!IsConnectionOpened())
+            {
+                SetLastError(0, "Connection is closed");
+                return false;
+            }
+
+            if (String.IsNullOrWhiteSpace(sCommand))
+            {
+                SetLastError(0, "Command is empty");
+                return false;
+            }
+
+            if ( _oCommand == null )
+            {
+                SetLastError(0, "Error in Command instance");
+                return false;
+            }
+
+            _oCommand.Parameters.Clear();
+            _oCommand.CommandTimeout = (Int32)Config.CommandTimeout;
+            _oCommand.CommandText = sCommand;
+
+            if (dCommandParameters != null)
+                foreach (KeyValuePair<String, Object> kvpCParameter in dCommandParameters)
+                {
+                    if (String.IsNullOrWhiteSpace(kvpCParameter.Key))
+                        continue;
+
+                    DbParameter oParameter = _oCommand.CreateParameter();
+                    oParameter.ParameterName = kvpCParameter.Key.Trim().Replace("@", "");
+                    oParameter.Value = kvpCParameter.Value;
+
+                    _oCommand.Parameters.Add(oParameter);
+                }
+
+            if (!Config.IsAutoCommitEnabled)
+            {
+                RollbackTransaction();
+                if (!BeginTransaction())
+                    return false;
+            }
+
+            return true;
+        }
+
+        #region public DBNonQueryCommandResultModel ExecuteNonQueryCommand
+
+        /// <summary>Nullable</summary>
+        public DBNonQueryCommandResultModel ExecuteNonQueryCommand(String sCommand)
+        {
+            return ExecuteNonQueryCommand(sCommand, null);
+        }
+
+        /// <summary>Nullable</summary>
+        public DBNonQueryCommandResultModel ExecuteNonQueryCommand(String sCommand, Dictionary<String, Object> dCommandParameters)
+        {
+            if (!PrepareCommand(ref sCommand, ref dCommandParameters))
+                return null;
+
+            try
+            {
+                Stopwatch
+                    oStopwatch = new Stopwatch();
+
+                oStopwatch.Start();
+                _bIsExecutingCommand = true;
+
+                Int32
+                    iUpdatedRows = _oCommand.ExecuteNonQuery();
+
+                _bIsExecutingCommand = false;
+                oStopwatch.Stop();
+
+                return new DBNonQueryCommandResultModel(ref iUpdatedRows, ref oStopwatch);
+            }
+            catch (ExternalException oExternalException)
+            {
+                SetLastError(oExternalException.ErrorCode, oExternalException.Message);
+            }
+            catch (Exception oException)
+            {
+                SetLastError(0, oException.Message);
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region public DBQueryCommandResultModel ExecuteQueryCommand()
+
+        public DBQueryCommandResultModel ExecuteQueryCommand(String sCommand)
+        {
+            return ExecuteQueryCommand(sCommand, null, 0);
+        }
+
+        public DBQueryCommandResultModel ExecuteQueryCommand(String sCommand, Dictionary<String, Object> dCommandParameters)
+        {
+            return ExecuteQueryCommand(sCommand, dCommandParameters, 0);
+        }
+
+        public DBQueryCommandResultModel ExecuteQueryCommand(String sCommand, Int32 i32ExpectedReadRowsNumber)
+        {
+            return ExecuteQueryCommand(sCommand, null, i32ExpectedReadRowsNumber);
+        }
+
+        public DBQueryCommandResultModel ExecuteQueryCommand(String sCommand, Dictionary<String, Object> dCommandParameters, Int32 i32ExpectedReadRowsNumber)
+        {
+            if (!PrepareCommand(ref sCommand, ref dCommandParameters))
+                return null;
+
+            try
+            {
+                Stopwatch
+                    oStopwatch = new Stopwatch();
+
+                oStopwatch.Start();
+
+                _bIsExecutingCommand = true;
+
+                DbDataReader 
+                    oDataReader = _oCommand.ExecuteReader();
+
+                _bIsExecutingCommand = false;
+
+                oStopwatch.Stop();
+
+                if (oDataReader == null)
+                {
+                    SetLastError(0, "Error in DataReader instance");
+                    return null;
+                }
+
+                DataTable
+                    oDataTable;
+
+                if (oDataReader.HasRows)
+                {
+                    oDataTable = new DataTable();
+
+                    if (i32ExpectedReadRowsNumber > 0)
+                        oDataTable.MinimumCapacity = i32ExpectedReadRowsNumber;
+
+                    oDataTable.Load(oDataReader);
+                }
+                else
+                    oDataTable = null;
+               
+                oDataReader.DisposeAsync();
+
+                return new DBQueryCommandResultModel(ref oDataTable, ref oStopwatch);
+            }
+            catch (ExternalException oExternalException)
+            {
+                SetLastError(oExternalException.ErrorCode, oExternalException.Message);
+            }
+            catch (Exception oException)
+            {
+                SetLastError(0, oException.Message);
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #endregion
+    }
+}
