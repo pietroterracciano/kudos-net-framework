@@ -12,7 +12,7 @@ namespace Kudos.Utils
         private static readonly JsonSerializerOptions
             _oOptions = new JsonSerializerOptions()
             {
-                    
+                PropertyNameCaseInsensitive = true
             };
 
         #region public static String Serialize()
