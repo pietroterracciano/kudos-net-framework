@@ -16,12 +16,6 @@ namespace Kudos.DataBases.Controllers
         where DbConnectionType : DbConnection, new()
         where DbConnectionStringBuilderType : DbConnectionStringBuilder
     {
-        private DBErrorModel
-            _mLastError;
-
-        private DBConfigModelType
-            _mConfig;
-
         private DbConnectionType
             _oConnection;
 
@@ -33,12 +27,19 @@ namespace Kudos.DataBases.Controllers
 
         public DBConfigModelType Config
         {
-            get { return _mConfig; }
+            get;
+            private set;
+        }
+
+        public DBErrorModel LastError
+        {
+            get;
+            private set;
         }
 
         public ADBController()
         {
-            _mConfig = new DBConfigModelType();
+            Config = new DBConfigModelType();
         }
 
         protected abstract DbConnectionStringBuilderType OnConnectionStringBuilderCreation();
@@ -225,15 +226,15 @@ namespace Kudos.DataBases.Controllers
 
         protected void ClearLastError()
         {
-            _mLastError = null;
+            LastError = null;
         }
 
         protected bool SetLastError(Int32 iErrorID, String sErrorMessage)
         {
-            if (_mLastError != null)
+            if (LastError != null)
                 return false;
-            
-            _mLastError = new DBErrorModel(iErrorID, sErrorMessage);
+
+            LastError = new DBErrorModel(iErrorID, sErrorMessage);
             return true;
         }
 

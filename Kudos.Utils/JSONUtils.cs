@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Kudos.Utils.Types;
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -55,7 +57,9 @@ namespace Kudos.Utils
             if (!String.IsNullOrWhiteSpace(sJSON) && oOptions != null)
                 try
                 {
-                    return JsonSerializer.Deserialize<Type>(sJSON, oOptions);
+                    Type oObject = JsonSerializer.Deserialize<Type>(sJSON, oOptions);
+                    if(oObject != null && oObject.GetType() == typeof(JsonElement))
+                        return ToDynamicObject((dynamic)oObject);
                 }
                 catch
                 {
@@ -63,6 +67,15 @@ namespace Kudos.Utils
                 }
 
             return default(Type);
+        }
+
+        #endregion
+
+        #region private static dynamic ToDynamicObject()
+
+        private static dynamic ToDynamicObject(JsonElement oJsonElement)
+        {
+            return new JSONDynamicObjectModel(oJsonElement);
         }
 
         #endregion
