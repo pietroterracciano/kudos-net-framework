@@ -33,16 +33,35 @@ namespace Kudos.Crypters.Hashes.Handlers
                 case EHashAlgorithm.SHA512:
                     try { _oHashAlgorithm = SHA512.Create(); } catch { }
                     break;
+                case EHashAlgorithm.MD5:
+                    try { _oHashAlgorithm = MD5.Create(); } catch { }
+                    break;
             }
 
             HashingPreferences = new HashingPreferencesModel();
         }
 
-        public Boolean CanHash()
+        private Boolean CanHash()
         {
             return
                 _oHashAlgorithm != null
                 && HashingPreferences.Encoding != null;
+        }
+
+        public Boolean Verify(Object o2Hash, String sHashed)
+        {
+            return
+                !String.IsNullOrWhiteSpace(sHashed)
+                    ? sHashed.Equals(Hash(o2Hash))
+                    : false;
+        }
+
+        public Boolean Verify(String s2Hash, String sHashed)
+        {
+            return
+                !String.IsNullOrWhiteSpace(sHashed)
+                    ? sHashed.Equals(Hash(s2Hash))
+                    : false;
         }
 
         public String Hash(Object oInput)
