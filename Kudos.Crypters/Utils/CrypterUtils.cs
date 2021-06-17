@@ -25,7 +25,7 @@ namespace Kudos.Crypters.Utils
         public static String AddSALT( String sInput, ASALTPreferencesModel mPreferences)
         {
             if (!CanDoSALTAction(ref sInput, ref mPreferences))
-                return null;
+                return sInput;
 
             StringBuilder oStringBuilder = new StringBuilder();
 
@@ -49,7 +49,7 @@ namespace Kudos.Crypters.Utils
         public static String RemoveSALT(String sOutput, ASALTPreferencesModel mPreferences)
         {
             if (!CanDoSALTAction(ref sOutput, ref mPreferences))
-                return null;
+                return sOutput;
 
             StringBuilder oStringBuilder = new StringBuilder();
 
