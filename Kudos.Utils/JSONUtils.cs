@@ -58,8 +58,11 @@ namespace Kudos.Utils
                 try
                 {
                     Type oObject = JsonSerializer.Deserialize<Type>(sJSON, oOptions);
-                    if(oObject != null && oObject.GetType() == typeof(JsonElement))
-                        return ToDynamicObject((dynamic)oObject);
+                    return
+                        oObject == null
+                        || oObject.GetType() != typeof(JsonElement)
+                            ? oObject
+                            : ToDynamicObject((dynamic)oObject);
                 }
                 catch
                 {
