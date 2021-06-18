@@ -52,6 +52,7 @@ namespace Kudos.Utils.Integers
         public static Int32 ParseFrom(Object oObject) { return ParseFrom(Int32NUtils.ParseFrom(oObject)); }
         public static Int32 ParseFrom(Enum oEnum) { return ParseFrom(Int32NUtils.ParseFrom(oEnum)); }
         public static Int32 ParseFrom(Int32? oInteger) { return oInteger != null ? oInteger.Value : 0; }
+        public static Int32 ParseFrom(Int64 oInteger) { return (Int64)oInteger; }
         public static Int32 ParseFrom(Single oSingle) { return (Int32)oSingle; }
         public static Int32 ParseFrom(Double oDouble) { return (Int32)oDouble; }
         public static Int32 ParseFrom(Decimal oDecimal) { return (Int32)oDecimal; }
