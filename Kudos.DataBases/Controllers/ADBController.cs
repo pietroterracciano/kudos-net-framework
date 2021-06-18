@@ -14,6 +14,7 @@ namespace Kudos.DataBases.Controllers
 {
     public abstract class ADBController<DBConfigModelType, DbCommandType, DbConnectionType, DbConnectionStringBuilderType> 
         where DBConfigModelType : ADBConfigModel, new()
+        where DbCommandType : DbCommand
         where DbConnectionType : DbConnection, new()
         where DbConnectionStringBuilderType : DbConnectionStringBuilder
     {
@@ -105,7 +106,7 @@ namespace Kudos.DataBases.Controllers
                 return false;
             }
 
-            _oCommand = _oConnection.CreateCommand();
+            _oCommand = _oConnection.CreateCommand() as DbCommandType;
 
             return true;
         }
@@ -403,7 +404,7 @@ namespace Kudos.DataBases.Controllers
                 _bIsExecutingCommand = false;
 
                 Int64
-                    iLastInsertedID =; ExecuteNonQueryCommand_GetLastInsertedID(_oCommand)
+                    iLastInsertedID = ExecuteNonQueryCommand_GetLastInsertedID(_oCommand);
 
                 return new DBNonQueryCommandResultModel(ref iLastInsertedID, ref iUpdatedRows, ref oStopwatch);
             }
