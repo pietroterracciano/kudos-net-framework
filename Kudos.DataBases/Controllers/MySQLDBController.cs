@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Kudos.DataBases.Controllers
 {
-    public class MySQLDBController : ADBController<MySQLDBConfigModel, MySqlConnection, MySqlConnectionStringBuilder>
+    public class MySQLDBController : ADBController<MySQLDBConfigModel, MySqlCommand, MySqlConnection, MySqlConnectionStringBuilder>
     {
         protected override MySqlConnectionStringBuilder OnConnectionStringBuilderCreation()
         {
@@ -39,6 +39,14 @@ namespace Kudos.DataBases.Controllers
                 //CacheServerProperties = ,
                 //TableCaching = ,
             };
+        }
+
+        protected override Int64 ExecuteNonQueryCommand_GetLastInsertedID(MySqlCommand oCommand)
+        {
+            return
+                oCommand != null
+                ? oCommand.LastInsertedId
+                : -1;
         }
     }
 }

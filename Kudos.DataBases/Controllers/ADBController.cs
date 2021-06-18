@@ -1,4 +1,5 @@
 ﻿using Kudos.DataBases.Models;
+
 using Kudos.DataBases.Models.Configs;
 using Kudos.DataBases.Models.Results;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.DataBases.Controllers
 {
-    public abstract class ADBController<DBConfigModelType, DbConnectionType, DbConnectionStringBuilderType> 
+    public abstract class ADBController<DBConfigModelType, DbCommandType, DbConnectionType, DbConnectionStringBuilderType> 
         where DBConfigModelType : ADBConfigModel, new()
         where DbConnectionType : DbConnection, new()
         where DbConnectionStringBuilderType : DbConnectionStringBuilder
@@ -19,7 +20,7 @@ namespace Kudos.DataBases.Controllers
         private DbConnectionType
             _oConnection;
 
-        private DbCommand
+        private DbCommandType
             _oCommand;
 
         private Boolean
@@ -392,16 +393,19 @@ namespace Kudos.DataBases.Controllers
                 Stopwatch
                     oStopwatch = new Stopwatch();
 
-                oStopwatch.Start();
                 _bIsExecutingCommand = true;
+                oStopwatch.Start();
 
                 Int32
                     iUpdatedRows = _oCommand.ExecuteNonQuery();
 
-                _bIsExecutingCommand = false;
                 oStopwatch.Stop();
+                _bIsExecutingCommand = false;
 
-                return new DBNonQueryCommandResultModel(ref iUpdatedRows, ref oStopwatch);
+                Int64
+                    iLastInsertedID =; ExecuteNonQueryCommand_GetLastInsertedID(_oCommand)
+
+                return new DBNonQueryCommandResultModel(ref iLastInsertedID, ref iUpdatedRows, ref oStopwatch);
             }
             catch (ExternalException oExternalException)
             {
@@ -414,6 +418,8 @@ namespace Kudos.DataBases.Controllers
 
             return null;
         }
+
+        protected abstract Int64 ExecuteNonQueryCommand_GetLastInsertedID(DbCommandType oDbCommand);
 
         #endregion
 

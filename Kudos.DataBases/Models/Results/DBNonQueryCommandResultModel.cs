@@ -13,8 +13,15 @@ namespace Kudos.DataBases.Models.Results
             private set;
         }
 
-        public DBNonQueryCommandResultModel(ref Int32 i32UpdatedRows, ref Stopwatch oStopwatch) : base(ref oStopwatch)
+        public Int64 LastInsertedID
         {
+            get;
+            private set;
+        }
+
+        public DBNonQueryCommandResultModel(ref Int64 i64LastInsertedID, ref Int32 i32UpdatedRows, ref Stopwatch oStopwatch) : base(ref oStopwatch)
+        {
+            LastInsertedID = i64LastInsertedID;
             UpdatedRows = i32UpdatedRows;
         }
     }
