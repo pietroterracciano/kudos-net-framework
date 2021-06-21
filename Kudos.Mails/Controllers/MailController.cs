@@ -28,31 +28,85 @@ namespace Kudos.Mails.Controllers
             _mConfig = new MConfigModel();
         }
 
-        #region public Boolean[] Send()
+        #region public Boolean[] Send
 
         /// <summary>Nullable</summary>
-        public Boolean[] Send(MMessageModel mMessage, Int32 i32SendNextAfterNMilliSeconds = 1000)
+        private Boolean[] Send(MMessageModel mMessage, Int32 i32SendNextAfterNMilliSeconds = 1000)
         {
-            Task<Boolean[]> oTask = SendAsync(mMessage, i32SendNextAfterNMilliSeconds);
-            oTask.Wait();
-            return oTask.Result;
+            return Send(new MMessageModel[] { mMessage }, i32SendNextAfterNMilliSeconds, null);
         }
 
-        /// <summary>Nullable</summary>
         public Boolean[] Send(List<MMessageModel> lMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
         {
-            Task<Boolean[]> oTask = SendAsync(lMessages, i32SendNextAfterNMilliSeconds);
-            if (oTask == null) return null;
-            oTask.Wait();
-            return oTask.Result;
+            return lMessages != null ? Send(lMessages.ToArray(), i32SendNextAfterNMilliSeconds, null) : null;
         }
 
         /// <summary>Nullable</summary>
-        public Boolean[] Send(MMessageModel[] aMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
+        private Boolean[] Send(MMessageModel[] aMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
         {
-            Task<Boolean[]> oTask = SendAsync(aMessages, i32SendNextAfterNMilliSeconds);
-            oTask.Wait();
-            return oTask.Result;
+            return Send(aMessages, i32SendNextAfterNMilliSeconds, null);
+        }
+
+        #endregion
+
+        #region private Boolean[] Send()
+
+        /// <summary>Nullable</summary>
+        private Boolean[] Send(MMessageModel[] aMessages, Int32 i32SendNextAfterNMilliSeconds = 1000, SendCompletedEventHandler oOnCompleted = null)
+        {
+            if (aMessages == null)
+                return null;
+
+            SmtpClient
+                oSmtpClient = _mConfig.ToSmtpClient();
+
+            if (oSmtpClient == null)
+                return null;
+
+            if (oOnCompleted != null)
+                oSmtpClient.SendCompleted += oOnCompleted;
+
+            Boolean[]
+                aResults = new Boolean[aMessages.Length];
+
+            ServicePointManager.ServerCertificateValidationCallback =
+                new RemoteCertificateValidationCallback(_RemoteCertificateValidationCallback);
+
+            for (Int32 i = 0; i < aMessages.Length; i++)
+            {
+                if (aMessages[i] == null)
+                {
+                    aResults[i] = false;
+                    continue;
+                }
+
+                MailMessage
+                    oMailMessage = aMessages[i].ToMailMessage();
+
+                if (oMailMessage == null)
+                {
+                    aResults[i] = false;
+                    continue;
+                }
+
+                try
+                {
+                    oSmtpClient.Send(oMailMessage);
+                    aResults[i] = true;
+                }
+                catch
+                {
+                    aResults[i] = false;
+                }
+
+                aMessages[i].FlushAttachments();
+                try { oMailMessage.Attachments.Dispose(); } catch { }
+
+                if (i < (aMessages.Length - 1))
+                    Thread.Sleep(i32SendNextAfterNMilliSeconds);
+            }
+
+            return aResults;
         }
 
         #endregion
@@ -88,59 +142,7 @@ namespace Kudos.Mails.Controllers
             return Task.Run<Boolean[]>(
                 () =>
                 {
-                    if (aMessages == null)
-                        return null;
-
-                    SmtpClient
-                        oSmtpClient = _mConfig.ToSmtpClient();
-
-                    if (oSmtpClient == null)
-                        return null;
-
-                    if (oOnCompleted != null)
-                        oSmtpClient.SendCompleted += oOnCompleted;
-
-                    Boolean[]
-                        aResults = new Boolean[aMessages.Length];
-
-                    ServicePointManager.ServerCertificateValidationCallback =
-                        new RemoteCertificateValidationCallback(_RemoteCertificateValidationCallback);
-
-                    for (Int32 i = 0; i < aMessages.Length; i++)
-                    {
-                        if (aMessages[i] == null)
-                        {
-                            aResults[i] = false;
-                            continue;
-                        }
-
-                        MailMessage
-                            oMailMessage = aMessages[i].ToMailMessage();
-
-                        if (oMailMessage == null)
-                        {
-                            aResults[i] = false;
-                            continue;
-                        }
-
-                        try
-                        {
-                            oSmtpClient.Send(oMailMessage);
-                            aResults[i] = true;
-                        }
-                        catch
-                        {
-                            aResults[i] = false;
-                        }
-
-                        aMessages[i].FlushAttachments();
-                        try { oMailMessage.Attachments.Dispose(); } catch { }
-
-                        if (i < (aMessages.Length - 1))
-                            Thread.Sleep(i32SendNextAfterNMilliSeconds);
-                    }
-
-                    return aResults;
+                    return Send(aMessages, i32SendNextAfterNMilliSeconds, oOnCompleted);
                 }
             );
 
