@@ -44,6 +44,16 @@ namespace Kudos.Types
                 );
         }
 
+        public Text Trim()
+        {
+            return
+                new Text(
+                    _sValue != null
+                    ? _sValue.Trim()
+                    : null
+                );
+        }
+
         public override Boolean Equals(Object oObject)
         {
             return

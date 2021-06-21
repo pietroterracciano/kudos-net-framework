@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
+    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
+  </ItemGroup>
+
+</Project>
