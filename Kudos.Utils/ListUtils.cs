@@ -13,6 +13,7 @@ namespace Kudos.Utils
         {
             return
                 lObjects != null
+                && i32Index > -1
                 && i32Index < lObjects.Count;
         }
     }

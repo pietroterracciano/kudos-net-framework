@@ -14,7 +14,7 @@ namespace Kudos.Mails.Models
         public Boolean IsMailValid()
         {
             return
-                !ValidateUtils.IsMail(Mail);
+                ValidateUtils.IsMail(Mail);
         }
 
         /// <summary>Nullable</summary>

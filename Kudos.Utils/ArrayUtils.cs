@@ -12,6 +12,7 @@ namespace Kudos.Utils
         {
             return
                 aObjects != null
+                && i32Index > -1
                 && i32Index < aObjects.Length;
         }
     }

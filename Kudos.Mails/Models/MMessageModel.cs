@@ -145,18 +145,18 @@ namespace Kudos.Mails.Models
 
         public void FlushBCCReceivers()
         {
-            FlushUsers(_lBCCReceivers, _dBCCReceiversMails2BCCReiceversIndexes);
+            FlushUsers(ref _lBCCReceivers, ref _dBCCReceiversMails2BCCReiceversIndexes);
         }
 
         #region public Boolean AddBCCReceiver
 
         public Boolean AddBCCReceiver(String sMail, String sName = null)
         {
-            return AddUser(_lBCCReceivers, _dBCCReceiversMails2BCCReiceversIndexes, sMail, sName);
+            return AddUser(ref _lBCCReceivers, ref _dBCCReceiversMails2BCCReiceversIndexes, sMail, sName);
         }
         private Boolean AddBCCReceiver(MUserModel mUser)
         {
-            return AddUser(_lBCCReceivers, _dBCCReceiversMails2BCCReiceversIndexes, mUser);
+            return AddUser(ref _lBCCReceivers, ref _dBCCReceiversMails2BCCReiceversIndexes, mUser);
         }
 
         #endregion
@@ -165,12 +165,12 @@ namespace Kudos.Mails.Models
 
         public Boolean RemoveBCCReceiver(String sMail)
         {
-            return RemoveUser(_lBCCReceivers, _dBCCReceiversMails2BCCReiceversIndexes, sMail);
+            return RemoveUser(ref _lBCCReceivers, ref _dBCCReceiversMails2BCCReiceversIndexes, sMail);
         }
 
         public Boolean RemoveBCCReceiver(MUserModel mUser)
         {
-            return RemoveUser(_lBCCReceivers, _dBCCReceiversMails2BCCReiceversIndexes, mUser);
+            return RemoveUser(ref _lBCCReceivers, ref _dBCCReceiversMails2BCCReiceversIndexes, mUser);
         }
 
         #endregion
@@ -186,18 +186,18 @@ namespace Kudos.Mails.Models
 
         public void FlushCCReceivers()
         {
-            FlushUsers(_lCCReceivers, _dCCReceiversMails2CCReiceversIndexes);
+            FlushUsers(ref _lCCReceivers, ref _dCCReceiversMails2CCReiceversIndexes);
         }
 
         #region public Boolean AddCCReceiver
 
         public Boolean AddCCReceiver(String sMail, String sName = null)
         {
-            return AddUser(_lCCReceivers, _dCCReceiversMails2CCReiceversIndexes, sMail, sName);
+            return AddUser(ref _lCCReceivers, ref _dCCReceiversMails2CCReiceversIndexes, sMail, sName);
         }
         private Boolean AddCCReceiver(MUserModel mUser)
         {
-            return AddUser(_lCCReceivers, _dCCReceiversMails2CCReiceversIndexes, mUser);
+            return AddUser(ref _lCCReceivers, ref _dCCReceiversMails2CCReiceversIndexes, mUser);
         }
 
         #endregion
@@ -206,12 +206,12 @@ namespace Kudos.Mails.Models
 
         public Boolean RemoveCCReceiver(String sMail)
         {
-            return RemoveUser(_lCCReceivers, _dCCReceiversMails2CCReiceversIndexes, sMail);
+            return RemoveUser(ref _lCCReceivers, ref _dCCReceiversMails2CCReiceversIndexes, sMail);
         }
 
         public Boolean RemoveCCReceiver(MUserModel mUser)
         {
-            return RemoveUser(_lCCReceivers, _dCCReceiversMails2CCReiceversIndexes, mUser);
+            return RemoveUser(ref _lCCReceivers, ref _dCCReceiversMails2CCReiceversIndexes, mUser);
         }
 
         #endregion
@@ -227,18 +227,18 @@ namespace Kudos.Mails.Models
 
         public void FlushReceivers()
         {
-            FlushUsers(_lReceivers, _dReceiversMails2ReiceversIndexes);
+            FlushUsers(ref _lReceivers, ref _dReceiversMails2ReiceversIndexes);
         }
 
         #region public Boolean AddReceiver
 
         public Boolean AddReceiver(String sMail, String sName = null)
         {
-            return AddUser(_lReceivers, _dReceiversMails2ReiceversIndexes, sMail, sName);
+            return AddUser(ref _lReceivers, ref _dReceiversMails2ReiceversIndexes, sMail, sName);
         }
         private Boolean AddReceiver(MUserModel mUser)
         {
-            return AddUser(_lReceivers, _dReceiversMails2ReiceversIndexes, mUser);
+            return AddUser(ref _lReceivers, ref _dReceiversMails2ReiceversIndexes, mUser);
         }
 
         #endregion
@@ -247,12 +247,12 @@ namespace Kudos.Mails.Models
 
         public Boolean RemoveReceiver(String sMail)
         {
-            return RemoveUser(_lReceivers, _dReceiversMails2ReiceversIndexes, sMail);
+            return RemoveUser(ref _lReceivers, ref _dReceiversMails2ReiceversIndexes, sMail);
         }
 
         public Boolean RemoveReceiver(MUserModel mUser)
         {
-            return RemoveUser(_lReceivers, _dReceiversMails2ReiceversIndexes, mUser);
+            return RemoveUser(ref _lReceivers, ref _dReceiversMails2ReiceversIndexes, mUser);
         }
 
         #endregion
@@ -268,18 +268,18 @@ namespace Kudos.Mails.Models
 
         public void FlushReplies2()
         {
-            FlushUsers(_lReplies2, _dReplies2Mails2Replies2Indexes);
+            FlushUsers(ref _lReplies2, ref _dReplies2Mails2Replies2Indexes);
         }
 
         #region public Boolean AddReceiver
 
         public Boolean AddReply2(String sMail, String sName = null)
         {
-            return AddUser(_lReplies2, _dReplies2Mails2Replies2Indexes, sMail, sName);
+            return AddUser(ref _lReplies2, ref _dReplies2Mails2Replies2Indexes, sMail, sName);
         }
         private Boolean AddReply2(MUserModel mUser)
         {
-            return AddUser(_lReplies2, _dReplies2Mails2Replies2Indexes, mUser);
+            return AddUser(ref _lReplies2, ref _dReplies2Mails2Replies2Indexes, mUser);
         }
 
         #endregion
@@ -288,12 +288,12 @@ namespace Kudos.Mails.Models
 
         public Boolean RemoveReply2(String sMail)
         {
-            return RemoveUser(_lReplies2, _dReplies2Mails2Replies2Indexes, sMail);
+            return RemoveUser(ref _lReplies2, ref _dReplies2Mails2Replies2Indexes, sMail);
         }
 
         public Boolean RemoveReply2(MUserModel mUser)
         {
-            return RemoveUser(_lReplies2, _dReplies2Mails2Replies2Indexes, mUser);
+            return RemoveUser(ref _lReplies2, ref _dReplies2Mails2Replies2Indexes, mUser);
         }
 
         #endregion
@@ -307,7 +307,7 @@ namespace Kudos.Mails.Models
 
         #region Users
 
-        private void FlushUsers(List<MUserModel> lUsers, Dictionary<String, Int32> dUMails2UIndexes)
+        private void FlushUsers(ref List<MUserModel> lUsers, ref Dictionary<String, Int32> dUMails2UIndexes)
         {
             lUsers = new List<MUserModel>();
             dUMails2UIndexes = new Dictionary<String, Int32>();
@@ -315,11 +315,11 @@ namespace Kudos.Mails.Models
 
         #region private Boolean AddUser
 
-        private Boolean AddUser(List<MUserModel> lUsers, Dictionary<String, Int32> dUMails2UIndexes, String sReceiverMail, String sReceiverName = null)
+        private Boolean AddUser(ref List<MUserModel> lUsers, ref Dictionary<String, Int32> dUMails2UIndexes, String sReceiverMail, String sReceiverName = null)
         {
-            return AddUser(lUsers, dUMails2UIndexes, new MUserModel() { Mail = sReceiverMail, Name = sReceiverName });
+            return AddUser(ref lUsers, ref dUMails2UIndexes, new MUserModel() { Mail = sReceiverMail, Name = sReceiverName });
         }
-        private Boolean AddUser(List<MUserModel> lUsers, Dictionary<String, Int32> dUMails2UIndexes, MUserModel mUser)
+        private Boolean AddUser(ref List<MUserModel> lUsers, ref Dictionary<String, Int32> dUMails2UIndexes, MUserModel mUser)
         {
             if (lUsers != null && dUMails2UIndexes != null && mUser != null && mUser.IsMailValid())
             {
@@ -327,7 +327,7 @@ namespace Kudos.Mails.Models
                     sUMail = mUser.Mail.ToLower().Trim();
 
                 Int32 iIndex;
-                if (dUMails2UIndexes.TryGetValue(sUMail, out iIndex) || iIndex > -1)
+                if (dUMails2UIndexes.TryGetValue(sUMail, out iIndex) || ListUtils.IsValidIndex(lUsers, iIndex))
                     return false;
 
                 lUsers.Add(mUser);
@@ -343,12 +343,12 @@ namespace Kudos.Mails.Models
 
         #region private Boolean RemoveUser()
 
-        private Boolean RemoveUser(List<MUserModel> lUsers, Dictionary<String, Int32> dUMails2UIndexes, String sUMail)
+        private Boolean RemoveUser(ref List<MUserModel> lUsers, ref Dictionary<String, Int32> dUMails2UIndexes, String sUMail)
         {
-            return RemoveUser(lUsers, dUMails2UIndexes, new MUserModel() { Mail = sUMail });
+            return RemoveUser(ref lUsers, ref dUMails2UIndexes, new MUserModel() { Mail = sUMail });
         }
 
-        private Boolean RemoveUser(List<MUserModel> lUsers, Dictionary<String, Int32> dUMails2UIndexes, MUserModel mUser)
+        private Boolean RemoveUser(ref List<MUserModel> lUsers, ref Dictionary<String, Int32> dUMails2UIndexes, MUserModel mUser)
         {
             if (lUsers != null && dUMails2UIndexes != null && mUser != null && mUser.IsMailValid())
             {

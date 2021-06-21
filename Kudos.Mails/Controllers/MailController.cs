@@ -14,9 +14,6 @@ namespace Kudos.Mails.Controllers
 { 
     public class MailController 
     {
-        private MConfigModel 
-            _mConfig;
-
         public MConfigModel Config
         {
             get;
@@ -25,15 +22,15 @@ namespace Kudos.Mails.Controllers
 
         public MailController()
         {
-            _mConfig = new MConfigModel();
+            Config = new MConfigModel();
         }
 
         #region public Boolean[] Send
 
         /// <summary>Nullable</summary>
-        private Boolean[] Send(MMessageModel mMessage, Int32 i32SendNextAfterNMilliSeconds = 1000)
+        public Boolean[] Send(MMessageModel mMessage)
         {
-            return Send(new MMessageModel[] { mMessage }, i32SendNextAfterNMilliSeconds, null);
+            return Send(new MMessageModel[] { mMessage }, 1000, null);
         }
 
         public Boolean[] Send(List<MMessageModel> lMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
@@ -42,7 +39,7 @@ namespace Kudos.Mails.Controllers
         }
 
         /// <summary>Nullable</summary>
-        private Boolean[] Send(MMessageModel[] aMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
+        public Boolean[] Send(MMessageModel[] aMessages, Int32 i32SendNextAfterNMilliSeconds = 1000)
         {
             return Send(aMessages, i32SendNextAfterNMilliSeconds, null);
         }
@@ -58,7 +55,7 @@ namespace Kudos.Mails.Controllers
                 return null;
 
             SmtpClient
-                oSmtpClient = _mConfig.ToSmtpClient();
+                oSmtpClient = Config.ToSmtpClient();
 
             if (oSmtpClient == null)
                 return null;
@@ -113,13 +110,9 @@ namespace Kudos.Mails.Controllers
 
         #region  public Task<Boolean[]> SendAsync()
 
-        public Task<Boolean[]> SendAsync(MMessageModel mMessage, SendCompletedEventHandler oOnCompleted = null, Int32 i32SendNextAfterNMilliSeconds = 1000)
+        public Task<Boolean[]> SendAsync(MMessageModel mMessage, SendCompletedEventHandler oOnCompleted = null)
         {
-            return SendAsync(new MMessageModel[] { mMessage }, i32SendNextAfterNMilliSeconds, oOnCompleted);
-        }
-        public Task<Boolean[]> SendAsync(MMessageModel mMessage, Int32 i32SendNextAfterNMilliSeconds = 1000, SendCompletedEventHandler oOnCompleted = null)
-        {
-            return SendAsync(new MMessageModel[] { mMessage }, i32SendNextAfterNMilliSeconds, oOnCompleted);
+            return SendAsync(new MMessageModel[] { mMessage }, 1000, oOnCompleted);
         }
 
         /// <summary>Nullable</summary>
