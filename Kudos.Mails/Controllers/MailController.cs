@@ -88,7 +88,10 @@ namespace Kudos.Mails.Controllers
 
                 try
                 {
-                    oSmtpClient.Send(oMailMessage);
+                    if (oOnCompleted != null)
+                        oSmtpClient.SendMailAsync(oMailMessage).Wait();
+                    else
+                        oSmtpClient.Send(oMailMessage);
                     aResults[i] = true;
                 }
                 catch
