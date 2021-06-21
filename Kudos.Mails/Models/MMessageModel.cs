@@ -38,11 +38,16 @@ namespace Kudos.Mails.Models
         private List<Attachment>
             _lAttachments;
 
-        public Text Message { get; set; }
-        public Text Object { get; set; }
+        public Boolean IsBodyHTML { get; set; }
+        public Encoding Encoding { get; set; }
+
+        public Text Subject { get; set; }
+        public Text Body { get; set; }
 
         public MMessageModel()
         {
+            Encoding = Encoding.UTF8;
+            IsBodyHTML = true;
             FlushReceivers();
             FlushBCCReceivers();
             FlushCCReceivers();
@@ -98,7 +103,7 @@ namespace Kudos.Mails.Models
                 String
                     sCleanedFile = sFile.ToLower().Trim();
                 Int32 iIndex;
-                if (_dAttachmentsFiles2AttachmentsIndexes.TryGetValue(sCleanedFile, out iIndex) || iIndex > -1)
+                if (_dAttachmentsFiles2AttachmentsIndexes.TryGetValue(sCleanedFile, out iIndex) || ListUtils.IsValidIndex(_lAttachments, iIndex))
                     return false;
 
                 try
@@ -390,17 +395,23 @@ namespace Kudos.Mails.Models
             if (oMASender == null)
                 return null;
 
+            Encoding
+                oEncoding = 
+                    Encoding != null 
+                        ? Encoding 
+                        : Encoding.ASCII; 
+
             MailMessage
                 oMailMessage = new MailMessage()
                 {
-                    IsBodyHtml = true,
+                    IsBodyHtml = IsBodyHTML,
 
-                    BodyEncoding = Encoding.UTF8,
-                    SubjectEncoding = Encoding.UTF8,
-                    HeadersEncoding = Encoding.UTF8,
+                    BodyEncoding = oEncoding,
+                    SubjectEncoding = oEncoding,
+                    HeadersEncoding = oEncoding,
 
-                    Body = Message,
-                    Subject = Object,
+                    Body = Body,
+                    Subject = Subject,
 
                     Sender = oMASender,
                     From = oMASender
