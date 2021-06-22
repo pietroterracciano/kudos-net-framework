@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kudos.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,14 +10,24 @@ namespace Kudos.Types
         private readonly String
             _sValue;
 
-        public Text(String sValue)
+        public int Length
         {
-            _sValue = sValue != null ? sValue : "";
+            get { return ToString().Length; }
         }
 
-        public override Int32 GetHashCode()
+        public Text(String sValue)
         {
-            return _sValue != null ? _sValue.GetHashCode() : "".GetHashCode();
+            _sValue = sValue;
+        }
+
+        public Text(Object oObject)
+        {
+            _sValue = StringUtils.ParseFrom(oObject);
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
         }
 
         public override String ToString()
@@ -27,47 +38,41 @@ namespace Kudos.Types
         public Text Replace(String sOld, String sNew)
         {
             return
-                new Text(
-                    _sValue != null
-                        ? _sValue.Replace(sOld, sNew)
-                        : null
-                );
+                new Text(ToString().Replace(sOld, sNew));
         }
 
         public Text ToLower()
         {
             return
-                new Text(
-                    _sValue != null
-                    ? _sValue.ToLower()
-                    : null
-                );
+                new Text(ToString().ToLower());
+        }
+
+        public Text ToUpper()
+        {
+            return
+                new Text(ToString().ToUpper());
         }
 
         public Text Trim()
         {
             return
-                new Text(
-                    _sValue != null
-                    ? _sValue.Trim()
-                    : null
-                );
+                new Text(ToString().Trim());
         }
 
         public override Boolean Equals(Object oObject)
         {
             return
-                oObject != null && oObject.GetType() == typeof(Text)
-                ? this == (Text)oObject
+                oObject != null 
+                && oObject.GetType() == typeof(Text)
+                ? Equals((Text)oObject)
                 : false;
         }
 
         public Boolean Equals(Text oText)
         {
             return
-                oText != null
-                && oText._sValue != null
-                && oText._sValue.Equals(_sValue);
+                this == oText
+                || ToString().Equals(oText.ToString());
         }
 
         public static implicit operator Text(String oString)
@@ -77,27 +82,17 @@ namespace Kudos.Types
 
         public static implicit operator String(Text oText)
         {
-            return oText != null && oText._sValue != null ? oText._sValue : "";
+            return oText.ToString();
         }
 
         public static Boolean operator ==(Text t0, Text t1)
         {
-            return
-                (
-                    ReferenceEquals(t0, null)
-                    && ReferenceEquals(t1, null)
-                )
-                ||
-                (
-                    !ReferenceEquals(t0, null)
-                    && !ReferenceEquals(t1, null)
-                    && ReferenceEquals(t0, t1)
-                );
+            return t0.Equals(t1);
         }
 
-        public static Boolean operator !=(Text a, Text b)
+        public static Boolean operator !=(Text t0, Text t1)
         {
-            return !(a == b);
+            return !(t0 == t1);
         }
     }
 }
