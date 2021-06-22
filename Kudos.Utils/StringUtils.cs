@@ -138,9 +138,9 @@ namespace Kudos.Utils
 
         #endregion
 
-        #region public static String ParseFrom()
+        #region public static String From()
 
-        public static String ParseFrom(Object oObject)
+        public static String From(Object oObject)
         {
             if (oObject != null)
                 try
@@ -155,13 +155,13 @@ namespace Kudos.Utils
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFrom(Byte[] aBytes)
+        public static String From(Byte[] aBytes)
         {
-            return ParseFrom(aBytes, Encoding.UTF8);
+            return From(aBytes, Encoding.UTF8);
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFrom(Byte[] aBytes, Encoding oEncoding)
+        public static String From(Byte[] aBytes, Encoding oEncoding)
         {
             if(aBytes != null && oEncoding != null)
                 try
@@ -174,6 +174,15 @@ namespace Kudos.Utils
                 }
 
             return null;
+        }
+
+        #endregion
+
+        #region public static ToNotNullable()
+
+        public static String ToNotNullable(String oString)
+        {
+            return oString != null ? oString : "";
         }
 
         #endregion
@@ -211,30 +220,30 @@ namespace Kudos.Utils
 
         #endregion
 
-        #region public static String ParseFromBase64()
+        #region public static String FromBase64()
 
         /// <summary>Nullable</summary>
-        public static String ParseFromBase64(String oString)
+        public static String FromBase64(String oString)
         {
-            return ParseFrom( BytesUtils.ParseFromBase64(oString) );
+            return From( BytesUtils.ParseFromBase64(oString) );
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFromBase64(String oString, Encoding oEncoding)
+        public static String FromBase64(String oString, Encoding oEncoding)
         {
-            return ParseFrom( BytesUtils.ParseFromBase64(oString), oEncoding);
+            return From( BytesUtils.ParseFromBase64(oString), oEncoding);
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFromBase64(Byte[] aBytes)
+        public static String FromBase64(Byte[] aBytes)
         {
-            return ParseFrom(BytesUtils.ParseFromBase64(aBytes));
+            return From(BytesUtils.ParseFromBase64(aBytes));
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFromBase64(Byte[] aBytes, Encoding oEncoding)
+        public static String FromBase64(Byte[] aBytes, Encoding oEncoding)
         {
-            return ParseFrom( BytesUtils.ParseFromBase64(aBytes, oEncoding), oEncoding );
+            return From( BytesUtils.ParseFromBase64(aBytes, oEncoding), oEncoding );
         }
 
         #endregion
@@ -271,16 +280,16 @@ namespace Kudos.Utils
 
         #endregion
 
-        #region public static String ParseFromHexadecimal()
+        #region public static String FromHexadecimal()
 
         /// <summary>Nullable</summary>
-        public static String ParseFromHexadecimal(String sHexadecimal)
+        public static String FromHexadecimal(String sHexadecimal)
         {
-            return ParseFromHexadecimal(sHexadecimal, Encoding.UTF8);
+            return FromHexadecimal(sHexadecimal, Encoding.UTF8);
         }
 
         /// <summary>Nullable</summary>
-        public static String ParseFromHexadecimal(String sHexadecimal, Encoding oEncoding)
+        public static String FromHexadecimal(String sHexadecimal, Encoding oEncoding)
         {
             if (sHexadecimal == null ||  oEncoding == null)
                 return null;
@@ -290,7 +299,7 @@ namespace Kudos.Utils
             for (Int32 i = 0; i < aBytes.Length; i++)
                 try { aBytes[i] = Convert.ToByte(sHexadecimal.Substring(i * 2, 2), 16); } catch { return null; }
 
-            return ParseFrom(aBytes, oEncoding);
+            return From(aBytes, oEncoding);
         }
 
         #endregion

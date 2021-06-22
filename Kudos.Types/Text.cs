@@ -22,7 +22,7 @@ namespace Kudos.Types
 
         public Text(Object oObject)
         {
-            _sValue = StringUtils.ParseFrom(oObject);
+            _sValue = StringUtils.From(oObject);
         }
 
         public override int GetHashCode()

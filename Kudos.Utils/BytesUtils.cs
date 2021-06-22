@@ -54,13 +54,13 @@ namespace Kudos.Utils
         /// <summary>Nullable</summary>
         public static Byte[] ParseFromBase64( Byte[] aBytes )
         {
-            return ParseFromBase64( StringUtils.ParseFrom(aBytes) );
+            return ParseFromBase64( StringUtils.From(aBytes) );
         }
 
         /// <summary>Nullable</summary>
         public static Byte[] ParseFromBase64( Byte[] aBytes, Encoding oEncoding )
         {
-            return ParseFromBase64( StringUtils.ParseFrom(aBytes, oEncoding) );
+            return ParseFromBase64( StringUtils.From(aBytes, oEncoding) );
         }
 
         /// <summary>Nullable</summary>

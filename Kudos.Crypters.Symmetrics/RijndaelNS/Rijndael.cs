@@ -210,7 +210,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             }
 
-            String sOutput = StringUtils.ParseFrom(aOutput, CryptionPreferences.Encoding);
+            String sOutput = StringUtils.From(aOutput, CryptionPreferences.Encoding);
             if (sOutput == null)
                 return default(ObjectType);
 
