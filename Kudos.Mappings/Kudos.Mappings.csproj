@@ -5,18 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\**" />
-    <Compile Remove="Datas\**" />
-    <Compile Remove="Helpers\**" />
-    <EmbeddedResource Remove="Controllers\**" />
-    <EmbeddedResource Remove="Datas\**" />
-    <EmbeddedResource Remove="Helpers\**" />
-    <None Remove="Controllers\**" />
-    <None Remove="Datas\**" />
-    <None Remove="Helpers\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,8 @@
 ﻿using Kudos.Mappings.Datas.Attributes;
-using Kudos.Mappings.Helpers;
+using Kudos.Mappings.Datas.Controllers;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,48 +11,62 @@ namespace Kudos.Mappings.Datas.Helpers
 {
     public static class MDataHelper
     {
-        private static MappingHelper
-            _hMapping = new MappingHelper();
+        private static MDataController
+            _oDataController = new MDataController();
 
-        private static readonly HashSet<String>
-            _hsAnalyzedClassesFullNames = new HashSet<String>();
+        #region public String GetTableName()
 
-        private static Dictionary<String, String>
-            _dClassesFullNames2Names = new Dictionary<String, String>(),
-            _dNames2ClassesFullNames = new Dictionary<String, String>();
-
-        private static Dictionary<String, Dictionary<String, String>>
-            _dClassesFullNames2MembersNames2Names = new Dictionary<String, Dictionary<String, String>>>(),
-            _dClassesFullNames2Names2MembersNames = new Dictionary<String, Dictionary<String, String>>>();
-
-        #region TableName
-
-        #region public static String GetDataTableTableName()
-
-        public static String GetDataTableTableName(Object oObject)
+        /// <summary>Nullable</summary>
+        public static String GetTableName(Object oObject)
         {
-            String sTableName;
-            _hMapping.(oObject, DATA_TABLE_MAPPING_ATTRIBUTE__FULL_NAME, out sTableName);
-            return sTableName;
+            return _oDataController.GetTableName(oObject);
         }
 
-        public static String GetDataTableTableName<ObjectType>()
+        /// <summary>Nullable</summary>
+        public static String GetTableName<ObjectType>()
         {
-            String sTableName;
-            GetTableName<ObjectType>(DATA_TABLE_MAPPING_ATTRIBUTE__FULL_NAME, out sTableName);
-            return sTableName;
+            return _oDataController.GetTableName<ObjectType>();
         }
 
-        public static String GetDataTableTableName(Type oType)
+        /// <summary>Nullable</summary>
+        public static String GetTableName(Type oType)
         {
-            String sTableName;
-            GetTableName(oType, DATA_TABLE_MAPPING_ATTRIBUTE__FULL_NAME, out sTableName);
-            return sTableName;
+            return _oDataController.GetTableName(oType);
         }
 
         #endregion
 
+        #region public String GetColumnsNames()
+
+        /// <summary>Nullable</summary>
+        public static Dictionary<String, String> GetColumnsNames(Object oObject)
+        {
+            return _oDataController.GetColumnsNames(oObject);
+        }
+
+        /// <summary>Nullable</summary>
+        public static Dictionary<String, String> GetColumnsNames<ObjectType>()
+        {
+            return _oDataController.GetColumnsNames<ObjectType>();
+        }
+
+        /// <summary>Nullable</summary>
+        public static Dictionary<String, String> GetColumnsNames(Type oType)
+        {
+            return _oDataController.GetColumnsNames(oType);
+        }
+
         #endregion
+
+        #region public ObjectType From<ObjectType>()
+
+        public static ObjectType From<ObjectType>(DataRow oDataRow) where ObjectType : new()
+        {
+            return _oDataController.From<ObjectType>(oDataRow);
+        }
+
+        #endregion
+
 
     }
 }
