@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Mappings.Datas.Controllers
 {
-    sealed class MDataController : MappingController<DataRow, DataTableMappingAttribute, DataRowMappingAttribute>
+    sealed class MDataController : MappingController<DataTable, DataRow, DataTableMappingAttribute, DataRowMappingAttribute>
     {
         protected override string GetRuleFromClassAttribute(DataTableMappingAttribute oCAttribute)
         {
@@ -79,6 +79,34 @@ namespace Kudos.Mappings.Datas.Controllers
 
         #endregion
 
+        #region public Dictionary<String,String> GetColumnName()
+
+        /// <summary>Nullable</summary>
+        public String GetColumnName(Object oObject, String sMName)
+        {
+            String oString;
+            ClassMemberName2Name(oObject, sMName, out oString);
+            return oString;
+        }
+
+        /// <summary>Nullable</summary>
+        public String GetColumnName<ObjectType>(String sMName)
+        {
+            String oString;
+            ClassMemberName2Name<ObjectType>(sMName, out oString);
+            return oString;
+        }
+
+        /// <summary>Nullable</summary>
+        public String GetColumnName(Type oType, String sMName)
+        {
+            String oString;
+            ClassMemberName2Name(oType, sMName, out oString);
+            return oString;
+        }
+
+        #endregion
+
         protected override ObjectType InternalFrom<ObjectType>(ref DataRow oDataRow)
         {
             Type oType = typeof(ObjectType);
@@ -128,5 +156,18 @@ namespace Kudos.Mappings.Datas.Controllers
             return oObject;
         }
 
+        protected override ObjectType[] InternalFrom<ObjectType>(ref DataTable oDataTable)
+        {
+            if (oDataTable == null)
+                return null;
+
+            List<ObjectType> 
+                lObjects = new List<ObjectType>();
+
+            for(int i=0; i<oDataTable.Rows.Count; i++)
+                lObjects.Add(InternalFrom<ObjectType>(oDataTable.Rows[i]));
+
+            return lObjects.ToArray();
+        }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Mappings.Controllers
 {
-    abstract class MappingController<FromObjectType, ClassAttributeType, MemberAttributeType>
+    abstract class MappingController<FromObjectsType, FromObjectType, ClassAttributeType, MemberAttributeType>
         where ClassAttributeType : Attribute
         where MemberAttributeType : Attribute
     {
@@ -238,29 +238,6 @@ namespace Kudos.Mappings.Controllers
 
         #endregion
 
-        //#region protected void Name2ClassFullName()
-
-        //protected void Name2ClassFullName(Type oType, String sName, out KeyValuePair<String, String> oKeyValuePair )
-        //{
-        //    if (!Analyze(ref oType))
-        //    {
-        //        oKeyValuePair = new KeyValuePair<String, String>();
-        //        return;
-        //    }
-
-        //    String sCFullName;
-        //    TryGetValueFromDictionary(
-        //        ref _dAttributesNames2Names2ClassFullNames, 
-        //        _tCAttribute.FullName, 
-        //        sName, 
-        //        out sCFullName
-        //    );
-
-        //    oKeyValuePair = new KeyValuePair<String, String>(sName, sCFullName);
-        //}
-
-        //#endregion
-
         #region protected void ClassMembersNames2Names()
 
         /// <summary>Nullable</summary>
@@ -295,6 +272,46 @@ namespace Kudos.Mappings.Controllers
                 _tMAttribute.FullName, 
                 oType.FullName, 
                 out oDictionary
+            );
+        }
+
+        #endregion
+
+        #region protected void ClassMemberName2Name()
+
+        /// <summary>Nullable</summary>
+        protected void ClassMemberName2Name(Object oObject, String sCMName, out String oString)
+        {
+            if (oObject == null)
+            {
+                oString = null;
+                return;
+            }
+
+            ClassMemberName2Name(oObject.GetType(), sCMName, out oString);
+        }
+
+        /// <summary>Nullable</summary>
+        protected void ClassMemberName2Name<ObjectType>(String sCMName, out String oString)
+        {
+            ClassMemberName2Name(typeof(ObjectType), sCMName, out oString);
+        }
+
+        /// <summary>Nullable</summary>
+        protected void ClassMemberName2Name(Type oType, String sCMName, out String oString)
+        {
+            if (!Analyze(ref oType))
+            {
+                oString = null;
+                return;
+            }
+
+            TryGetValueFromDictionary(
+                ref _dAttributes2ClassFullNames2MembersNames2Names,
+                _tMAttribute.FullName,
+                oType.FullName,
+                sCMName,
+                out oString
             );
         }
 
@@ -470,7 +487,7 @@ namespace Kudos.Mappings.Controllers
             return TryGetValueFromDictionary(ref dStrings2Strings, sKey1, out sValue);
         }
 
-        private static Boolean TryGetValueFromDictionary(
+        protected static Boolean TryGetValueFromDictionary(
             ref Dictionary<String, String> dStrings2Strings,
             String sKey,
             out String sValue
@@ -542,6 +559,17 @@ namespace Kudos.Mappings.Controllers
 
         //#endregion
 
+        public ObjectType[] From<ObjectType>(FromObjectsType oFromObject) where ObjectType : new()
+        {
+            Type
+                oType = typeof(ObjectType);
+
+            return
+                Analyze(ref oType)
+                    ? InternalFrom<ObjectType>(ref oFromObject)
+                    : null;
+        }
+
         public ObjectType From<ObjectType>(FromObjectType oFromObject) where ObjectType : new()
         {
             Type
@@ -553,6 +581,15 @@ namespace Kudos.Mappings.Controllers
                     : default(ObjectType);
         }
 
+        protected ObjectType[] InternalFrom<ObjectType>(FromObjectsType oFromObjects) where ObjectType : new()
+        {
+            return InternalFrom<ObjectType>(ref oFromObjects);
+        }
+        protected abstract ObjectType[] InternalFrom<ObjectType>(ref FromObjectsType oFromObject) where ObjectType : new();
+        protected ObjectType InternalFrom<ObjectType>(FromObjectType oFromObject) where ObjectType : new()
+        {
+            return InternalFrom<ObjectType>(ref oFromObject);
+        }
         protected abstract ObjectType InternalFrom<ObjectType>(ref FromObjectType oFromObject) where ObjectType : new();
     }
 }

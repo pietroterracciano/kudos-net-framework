@@ -58,6 +58,37 @@ namespace Kudos.Mappings.Datas.Helpers
 
         #endregion
 
+        #region public String GetColumnName()
+
+        /// <summary>Nullable</summary>
+        public static String GetColumnName(Object oObject, String sMName)
+        {
+            return _oDataController.GetColumnName(oObject, sMName);
+        }
+
+        /// <summary>Nullable</summary>
+        public static String GetColumnName<ObjectType>(String sMName)
+        {
+            return _oDataController.GetColumnName<ObjectType>(sMName);
+        }
+
+        /// <summary>Nullable</summary>
+        public static String GetColumnsNames(Type oType, String sMName)
+        {
+            return _oDataController.GetColumnName(oType, sMName);
+        }
+
+        #endregion
+
+        #region public ObjectType[] From<ObjectType>()
+
+        public static ObjectType[] From<ObjectType>(DataTable oDataTable) where ObjectType : new()
+        {
+            return _oDataController.From<ObjectType>(oDataTable);
+        }
+
+        #endregion
+
         #region public ObjectType From<ObjectType>()
 
         public static ObjectType From<ObjectType>(DataRow oDataRow) where ObjectType : new()
