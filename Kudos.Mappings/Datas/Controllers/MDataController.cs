@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Kudos.Mappings.Datas.Controllers
 {
     sealed class MDataController : MappingController<DataTable, DataRow, DataTableMappingAttribute, DataRowMappingAttribute>
-    {
+    { 
         protected override string GetRuleFromClassAttribute(DataTableMappingAttribute oCAttribute)
         {
             return oCAttribute.TableName;

@@ -73,7 +73,7 @@ namespace Kudos.Mappings.Datas.Helpers
         }
 
         /// <summary>Nullable</summary>
-        public static String GetColumnsNames(Type oType, String sMName)
+        public static String GetColumnName(Type oType, String sMName)
         {
             return _oDataController.GetColumnName(oType, sMName);
         }
