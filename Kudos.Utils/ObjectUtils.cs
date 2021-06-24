@@ -50,6 +50,30 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region public static MemberInfo[] GetMembers()
+
+        public static MemberInfo[] GetMembers(Type oType)
+        {
+            return GetMembers(oType, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        /// <summary>Nullable</summary>
+        public static MemberInfo[] GetMembers(Type oType, BindingFlags eBindingFlags)
+        {
+            if (oType != null)
+                try
+                {
+                    return oType.GetMembers(eBindingFlags);
+                }
+                catch
+                {
+                }
+
+            return null;
+        }
+
+        #endregion
+
         #region public static FieldInfo[] GetFields()
 
         /// <summary>Nullable</summary>

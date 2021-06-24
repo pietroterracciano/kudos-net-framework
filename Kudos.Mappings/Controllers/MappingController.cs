@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Mappings.Controllers
 {
-    abstract class MappingController<FromObjectsType, FromObjectType, ClassAttributeType, MemberAttributeType>
+    abstract class MappingController<FromObjectType, ClassAttributeType, MemberAttributeType>
         where ClassAttributeType : Attribute
         where MemberAttributeType : Attribute
     {
@@ -67,20 +67,6 @@ namespace Kudos.Mappings.Controllers
                 _dAttributesNames2Names2ClassFullNames[_tCAttribute.FullName] = new Dictionary<String, String>();
                 _dAttributesNames2Names2ClassFullNames[_tCAttribute.FullName][sCRule] = oType.FullName;
 
-                //PopulateDictionary(
-                //    ref _dAttributesNames2ClassFullNames2Names,
-                //    _tCAttribute.FullName,
-                //    oType.FullName,
-                //    sCRule
-                //);
-
-                //PopulateDictionary(
-                //    ref _dAttributesNames2Names2ClassFullNames,
-                //    _tCAttribute.FullName,
-                //    sCRule,
-                //    oType.FullName
-                //);
-
                 #endregion
 
                 List<MemberInfo>
@@ -91,13 +77,27 @@ namespace Kudos.Mappings.Controllers
                 lMembers = new List<MemberInfo>();
 
                 PropertyInfo[]
-                    aProperties = ObjectUtils.GetProperties(oType);
+                    aProperties = 
+                        ObjectUtils.GetProperties(
+                            oType, 
+                            BindingFlags.Public 
+                            | BindingFlags.Instance 
+                            | BindingFlags.Static
+                            | BindingFlags.SetProperty
+                        );
 
                 if (aProperties != null)
                     lMembers.AddRange(aProperties);
 
                 FieldInfo[]
-                    aFields = ObjectUtils.GetFields(oType);
+                    aFields = 
+                        ObjectUtils.GetFields(
+                            oType,
+                            BindingFlags.Public
+                            | BindingFlags.Instance
+                            | BindingFlags.Static
+                            | BindingFlags.SetField
+                        );
 
                 if (aFields != null)
                     lMembers.AddRange(aFields);
@@ -139,30 +139,6 @@ namespace Kudos.Mappings.Controllers
                     _dAttributes2ClassFullNames2MembersNames2Names[_tMAttribute.FullName][oType.FullName][lMembers[i].Name] = sMRule;
                     _dAttributes2ClassFullNames2Names2MembersNames[_tMAttribute.FullName][oType.FullName][sMRule] = lMembers[i].Name;
 
-                    //#region Popolo il Dictionary normale
-
-                    //PopulateDictionary(
-                    //    ref _dAttributes2ClassFullNames2MembersNames2Names,
-                    //    _tMAttribute.FullName,
-                    //    oType.FullName,
-                    //    lMembers[i].Name,
-                    //    sMRule
-                    //);
-
-                    //#endregion
-
-                    //#region Popolo il Dictionary inverso
-
-                    //PopulateDictionary(
-                    //    ref _dAttributes2ClassFullNames2Names2MembersNames,
-                    //    _tMAttribute.FullName,
-                    //    oType.FullName,
-                    //    sMRule,
-                    //    lMembers[i].Name
-                    //);
-
-                    //#endregion
-
                     #endregion
                 }
 
@@ -171,8 +147,6 @@ namespace Kudos.Mappings.Controllers
                 return true;
             }
         }
-
-        #region protected void GetClassMemberInfo()
 
         protected void GetClassMemberInfo(Type oType, String sCMName, out MemberInfo oMemberInfo)
         {
@@ -197,26 +171,6 @@ namespace Kudos.Mappings.Controllers
             dClassMembersNames2ClassMembersInfos.TryGetValue(sCMName, out oMemberInfo);
         }
 
-        #endregion
-
-        #region protected void ClassFullName2Name()
-
-        protected void ClassFullName2Name(Object oObject, out KeyValuePair<String, String> oKeyValuePair)
-        {
-            if(oObject == null)
-            {
-                oKeyValuePair = new KeyValuePair<String, String>();
-                return;
-            }
-
-            ClassFullName2Name(oObject.GetType(), out oKeyValuePair);
-        }
-
-        protected void ClassFullName2Name<ObjectType>(out KeyValuePair<String, String> oKeyValuePair)
-        {
-            ClassFullName2Name(typeof(ObjectType), out oKeyValuePair);
-        }
-
         protected void ClassFullName2Name(Type oType, out KeyValuePair<String, String> oKeyValuePair )
         {
             if (!Analyze(ref oType))
@@ -236,34 +190,17 @@ namespace Kudos.Mappings.Controllers
             oKeyValuePair = new KeyValuePair<String, String>(oType.FullName, sName);
         }
 
-        #endregion
-
-        #region protected void ClassMembersNames2Names()
-
         /// <summary>Nullable</summary>
-        protected void ClassMembersNames2Names(Object oObject, out Dictionary<String, String> oDictionary)
-        {
-            if (oObject == null)
-            {
-                oDictionary = null;
-                return;
-            }
-
-            ClassMembersNames2Names(oObject.GetType(), out oDictionary);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void ClassMembersNames2Names<ObjectType>(out Dictionary<String, String> oDictionary)
-        {
-            ClassMembersNames2Names(typeof(ObjectType), out oDictionary);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void ClassMembersNames2Names(Type oType, out Dictionary<String, String> oDictionary)
+        protected void ClassMembersNames2Names(
+            Type oType,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out Dictionary<String, String> dStrings2Strings
+        )
         {
             if (!Analyze(ref oType))
             {
-                oDictionary = null;
+                dStrings2Strings2Strings = null;
+                dStrings2Strings = null;
                 return;
             }
 
@@ -271,37 +208,53 @@ namespace Kudos.Mappings.Controllers
                 ref _dAttributes2ClassFullNames2MembersNames2Names, 
                 _tMAttribute.FullName, 
                 oType.FullName, 
-                out oDictionary
+                out dStrings2Strings2Strings,
+                out dStrings2Strings
             );
         }
 
-        #endregion
-
-        #region protected void ClassMemberName2Name()
+        #region protected void GetNameFromClassMemberName()
 
         /// <summary>Nullable</summary>
-        protected void ClassMemberName2Name(Object oObject, String sCMName, out String oString)
+        protected void GetNameFromClassMemberName(
+            Type oType,
+            String sCMName,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out String oString
+        )
         {
-            if (oObject == null)
+            if (!Analyze(ref oType))
             {
+                dStrings2Strings2Strings = null;
                 oString = null;
                 return;
             }
 
-            ClassMemberName2Name(oObject.GetType(), sCMName, out oString);
+            Dictionary<String, String> dStrings2Strings;
+            TryGetValueFromDictionary(
+                ref _dAttributes2ClassFullNames2MembersNames2Names,
+                _tMAttribute.FullName,
+                oType.FullName,
+                sCMName,
+                out dStrings2Strings2Strings,
+                out dStrings2Strings,
+                out oString
+            );
         }
 
         /// <summary>Nullable</summary>
-        protected void ClassMemberName2Name<ObjectType>(String sCMName, out String oString)
-        {
-            ClassMemberName2Name(typeof(ObjectType), sCMName, out oString);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void ClassMemberName2Name(Type oType, String sCMName, out String oString)
+        protected void GetNameFromClassMemberName(
+            Type oType, 
+            String sCMName,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out Dictionary<String, String> dStrings2Strings, 
+            out String oString
+        )
         {
             if (!Analyze(ref oType))
             {
+                dStrings2Strings2Strings = null;
+                dStrings2Strings = null;
                 oString = null;
                 return;
             }
@@ -311,90 +264,63 @@ namespace Kudos.Mappings.Controllers
                 _tMAttribute.FullName,
                 oType.FullName,
                 sCMName,
+                out dStrings2Strings2Strings,
+                out dStrings2Strings,
                 out oString
             );
         }
 
         #endregion
 
-        #region protected void Names2ClassMembersNames()
-
         /// <summary>Nullable</summary>
-        protected void Names2ClassMembersNames(Object oObject, out Dictionary<String, String> oDictionary)
-        {
-            if (oObject == null)
-            {
-                oDictionary = null;
-                return;
-            }
-
-            Names2ClassMembersNames(oObject.GetType(), out oDictionary);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void Names2ClassMembersNames<ObjectType>(out Dictionary<String, String> oDictionary)
-        {
-            Names2ClassMembersNames(typeof(ObjectType), out oDictionary);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void Names2ClassMembersNames(Type oType, out Dictionary<String, String> dStrings2Strings)
+        protected void Names2ClassMembersNames(
+            Type oType,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings, 
+            out Dictionary<String, String> dStrings2Strings
+        )
         {
             if (!Analyze(ref oType))
             {
+                dStrings2Strings2Strings = null;
                 dStrings2Strings = null;
                 return;
             }
 
             TryGetValueFromDictionary(
                 ref _dAttributes2ClassFullNames2Names2MembersNames,
-                _tCAttribute.FullName,
+                _tMAttribute.FullName,
                 oType.FullName,
+                out dStrings2Strings2Strings,
                 out dStrings2Strings
             );
         }
 
-        #endregion
-
-        #region protected void GetClassMemberName()
-
         /// <summary>Nullable</summary>
-        protected void GetClassMemberName(Object oObject, String sName, out String sCMemberName)
-        {
-            if (oObject == null)
-            {
-                sCMemberName = null;
-                return;
-            }
-
-            GetClassMemberName(oObject.GetType(), sName, out sCMemberName);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void GetClassMemberName<ObjectType>(String sName, out String sCMemberName)
-        {
-            GetClassMemberName(typeof(ObjectType), sName, out sCMemberName);
-        }
-
-        /// <summary>Nullable</summary>
-        protected void GetClassMemberName(Type oType, String sName, out String sCMemberName)
+        protected void GetClassMemberNameFromName(
+            Type oType, 
+            String sName, 
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out Dictionary<String, String> dStrings2Strings,
+            out String sCMemberName)
         {
             if (!Analyze(ref oType))
             {
+                dStrings2Strings2Strings = null;
+                dStrings2Strings = null;
                 sCMemberName = null;
                 return;
             }
 
             TryGetValueFromDictionary(
                 ref _dAttributes2ClassFullNames2Names2MembersNames,
-                _tCAttribute.FullName,
+                _tMAttribute.FullName,
                 oType.FullName,
                 sName,
+                out dStrings2Strings2Strings,
+                out dStrings2Strings,
                 out sCMemberName
             );
         }
-
-        #endregion
 
         #region private static Boolean TryGetValueFromDictionary()
 
@@ -415,11 +341,10 @@ namespace Kudos.Mappings.Controllers
             ref Dictionary<String, Dictionary<String, Dictionary<String, String>>> dStrings2Strings2Strings2Strings,
             String sKey0,
             String sKey1,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out Dictionary<String, String> dStrings2Strings
         )
         {
-            Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings;
-
             if (!TryGetValueFromDictionary(ref dStrings2Strings2Strings2Strings, sKey0, out dStrings2Strings2Strings))
             {
                 dStrings2Strings = null;
@@ -436,16 +361,18 @@ namespace Kudos.Mappings.Controllers
             String sKey0,
             String sKey1,
             String sKey2,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out Dictionary<String, String> dStrings2Strings,
             out String oString
         )
         {
-            Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings;
-            Dictionary<String, String> dStrings2Strings;
-
-            if (
-                !TryGetValueFromDictionary(ref dStrings2Strings2Strings2Strings, sKey0, out dStrings2Strings2Strings)
-                || !TryGetValueFromDictionary(ref dStrings2Strings2Strings, sKey1, out dStrings2Strings)
-            )
+            if (!TryGetValueFromDictionary(ref dStrings2Strings2Strings2Strings, sKey0, out dStrings2Strings2Strings))
+            {
+                dStrings2Strings = null;
+                oString = null;
+                return false;
+            }
+            else if(!TryGetValueFromDictionary(ref dStrings2Strings2Strings, sKey1, out dStrings2Strings))
             {
                 oString = null;
                 return false;
@@ -456,7 +383,7 @@ namespace Kudos.Mappings.Controllers
             return true;
         }
 
-        private static Boolean TryGetValueFromDictionary(
+        protected static Boolean TryGetValueFromDictionary(
             ref Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             String sKey,
             out Dictionary<String, String> dStrings2Strings
@@ -469,7 +396,7 @@ namespace Kudos.Mappings.Controllers
             return false;
         }
 
-        private static Boolean TryGetValueFromDictionary(
+        protected static Boolean TryGetValueFromDictionary(
             ref Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             String sKey0,
             String sKey1,
@@ -502,94 +429,5 @@ namespace Kudos.Mappings.Controllers
 
 
         #endregion
-
-        //#region private static Boolean PopulateDictionary()
-
-        //private static Boolean PopulateDictionary(
-        //    ref Dictionary<String, Dictionary<String, Dictionary<String, String>>> dStrings2Strings2Strings2Strings,
-        //    String sKey0,
-        //    String sKey1,
-        //    String sKey2,
-        //    String sValue
-        //)
-        //{
-        //    if (dStrings2Strings2Strings2Strings == null)
-        //        dStrings2Strings2Strings2Strings = new Dictionary<String, Dictionary<String, Dictionary<String, String>>>();
-
-        //    if (sKey0 == null)
-        //        return false;
-
-        //    Dictionary<String, Dictionary<String, String>>
-        //        dStrings2Strings2Strings;
-
-        //    if (
-        //        !dStrings2Strings2Strings2Strings.TryGetValue(sKey0, out dStrings2Strings2Strings)
-        //        || dStrings2Strings2Strings == null
-        //    )
-        //        dStrings2Strings2Strings2Strings[sKey0] = dStrings2Strings2Strings = new Dictionary<String, Dictionary<String, String>>();
-
-        //    return PopulateDictionary(ref dStrings2Strings2Strings, sKey1, sKey2, sValue);
-        //}
-
-        //private static Boolean PopulateDictionary(
-        //    ref Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
-        //    String sKey0,
-        //    String sKey1,
-        //    String sValue
-        //)
-        //{
-        //    if (dStrings2Strings2Strings == null)
-        //        dStrings2Strings2Strings = new Dictionary<String, Dictionary<String, String>>();
-
-        //    if (dStrings2Strings2Strings == null || sKey0 == null || sKey1 == null)
-        //        return false;
-
-        //    Dictionary<String, String>
-        //        dStrings2Strings;
-
-        //    if (
-        //        !dStrings2Strings2Strings.TryGetValue(sKey0, out dStrings2Strings)
-        //        || dStrings2Strings == null
-        //    )
-        //        dStrings2Strings2Strings[sKey0] = dStrings2Strings = new Dictionary<String, String>();
-
-        //    dStrings2Strings[sKey1] = sValue;
-        //    return true;
-        //}
-
-        //#endregion
-
-        public ObjectType[] From<ObjectType>(FromObjectsType oFromObject) where ObjectType : new()
-        {
-            Type
-                oType = typeof(ObjectType);
-
-            return
-                Analyze(ref oType)
-                    ? InternalFrom<ObjectType>(ref oFromObject)
-                    : null;
-        }
-
-        public ObjectType From<ObjectType>(FromObjectType oFromObject) where ObjectType : new()
-        {
-            Type
-                oType = typeof(ObjectType);
-
-            return
-                Analyze(ref oType)
-                    ? InternalFrom<ObjectType>(ref oFromObject)
-                    : default(ObjectType);
-        }
-
-        protected ObjectType[] InternalFrom<ObjectType>(FromObjectsType oFromObjects) where ObjectType : new()
-        {
-            return InternalFrom<ObjectType>(ref oFromObjects);
-        }
-        protected abstract ObjectType[] InternalFrom<ObjectType>(ref FromObjectsType oFromObject) where ObjectType : new();
-        protected ObjectType InternalFrom<ObjectType>(FromObjectType oFromObject) where ObjectType : new()
-        {
-            return InternalFrom<ObjectType>(ref oFromObject);
-        }
-        protected abstract ObjectType InternalFrom<ObjectType>(ref FromObjectType oFromObject) where ObjectType : new();
     }
 }
