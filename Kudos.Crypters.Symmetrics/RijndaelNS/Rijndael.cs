@@ -33,7 +33,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             return
                 CryptionPreferences.Encoding != null
-                    ? ImportKey(BytesUtils.ParseFrom(sKey, CryptionPreferences.Encoding))
+                    ? ImportKey(BytesUtils.From(sKey, CryptionPreferences.Encoding))
                     : false;
         }
 
@@ -113,11 +113,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             if (sInput == null) 
                 return null;
 
-            sInput = CrypterUtils.AddSALT(sInput, CryptionPreferences.SALT);
-            if (sInput == null)
-                return null;
-
-            Byte[] aInput = BytesUtils.ParseFrom(sInput, CryptionPreferences.Encoding );
+            Byte[] aInput = BytesUtils.From(CrypterUtils.AddSALT(sInput, CryptionPreferences.SALT), CryptionPreferences.Encoding );
             if (aInput == null)
                 return null;
 
@@ -169,7 +165,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             ApplyCryptionPreferences();
 
-            Byte[] aInputWithIV = BytesUtils.ParseFromBase64(sInput);
+            Byte[] aInputWithIV = BytesUtils.FromBase64(sInput);
             if (aInputWithIV == null)
                 return default(ObjectType);
 

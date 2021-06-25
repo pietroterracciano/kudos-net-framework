@@ -5,16 +5,16 @@ namespace Kudos.Utils
 {
     public static class BytesUtils
     {
-        #region public static Byte[] ParseFrom()
+        #region public static Byte[] From()
 
         /// <summary>Nullable</summary>
-        public static Byte[] ParseFrom(String oString)
+        public static Byte[] From(String oString)
         {
-            return ParseFrom(oString, Encoding.UTF8);
+            return From(oString, Encoding.UTF8);
         }
 
         /// <summary>Nullable</summary>
-        public static Byte[] ParseFrom(String oString, Encoding oEncoding)
+        public static Byte[] From(String oString, Encoding oEncoding)
         {
             if(oString != null && oEncoding != null)
                 try
@@ -38,33 +38,33 @@ namespace Kudos.Utils
         /// <summary>Nullable</summary>
         public static Byte[] ToBase64(Byte[] aBytes, Encoding oEncoding = null)
         {
-            return ParseFrom( StringUtils.ToBase64(aBytes), oEncoding);
+            return From( StringUtils.ToBase64(aBytes), oEncoding);
         }
 
         /// <summary>Nullable</summary>
         public static Byte[] ToBase64( String oString, Encoding oEncoding = null )
         {
-            return ParseFrom( StringUtils.ToBase64(oString, oEncoding), oEncoding );
+            return From( StringUtils.ToBase64(oString, oEncoding), oEncoding );
         }
 
         #endregion
 
-        #region public static Byte[] ParseFromBase64()
+        #region public static Byte[] FromBase64()
 
         /// <summary>Nullable</summary>
-        public static Byte[] ParseFromBase64( Byte[] aBytes )
+        public static Byte[] FromBase64( Byte[] aBytes )
         {
-            return ParseFromBase64( StringUtils.From(aBytes) );
+            return FromBase64( StringUtils.From(aBytes) );
         }
 
         /// <summary>Nullable</summary>
-        public static Byte[] ParseFromBase64( Byte[] aBytes, Encoding oEncoding )
+        public static Byte[] FromBase64( Byte[] aBytes, Encoding oEncoding )
         {
-            return ParseFromBase64( StringUtils.From(aBytes, oEncoding) );
+            return FromBase64( StringUtils.From(aBytes, oEncoding) );
         }
 
         /// <summary>Nullable</summary>
-        public static Byte[] ParseFromBase64(String oString)
+        public static Byte[] FromBase64(String oString)
         {
             if (oString != null)
                 try

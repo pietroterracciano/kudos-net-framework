@@ -1,5 +1,6 @@
 ﻿using Kudos.Crypters.Hashes.Enums;
 using Kudos.Crypters.Hashes.Models;
+using Kudos.Crypters.Utils;
 using Kudos.Utils;
 using System;
 using System.Security.Cryptography;
@@ -8,6 +9,9 @@ namespace Kudos.Crypters.Hashes.Handlers
 {
     public abstract class AHandler : IDisposable
     {
+        private static readonly String
+            SEPARATOR = nameof(AHandler) +"."+nameof(SEPARATOR);
+
         private HashAlgorithm
             _oHashAlgorithm;
 
@@ -77,8 +81,9 @@ namespace Kudos.Crypters.Hashes.Handlers
             if (sInput == null)
                 return null;
 
-            Byte[] aInput;
-            try { aInput = HashingPreferences.Encoding.GetBytes(sInput); } catch { return null; }
+            Byte[] aInput = BytesUtils.From(sInput);//CrypterUtils.AddSALT(sInput, HashingPreferences.SALT), HashingPreferences.Encoding);
+            if (aInput == null)
+                return null;
 
             Byte[] aOutput;
             try { aOutput = _oHashAlgorithm.ComputeHash(aInput); } catch { return null; }

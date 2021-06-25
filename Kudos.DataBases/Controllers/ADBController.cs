@@ -2,6 +2,7 @@
 
 using Kudos.DataBases.Models.Configs;
 using Kudos.DataBases.Models.Results;
+using Kudos.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -240,23 +241,24 @@ namespace Kudos.DataBases.Controllers
             return true;
         }
 
-        #region public Boolean ChangeDatabase()
+        #region public Boolean ChangeSchema()
 
-        public Boolean ChangeDatabase(String sDatabaseName)
+        public Boolean ChangeSchema(String sSchemaName)
         {
-            if (!IsConnectionOpened() || String.IsNullOrWhiteSpace(sDatabaseName))
+            if (!IsConnectionOpened() || String.IsNullOrWhiteSpace(sSchemaName))
                 return false;
 
-            _oConnection.ChangeDatabase(sDatabaseName);
+            _oConnection.ChangeDatabase(sSchemaName);
+            Config.SchemaName = sSchemaName;
             return true;
         }
 
-        public Task<Boolean> ChangeDatabaseAsync(String sDatabaseName)
+        public Task<Boolean> ChangeSchemaAsync(String sSchemaName)
         {
             return Task.Run(
                 delegate ()
                 {
-                    return ChangeDatabase(sDatabaseName);
+                    return ChangeSchema(sSchemaName);
                 }
             );
         }
@@ -497,6 +499,47 @@ namespace Kudos.DataBases.Controllers
             }
 
             return null;
+        }
+
+        #endregion
+
+        #region public String PrepareQueryColumnsNames()
+
+        public String PrepareQueryColumnsNames(String sTableName, String sFakeTableName = null)
+        {
+            return PrepareQueryColumnsNames(Config.SchemaName, sTableName, sFakeTableName);
+        }
+
+        public String PrepareQueryColumnsNames(String sSchemaName, String sTableName, String sFakeTableName = null)
+        {
+            if (
+                String.IsNullOrWhiteSpace(sSchemaName)
+                || String.IsNullOrWhiteSpace(sTableName)
+            )
+                return null;
+
+            if (String.IsNullOrWhiteSpace(sFakeTableName))
+                sFakeTableName = sTableName;
+
+            String sCommand =
+                "SELECT " +
+                    "GROUP_CONCAT( CONCAT('" + sFakeTableName + "', '.', COLUMN_NAME, ' AS " + sFakeTableName + "', COLUMN_NAME) SEPARATOR ',') AS PreparedQueryColumnsNames " +
+                "FROM " +
+                    "information_schema.columns " +
+                "WHERE " +
+                    "table_schema = \"" + sSchemaName + "\" " +
+                "AND " +
+                    "table_name = \"" + sTableName + "\" "; 
+
+            DBQueryCommandResultModel
+                mResult = ExecuteQueryCommand(sCommand, 1);
+
+            return
+                mResult != null
+                && mResult.Data != null
+                && mResult.Data.Rows.Count > 0
+                    ? StringUtils.From(mResult.Data.Rows[0]["PreparedQueryColumnsNames"])
+                    : null;
         }
 
         #endregion

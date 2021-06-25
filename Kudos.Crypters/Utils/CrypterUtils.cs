@@ -11,7 +11,7 @@ namespace Kudos.Crypters.Utils
     {
         #region SALT
 
-        private static Boolean CanDoSALTAction(ref String oString, ref ASALTPreferencesModel mPreferences)
+        private static Boolean CanDoSALTAction(ref String oString, ref SALTPreferencesModel mPreferences)
         {
             return
                 oString != null
@@ -22,7 +22,7 @@ namespace Kudos.Crypters.Utils
 
         #region public static String AddSALT()
 
-        public static String AddSALT( String sInput, ASALTPreferencesModel mPreferences)
+        public static String AddSALT( String sInput, SALTPreferencesModel mPreferences)
         {
             if (!CanDoSALTAction(ref sInput, ref mPreferences))
                 return sInput;
@@ -46,7 +46,7 @@ namespace Kudos.Crypters.Utils
 
         #region public static String RemoveSALT()
 
-        public static String RemoveSALT(String sOutput, ASALTPreferencesModel mPreferences)
+        public static String RemoveSALT(String sOutput, SALTPreferencesModel mPreferences)
         {
             if (!CanDoSALTAction(ref sOutput, ref mPreferences))
                 return sOutput;

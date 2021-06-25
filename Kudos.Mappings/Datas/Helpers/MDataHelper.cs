@@ -54,16 +54,19 @@ namespace Kudos.Mappings.Datas.Helpers
             return sName;
         }
 
+        /// <summary>Nullable</summary>
         public static ObjectType[] From<ObjectType>(DataTable oDataTable) where ObjectType : new()
         {
             return _oDataController.From<ObjectType>(ref oDataTable);
         }
 
+        /// <summary>Nullable</summary>
         public static ObjectType[] From<ObjectType>(DataRowCollection cDataRow) where ObjectType : new()
         {
             return _oDataController.From<ObjectType>(ref cDataRow);
         }
 
+        /// <summary>Nullable</summary>
         public static ObjectType From<ObjectType>(DataRow oDataRow) where ObjectType : new()
         {
             return _oDataController.From<ObjectType>(ref oDataRow);

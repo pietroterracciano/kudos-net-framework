@@ -194,13 +194,13 @@ namespace Kudos.Utils
         /// <summary>Nullable</summary>
         public static String ToBase64(String oString)
         {
-            return ToBase64( BytesUtils.ParseFrom(oString) );
+            return ToBase64( BytesUtils.From(oString) );
         }
 
         /// <summary>Nullable</summary>
         public static String ToBase64(String oString, Encoding oEncoding)
         {
-            return ToBase64( BytesUtils.ParseFrom(oString, oEncoding) );
+            return ToBase64( BytesUtils.From(oString, oEncoding) );
         }
 
         /// <summary>Nullable</summary>
@@ -225,25 +225,25 @@ namespace Kudos.Utils
         /// <summary>Nullable</summary>
         public static String FromBase64(String oString)
         {
-            return From( BytesUtils.ParseFromBase64(oString) );
+            return From( BytesUtils.FromBase64(oString) );
         }
 
         /// <summary>Nullable</summary>
         public static String FromBase64(String oString, Encoding oEncoding)
         {
-            return From( BytesUtils.ParseFromBase64(oString), oEncoding);
+            return From( BytesUtils.FromBase64(oString), oEncoding);
         }
 
         /// <summary>Nullable</summary>
         public static String FromBase64(Byte[] aBytes)
         {
-            return From(BytesUtils.ParseFromBase64(aBytes));
+            return From(BytesUtils.FromBase64(aBytes));
         }
 
         /// <summary>Nullable</summary>
         public static String FromBase64(Byte[] aBytes, Encoding oEncoding)
         {
-            return From( BytesUtils.ParseFromBase64(aBytes, oEncoding), oEncoding );
+            return From( BytesUtils.FromBase64(aBytes, oEncoding), oEncoding );
         }
 
         #endregion
@@ -266,7 +266,7 @@ namespace Kudos.Utils
             if (oString == null || oEncoding == null)
                 return null;
 
-            Byte[] aBytes = BytesUtils.ParseFrom(oString, oEncoding);
+            Byte[] aBytes = BytesUtils.From(oString, oEncoding);
             if (aBytes == null)
                 return null;
 

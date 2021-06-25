@@ -4,13 +4,13 @@ using System;
 
 namespace Kudos.Crypters.Models.SALTs
 {
-    public abstract class ASALTPreferencesModel
+    public class SALTPreferencesModel
     {
         public Int32 Splice { get; set; }
         public Int32 Length { get; set; }
         public ECharType CharType { get; set; }
 
-        public ASALTPreferencesModel()
+        public SALTPreferencesModel()
         {
             CharType = ECharType.StandardLowerCase | ECharType.StandardUpperCase | ECharType.Numeric;
         }
