@@ -80,7 +80,7 @@ namespace Kudos.Crypters.Symmetrics.Utils
             if (aBytesWithIV == null)
                 return;
 
-            BytesUtils.SplitIn2(aBytesWithIV, aBytesWithIV.Length - 16, out aIV, out aBytes);
+            BytesUtils.SplitIn2(aBytesWithIV, aBytesWithIV.Length - 16, out aBytes, out aIV);
         }
 
         #endregion
