@@ -11,13 +11,7 @@ namespace Kudos.Utils
         #region public static String Random()
 
         /// <summary>Nullable</summary>
-        public static String Random(Int32 i32Length)
-        {
-            return Random(i32Length, ECharType.StandardLowerCase | ECharType.StandardUpperCase | ECharType.Numeric);
-        }
-
-        /// <summary>Nullable</summary>
-        public static String Random(Int32 i32Length, ECharType eCType)
+        public static String Random(Int32 i32Length, ECharType eCType = ECharType.StandardLowerCase | ECharType.StandardUpperCase | ECharType.Numeric)
         {
             if (i32Length < 1)
                 return null;
@@ -187,6 +181,69 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region Base16
+
+        #region public static String ToBase16()
+
+        /// <summary>Nullable</summary>
+        public static String ToBase16(String oString)
+        {
+            return ToBase16(BytesUtils.From(oString));
+        }
+
+        /// <summary>Nullable</summary>
+        public static String ToBase16(String oString, Encoding oEncoding)
+        {
+            return ToBase16(BytesUtils.From(oString, oEncoding));
+        }
+
+        /// <summary>Nullable</summary>
+        public static String ToBase16(Byte[] aBytes)
+        {
+            if (aBytes != null)
+                try
+                {
+                    return Convert.ToHexString(aBytes);
+                }
+                catch
+                {
+                }
+
+            return null;
+        }
+
+        #endregion
+
+        #region public static String FromBase16()
+
+        /// <summary>Nullable</summary>
+        public static String FromBase16(String oString)
+        {
+            return From(BytesUtils.FromBase16(oString));
+        }
+
+        /// <summary>Nullable</summary>
+        public static String FromBase16(String oString, Encoding oEncoding)
+        {
+            return From(BytesUtils.FromBase16(oString), oEncoding);
+        }
+
+        /// <summary>Nullable</summary>
+        public static String FromBase16(Byte[] aBytes)
+        {
+            return From(BytesUtils.FromBase16(aBytes));
+        }
+
+        /// <summary>Nullable</summary>
+        public static String FromBase16(Byte[] aBytes, Encoding oEncoding)
+        {
+            return From(BytesUtils.FromBase16(aBytes, oEncoding), oEncoding);
+        }
+
+        #endregion
+
+        #endregion
+
         #region Base64
 
         #region public static String ToBase64()
@@ -244,62 +301,6 @@ namespace Kudos.Utils
         public static String FromBase64(Byte[] aBytes, Encoding oEncoding)
         {
             return From( BytesUtils.FromBase64(aBytes, oEncoding), oEncoding );
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Hexadecimal
-
-        #region public static String ToHexadecimal()
-
-        /// <summary>Nullable</summary>
-        public static String ToHexadecimal(String oString)
-        {
-            return ToHexadecimal(oString, Encoding.UTF8);
-        }
-
-        /// <summary>Nullable</summary>
-        public static String ToHexadecimal(String oString, Encoding oEncoding)
-        {
-            if (oString == null || oEncoding == null)
-                return null;
-
-            Byte[] aBytes = BytesUtils.From(oString, oEncoding);
-            if (aBytes == null)
-                return null;
-
-            StringBuilder oStringBuilder = new StringBuilder();
-
-            for (int i=0; i<aBytes.Length; i++)
-                try { oStringBuilder.Append(aBytes[i].ToString("X2")); } catch { return null; }
-
-            return oStringBuilder.ToString();
-        }
-
-        #endregion
-
-        #region public static String FromHexadecimal()
-
-        /// <summary>Nullable</summary>
-        public static String FromHexadecimal(String sHexadecimal)
-        {
-            return FromHexadecimal(sHexadecimal, Encoding.UTF8);
-        }
-
-        /// <summary>Nullable</summary>
-        public static String FromHexadecimal(String sHexadecimal, Encoding oEncoding)
-        {
-            if (sHexadecimal == null ||  oEncoding == null)
-                return null;
-
-            Byte[] aBytes = new Byte[sHexadecimal.Length / 2];
-
-            for (Int32 i = 0; i < aBytes.Length; i++)
-                try { aBytes[i] = Convert.ToByte(sHexadecimal.Substring(i * 2, 2), 16); } catch { return null; }
-
-            return From(aBytes, oEncoding);
         }
 
         #endregion

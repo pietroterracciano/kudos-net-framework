@@ -1,6 +1,7 @@
 ﻿using Kudos.Crypters.Symmetrics.RijndaelNS.Enums;
 using Kudos.Crypters.Symmetrics.RijndaelNS.Models.Cryptions;
-using Kudos.Crypters.Utils;
+using Kudos.Crypters.Symmetrics.Utils;
+using Kudos.Enums;
 using Kudos.Utils;
 using System;
 using System.Security.Cryptography;
@@ -16,7 +17,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
         private Boolean
             _bIsRijndaelReadyToEncryptDecrypt;
 
-        public RCryptionPreferencesModel CryptionPreferences
+        public RCrypterPreferencesModel Preferences
         {
             get; private set;
         }
@@ -24,7 +25,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
         public Rijndael()
         {
             _oRijndaelManaged = new RijndaelManaged();
-            CryptionPreferences = new RCryptionPreferencesModel();
+            Preferences = new RCrypterPreferencesModel();
         }
 
         public Boolean ImportKey(String sKey)
@@ -32,8 +33,8 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             _bIsRijndaelReadyToEncryptDecrypt = false;
 
             return
-                CryptionPreferences.Encoding != null
-                    ? ImportKey(BytesUtils.From(sKey, CryptionPreferences.Encoding))
+                Preferences.Encoding != null
+                    ? ImportKey(BytesUtils.From(sKey, Preferences.Encoding))
                     : false;
         }
 
@@ -49,7 +50,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             try
             {
-                _oRijndaelManaged.KeySize = EnumUtils.GetValue(CryptionPreferences.KeySize);
+                _oRijndaelManaged.KeySize = EnumUtils.GetValue(Preferences.KeySize);
             }
             catch
             {
@@ -89,17 +90,17 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             }
         }
 
-        private void ApplyCryptionPreferences()
+        private void ApplyPreferences()
         {
-            _oRijndaelManaged.Mode = CryptionPreferences.CipherMode;
-            _oRijndaelManaged.Padding = CryptionPreferences.PaddingMode;
+            _oRijndaelManaged.Mode = Preferences.CipherMode;
+            _oRijndaelManaged.Padding = Preferences.PaddingMode;
         }
 
         private Boolean CanEncryptDecrypt()
         {
             return
                 _bIsRijndaelReadyToEncryptDecrypt
-                && CryptionPreferences.Encoding != null;
+                && Preferences.Encoding != null;
         }
 
         public String Encrypt(Object oInput)
@@ -107,13 +108,14 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             if (!CanEncryptDecrypt())
                 return null;
 
-            ApplyCryptionPreferences();
+            ApplyPreferences();
  
             String sInput = JSONUtils.Serialize(oInput);
-            if (sInput == null) 
-                return null;
 
-            Byte[] aInput = BytesUtils.From(CrypterUtils.AddSALT(sInput, CryptionPreferences.SALT), CryptionPreferences.Encoding );
+            if (Preferences.SALTPreferences.Use)
+                sInput = CSymmetricUtils.DirtyWithSALT(sInput, Preferences.SALTPreferences);
+
+            Byte[] aInput = BytesUtils.From(sInput, Preferences.Encoding);
             if (aInput == null)
                 return null;
 
@@ -151,11 +153,11 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             if (aOutput == null)
                 return null;
 
-            aOutput = CrypterUtils.AppendIV(aOutput, _oRijndaelManaged.IV);
+            aOutput = CSymmetricUtils.AppendIV(aOutput, _oRijndaelManaged.IV);
 
-            return aOutput != null
+            return Preferences.BinaryEncoding == EBinaryEncoding.Base64
                 ? StringUtils.ToBase64(aOutput)
-                : null;
+                : StringUtils.ToBase16(aOutput);
         }
 
         public ObjectType Decrypt<ObjectType>(String sInput)
@@ -163,14 +165,18 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
             if (!CanEncryptDecrypt())
                 return default(ObjectType);
 
-            ApplyCryptionPreferences();
+            ApplyPreferences();
 
-            Byte[] aInputWithIV = BytesUtils.FromBase64(sInput);
+            Byte[] aInputWithIV =
+                Preferences.BinaryEncoding == EBinaryEncoding.Base64
+                    ? BytesUtils.FromBase64(sInput)
+                    : BytesUtils.FromBase16(sInput);
+
             if (aInputWithIV == null)
                 return default(ObjectType);
 
             Byte[] aIV, aInput;
-            CrypterUtils.RemoveIV(aInputWithIV, out aInput, out aIV);
+            CSymmetricUtils.RemoveIV(aInputWithIV, out aInput, out aIV);
             if (aIV == null || aInput == null)
                 return default(ObjectType);
 
@@ -206,11 +212,12 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             }
 
-            String sOutput = StringUtils.From(aOutput, CryptionPreferences.Encoding);
+            String sOutput = StringUtils.From(aOutput, Preferences.Encoding);
             if (sOutput == null)
                 return default(ObjectType);
 
-            sOutput = CrypterUtils.RemoveSALT(sOutput, CryptionPreferences.SALT);
+            if (Preferences.SALTPreferences.Use)
+                sOutput = CSymmetricUtils.CleanSALT(sOutput, Preferences.SALTPreferences);
 
             return sOutput != null
                 ? JSONUtils.Deserialize<ObjectType>(sOutput)

@@ -1,9 +1,13 @@
 ﻿using Kudos.Crypters.Hashes.Enums;
 using Kudos.Crypters.Hashes.Models;
+using Kudos.Crypters.Hashes.Utils;
 using Kudos.Crypters.Utils;
+using Kudos.Enums;
 using Kudos.Utils;
 using System;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Kudos.Crypters.Hashes.Handlers
 {
@@ -15,7 +19,7 @@ namespace Kudos.Crypters.Hashes.Handlers
         private HashAlgorithm
             _oHashAlgorithm;
 
-        public HashingPreferencesModel HashingPreferences
+        public HashingPreferencesModel Preferences
         {
             get;
             private set;
@@ -42,56 +46,83 @@ namespace Kudos.Crypters.Hashes.Handlers
                     break;
             }
 
-            HashingPreferences = new HashingPreferencesModel();
+            Preferences = new HashingPreferencesModel();
         }
 
         private Boolean CanHash()
         {
             return
                 _oHashAlgorithm != null
-                && HashingPreferences.Encoding != null;
+                && Preferences.Encoding != null;
         }
 
         public Boolean Verify(Object o2Hash, String sHashed)
         {
-            return
-                !String.IsNullOrWhiteSpace(sHashed)
-                    ? sHashed.Equals(Hash(o2Hash))
-                    : false;
-        }
+            if (sHashed == null)
+                return false;
 
-        public Boolean Verify(String s2Hash, String sHashed)
-        {
-            return
-                !String.IsNullOrWhiteSpace(sHashed)
-                    ? sHashed.Equals(Hash(s2Hash))
-                    : false;
+            Byte[]
+                aObjectHashed =
+                    Hash(
+                        o2Hash,
+                        CHashUtils.ExtrapolateSALT(sHashed)
+                    );
+
+            if (aObjectHashed == null)
+                return false;
+
+            return aObjectHashed.SequenceEqual(BytesUtils.From(sHashed, Preferences.Encoding));
         }
 
         public String Hash(Object oInput)
         {
-            if (
-                !CanHash()
-                || oInput == null
-            )
-                return null;
+            Byte[]
+                aSALT;
 
-            String sInput = JSONUtils.Serialize(oInput);
+            if (Preferences.SALTPreferences.Use)
+                aSALT = CrypterUtils.GenerateSALT(Preferences.SALTPreferences);
+            else
+                aSALT = null;
 
-            if (sInput == null)
-                return null;
-
-            Byte[] aInput = BytesUtils.From(sInput);//CrypterUtils.AddSALT(sInput, HashingPreferences.SALT), HashingPreferences.Encoding);
-            if (aInput == null)
-                return null;
-
-            Byte[] aOutput;
-            try { aOutput = _oHashAlgorithm.ComputeHash(aInput); } catch { return null; }
+            Byte[]
+                aOutput = 
+                    Hash(
+                        oInput, 
+                        aSALT
+                    );
 
             if (aOutput == null)
                 return null;
 
-            try { return StringUtils.ToBase64(aOutput); } catch { return null; }
+            return
+                CHashUtils.AppendSALT(
+                    Preferences.BinaryEncoding == EBinaryEncoding.Base64
+                        ? StringUtils.ToBase64(aOutput)
+                        : StringUtils.ToBase16(aOutput),
+                    StringUtils.From(aSALT)
+                );
+        }
+
+        private Byte[] Hash(Object oInput, String sSALT)
+        {
+            return
+                Hash(
+                    oInput,
+                    BytesUtils.From(sSALT, Preferences.Encoding)
+                );
+        }
+
+        private Byte[] Hash(Object oInput, Byte[] aSALT)
+        {
+            return Hash(BytesUtils.From(JSONUtils.Serialize(oInput)), aSALT);
+        }
+
+        private Byte[] Hash(Byte[] aInput, Byte[] aSALT = null)
+        {
+            if (!CanHash() || aInput == null)
+                return null;
+
+            try { return _oHashAlgorithm.ComputeHash(CHashUtils.AppendSALT(aInput, aSALT)); } catch { return null; }
         }
 
 

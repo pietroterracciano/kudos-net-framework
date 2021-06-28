@@ -61,11 +61,20 @@ namespace Kudos.Mappings.Controllers
                             ? GetRuleFromClassAttribute(oCAttribute)
                             : oType.FullName;
 
-                _dAttributesNames2ClassFullNames2Names[_tCAttribute.FullName] = new Dictionary<String, String>();
-                _dAttributesNames2ClassFullNames2Names[_tCAttribute.FullName][oType.FullName] = sCRule;
+                Dictionary<String, String> dClassFullNames2Names;
 
-                _dAttributesNames2Names2ClassFullNames[_tCAttribute.FullName] = new Dictionary<String, String>();
-                _dAttributesNames2Names2ClassFullNames[_tCAttribute.FullName][sCRule] = oType.FullName;
+                if (
+                    !TryGetValueFromDictionary(
+                        ref _dAttributesNames2ClassFullNames2Names,
+                        _tCAttribute.FullName,
+                        out dClassFullNames2Names
+                    )
+                    || dClassFullNames2Names == null
+                )
+                    _dAttributesNames2ClassFullNames2Names[_tCAttribute.FullName] = dClassFullNames2Names = new Dictionary<String, String>();
+
+                dClassFullNames2Names[oType.FullName] = sCRule;
+                dClassFullNames2Names[sCRule] = oType.FullName;
 
                 #endregion
 
@@ -108,11 +117,33 @@ namespace Kudos.Mappings.Controllers
 
                 _dClassFullNames2MembersNames2MembersInfos[oType.FullName] = new Dictionary<String, MemberInfo>();
 
-                _dAttributes2ClassFullNames2MembersNames2Names[_tMAttribute.FullName] = new Dictionary<String, Dictionary<String, String>>();
-                _dAttributes2ClassFullNames2MembersNames2Names[_tMAttribute.FullName][oType.FullName] = new Dictionary<String, String>();
+                Dictionary<String, Dictionary<String, String>> dClassFullNames2MembersNames2Names;
 
-                _dAttributes2ClassFullNames2Names2MembersNames[_tMAttribute.FullName] = new Dictionary<String, Dictionary<String, String>>();
-                _dAttributes2ClassFullNames2Names2MembersNames[_tMAttribute.FullName][oType.FullName] = new Dictionary<String, String>();
+                if (
+                    !TryGetValueFromDictionary(
+                        ref _dAttributes2ClassFullNames2MembersNames2Names,
+                        _tMAttribute.FullName,
+                        out dClassFullNames2MembersNames2Names
+                    )
+                    || dClassFullNames2MembersNames2Names == null
+                )
+                    _dAttributes2ClassFullNames2MembersNames2Names[_tMAttribute.FullName] = dClassFullNames2MembersNames2Names = new Dictionary<String, Dictionary<String,String>>();
+
+                dClassFullNames2MembersNames2Names[oType.FullName] = new Dictionary<String, String>();
+
+                Dictionary<String, Dictionary<String, String>> dClassFullNames2Names2MembersNames;
+
+                if (
+                    !TryGetValueFromDictionary(
+                        ref _dAttributes2ClassFullNames2Names2MembersNames,
+                        _tMAttribute.FullName,
+                        out dClassFullNames2Names2MembersNames
+                    )
+                    || dClassFullNames2Names2MembersNames == null
+                )
+                    _dAttributes2ClassFullNames2Names2MembersNames[_tMAttribute.FullName] = dClassFullNames2Names2MembersNames = new Dictionary<String, Dictionary<String, String>>();
+
+                dClassFullNames2Names2MembersNames[oType.FullName] = new Dictionary<String, String>();
 
                 for (int i = 0; i < lMembers.Count; i++)
                 {
