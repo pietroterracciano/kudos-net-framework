@@ -74,7 +74,13 @@ namespace Kudos.Crypters.Symmetrics.Utils
 
         public static void RemoveIV(Byte[] aBytesWithIV, out Byte[] aBytes, out Byte[] aIV)
         {
-            BytesUtils.SplitIn2(aBytesWithIV, 16, out aBytes, out aIV);
+            aBytes = null;
+            aIV = null;
+
+            if (aBytesWithIV == null)
+                return;
+
+            BytesUtils.SplitIn2(aBytesWithIV, aBytesWithIV.Length - 16, out aIV, out aBytes);
         }
 
         #endregion

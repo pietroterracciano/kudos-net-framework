@@ -10,7 +10,7 @@ namespace Kudos.Crypters.Hashes.Utils
 {
     static class CHashUtils
     {
-        public static Byte[] AppendSALT(Byte[] aInput, Byte[] aSALT)
+        public static Byte[] PrependSALT(Byte[] aInput, Byte[] aSALT)
         {
             return BytesUtils.Append(aSALT, aInput);
         }
