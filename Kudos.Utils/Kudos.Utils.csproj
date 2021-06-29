@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Defines\Kudos.Defines.csproj" />
     <ProjectReference Include="..\Kudos.Enums\Kudos.Enums.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
   </ItemGroup>

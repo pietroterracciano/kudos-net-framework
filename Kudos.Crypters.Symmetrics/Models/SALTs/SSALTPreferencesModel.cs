@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kudos.Crypters.Symmetrics.RijndaelNS.Models.SALTs
+namespace Kudos.Crypters.Symmetrics.Models.SALTs
 {
-    public class RSALTPreferencesModel : SALTPreferencesModel
+    public class SSALTPreferencesModel : SALTPreferencesModel
     {
         public Int32 Splice { get; set; }
     }

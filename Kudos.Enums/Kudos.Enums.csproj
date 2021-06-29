@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kudos.Constants\Kudos.Constants.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
   </ItemGroup>
 

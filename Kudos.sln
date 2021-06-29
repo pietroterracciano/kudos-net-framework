@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Utils", "Kudos.Utils\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Enums", "Kudos.Enums\Kudos.Enums.csproj", "{C88213A3-04CE-461B-8F05-BADC36F73E64}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Defines", "Kudos.Defines\Kudos.Defines.csproj", "{48AB3E88-B69E-43D2-9F04-1360680E7A1C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Crypters", "Kudos.Crypters\Kudos.Crypters.csproj", "{5371F8C8-592E-4AB2-9F65-D37058315215}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Crypters.Symmetrics", "Kudos.Crypters.Symmetrics\Kudos.Crypters.Symmetrics.csproj", "{2F1AAC8B-A181-45A4-A16A-76F2961D6CF1}"
@@ -24,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Mails", "Kudos.Mails\Kudos.Mails.csproj", "{A6D44D54-2157-4597-BC29-6D6C726751EE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Mappings", "Kudos.Mappings\Kudos.Mappings.csproj", "{4226B526-EE03-4FF3-9CDA-EF6FAC0AF0C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Constants", "Kudos.Constants\Kudos.Constants.csproj", "{E02D5931-DC08-4F42-9AA4-A37C345FF747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,10 +51,6 @@ Global
 		{C88213A3-04CE-461B-8F05-BADC36F73E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C88213A3-04CE-461B-8F05-BADC36F73E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C88213A3-04CE-461B-8F05-BADC36F73E64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48AB3E88-B69E-43D2-9F04-1360680E7A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48AB3E88-B69E-43D2-9F04-1360680E7A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48AB3E88-B69E-43D2-9F04-1360680E7A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48AB3E88-B69E-43D2-9F04-1360680E7A1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5371F8C8-592E-4AB2-9F65-D37058315215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5371F8C8-592E-4AB2-9F65-D37058315215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5371F8C8-592E-4AB2-9F65-D37058315215}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,6 +71,10 @@ Global
 		{4226B526-EE03-4FF3-9CDA-EF6FAC0AF0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4226B526-EE03-4FF3-9CDA-EF6FAC0AF0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4226B526-EE03-4FF3-9CDA-EF6FAC0AF0C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

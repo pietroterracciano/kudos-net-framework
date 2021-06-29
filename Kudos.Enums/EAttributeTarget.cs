@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Kudos.Constants;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Kudos.Enums
 {
+    [Flags]
     public enum EAttributeTarget
     {
-        Class = 1,
-        Member = 2
+        Class = CBinaryFlag.__,
+        Member = CBinaryFlag._0
     }
 }

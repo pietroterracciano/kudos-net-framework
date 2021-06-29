@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace Kudos.Crypters.Models
 {
-    public class CrypterPreferencesModel<SALTPreferencesModelType> where SALTPreferencesModelType : SALTPreferencesModel, new()
+    public class CrypterPreferencesModel<SALTPreferencesModelType> 
+        where SALTPreferencesModelType : SALTPreferencesModel, new()
     {
         public Encoding Encoding { get; set; }
         public EBinaryEncoding BinaryEncoding { get; set; }

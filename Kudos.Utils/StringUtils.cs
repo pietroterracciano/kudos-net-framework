@@ -1,4 +1,4 @@
-﻿using Kudos.Defines;
+﻿using Kudos.Constants;
 using Kudos.Enums;
 using Kudos.Utils.Integers;
 using System;
@@ -19,28 +19,28 @@ namespace Kudos.Utils
             StringBuilder sbAlphabet = new StringBuilder();
 
             if (eCType.HasFlag(ECharType.StandardLowerCase))
-                sbAlphabet.Append(DCharacters.STANDARD_LOWER_CASE);
+                sbAlphabet.Append(CCharacters.STANDARD_LOWER_CASE);
 
             if (eCType.HasFlag(ECharType.StandardUpperCase))
-                sbAlphabet.Append(DCharacters.STANDARD_UPPER_CASE);
+                sbAlphabet.Append(CCharacters.STANDARD_UPPER_CASE);
 
             if (eCType.HasFlag(ECharType.AccentedLowerCase))
-                sbAlphabet.Append(DCharacters.ACCENTED_LOWER_CASE);
+                sbAlphabet.Append(CCharacters.ACCENTED_LOWER_CASE);
 
             if (eCType.HasFlag(ECharType.AccentedUpperCase))
-                sbAlphabet.Append(DCharacters.ACCENTED_UPPER_CASE);
+                sbAlphabet.Append(CCharacters.ACCENTED_UPPER_CASE);
 
             if (eCType.HasFlag(ECharType.Punctuation))
-                sbAlphabet.Append(DCharacters.PUNCTUATION);
+                sbAlphabet.Append(CCharacters.PUNCTUATION);
 
             if (eCType.HasFlag(ECharType.Numeric))
-                sbAlphabet.Append(DCharacters.NUMERIC);
+                sbAlphabet.Append(CCharacters.NUMERIC);
 
             if (eCType.HasFlag(ECharType.Math))
-                sbAlphabet.Append(DCharacters.MATH);
+                sbAlphabet.Append(CCharacters.MATH);
 
             if (eCType.HasFlag(ECharType.Special))
-                sbAlphabet.Append(DCharacters.SPECIAL);
+                sbAlphabet.Append(CCharacters.SPECIAL);
 
             String sAlphabet = sbAlphabet.ToString();
 

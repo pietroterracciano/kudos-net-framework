@@ -1,6 +1,6 @@
 ﻿namespace Kudos.Crypters.Symmetrics.RijndaelNS.Enums
 {
-    public enum ERBlockSize
+    public enum ESRBlockSize
     {
         _128bit = 128,
         _160bit = 160,
