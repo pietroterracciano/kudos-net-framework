@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kudos.Utils.Doubles;
+using System;
 
 namespace Kudos.Utils.Integers
 {

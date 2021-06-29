@@ -179,7 +179,7 @@ namespace Kudos.Mappings.Controllers
             }
         }
 
-        protected void GetClassMemberInfo(Type oType, String sCMName, out MemberInfo oMemberInfo)
+        protected void GetClassMemberInfo(ref Type oType, String sCMName, out MemberInfo oMemberInfo)
         {
             if (!Analyze(ref oType))
             {
@@ -202,7 +202,7 @@ namespace Kudos.Mappings.Controllers
             dClassMembersNames2ClassMembersInfos.TryGetValue(sCMName, out oMemberInfo);
         }
 
-        protected void ClassFullName2Name(Type oType, out KeyValuePair<String, String> oKeyValuePair )
+        protected void ClassFullName2Name(ref Type oType, out KeyValuePair<String, String> oKeyValuePair )
         {
             if (!Analyze(ref oType))
             {
@@ -223,7 +223,7 @@ namespace Kudos.Mappings.Controllers
 
         /// <summary>Nullable</summary>
         protected void ClassMembersNames2Names(
-            Type oType,
+            ref Type oType,
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out Dictionary<String, String> dStrings2Strings
         )
@@ -248,7 +248,7 @@ namespace Kudos.Mappings.Controllers
 
         /// <summary>Nullable</summary>
         protected void GetNameFromClassMemberName(
-            Type oType,
+            ref Type oType,
             String sCMName,
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out String oString
@@ -275,7 +275,7 @@ namespace Kudos.Mappings.Controllers
 
         /// <summary>Nullable</summary>
         protected void GetNameFromClassMemberName(
-            Type oType, 
+            ref Type oType, 
             String sCMName,
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out Dictionary<String, String> dStrings2Strings, 
@@ -305,7 +305,7 @@ namespace Kudos.Mappings.Controllers
 
         /// <summary>Nullable</summary>
         protected void Names2ClassMembersNames(
-            Type oType,
+            ref Type oType,
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings, 
             out Dictionary<String, String> dStrings2Strings
         )
@@ -328,7 +328,7 @@ namespace Kudos.Mappings.Controllers
 
         /// <summary>Nullable</summary>
         protected void GetClassMemberNameFromName(
-            Type oType, 
+            ref Type oType, 
             String sName, 
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out Dictionary<String, String> dStrings2Strings,

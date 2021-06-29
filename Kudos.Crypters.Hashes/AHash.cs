@@ -11,8 +11,8 @@ namespace Kudos.Crypters.Hashes
 {
     public abstract class AHash : ACrypter<CrypterPreferencesModel<SALTPreferencesModel>, SALTPreferencesModel>
     {
-        private static readonly String
-            SEPARATOR = nameof(AHash) + "." + nameof(SEPARATOR);
+        private const String
+            SEPARATOR = "$";
 
         private HashAlgorithm
             _oHashAlgorithm;
@@ -45,7 +45,7 @@ namespace Kudos.Crypters.Hashes
                 return false;
 
             Boolean
-                bContainsSALT = sHash.Contains("$");
+                bContainsSALT = sHash.Contains(SEPARATOR);
 
             String
                 sSALT;
@@ -53,7 +53,7 @@ namespace Kudos.Crypters.Hashes
             if (bContainsSALT)
             {
                 String[]
-                    aIPieces = sHash.Split("$");
+                    aIPieces = sHash.Split(SEPARATOR);
 
                 if (ArrayUtils.IsValidIndex(aIPieces, 1))
                 {
@@ -101,13 +101,17 @@ namespace Kudos.Crypters.Hashes
             {
                 String sSALT;
                 Internal_ToString(ref aSALT, out sSALT);
-                oStringBuilder.Append(sSALT + "$");
+
+                oStringBuilder
+                    .Append(sSALT)
+                    .Append(SEPARATOR);
             }
 
             if (aOutput != null)
             {
                 String sOutput;
                 External_ToString(ref aOutput, out sOutput);
+
                 oStringBuilder.Append(sOutput);
             }
 

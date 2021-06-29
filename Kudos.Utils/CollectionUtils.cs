@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace Kudos.Utils
 {
-    public static class ListUtils
+    public static class CollectionUtils
     {
-        public static Boolean IsValidIndex(IList oList, Int32 i32Index)
+        public static Boolean IsValidIndex(ICollection oCollection, Int32 i32Index)
         {
             return
-                oList != null
+                oCollection != null
                 && i32Index > -1
-                && i32Index < oList.Count;
+                && i32Index < oCollection.Count;
         }
     }
 }

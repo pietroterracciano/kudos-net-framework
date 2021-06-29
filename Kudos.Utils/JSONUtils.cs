@@ -78,7 +78,7 @@ namespace Kudos.Utils
 
         private static dynamic ToDynamicObject(JsonElement oJsonElement)
         {
-            return new JSONDynamicObjectModel(oJsonElement);
+            return new JSONDynamicObject(oJsonElement);
         }
 
         #endregion

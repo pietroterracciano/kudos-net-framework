@@ -13,7 +13,7 @@ namespace Kudos.Mappings.Datas.Controllers
 {
     sealed class MDataController : MappingController<DataRow, DataTableMappingAttribute, DataRowMappingAttribute>
     {
-        private static readonly String
+        private const String
             SEPARATOR = nameof(MDataController) + "." + nameof(SEPARATOR);
 
         private static Dictionary<String, String>
@@ -35,7 +35,7 @@ namespace Kudos.Mappings.Datas.Controllers
         }
 
         /// <summary>Nullable</summary>
-        public void GetFullName(Type oType, out String sName)
+        public void GetFullName(ref Type oType, out String sName)
         {
             TryGetValueFromDictionary(
                 ref _dClassFullNames2FullNames,
@@ -47,8 +47,8 @@ namespace Kudos.Mappings.Datas.Controllers
                 return;
 
             String sSchemaName, sTableName;
-            GetSchemaName(oType, out sSchemaName);
-            GetTableName(oType, out sTableName);
+            GetSchemaName(ref oType, out sSchemaName);
+            GetTableName(ref oType, out sTableName);
 
             Boolean
                 bIsSchemaNameNullOrWhiteSpace = String.IsNullOrWhiteSpace(sSchemaName),
@@ -67,7 +67,7 @@ namespace Kudos.Mappings.Datas.Controllers
         }
 
         /// <summary>Nullable</summary>
-        public void GetTableName(Type oType, out String sName)
+        public void GetTableName(ref Type oType, out String sName)
         {
             TryGetValueFromDictionary(
                 ref _dClassFullNames2TablesNames,
@@ -79,7 +79,7 @@ namespace Kudos.Mappings.Datas.Controllers
                 return;
 
             KeyValuePair<String, String> oKeyValuePair;
-            ClassFullName2Name(oType, out oKeyValuePair);
+            ClassFullName2Name(ref oType, out oKeyValuePair);
 
             String sSchemaName;
             AnalizeClassFullName2Name(ref oKeyValuePair, out sSchemaName, out sName);
@@ -88,7 +88,7 @@ namespace Kudos.Mappings.Datas.Controllers
         }
 
         /// <summary>Nullable</summary>
-        public void GetSchemaName(Type oType, out String sName)
+        public void GetSchemaName(ref Type oType, out String sName)
         {
             TryGetValueFromDictionary(
                 ref _dClassFullNames2SchemasNames,
@@ -100,7 +100,7 @@ namespace Kudos.Mappings.Datas.Controllers
                 return;
 
             KeyValuePair<String, String> oKeyValuePair;
-            ClassFullName2Name(oType, out oKeyValuePair);
+            ClassFullName2Name(ref oType, out oKeyValuePair);
 
             String sTableName;
             AnalizeClassFullName2Name(ref oKeyValuePair, out sName, out sTableName);
@@ -110,7 +110,7 @@ namespace Kudos.Mappings.Datas.Controllers
 
         private void AnalizeClassFullName2Name(ref KeyValuePair<String, String> oKeyValuePair, out String sSchemaName, out String sTableName)
         {
-            if(oKeyValuePair.Value == null)
+            if (oKeyValuePair.Value == null)
             {
                 sSchemaName = null;
                 sTableName = null;
@@ -120,19 +120,22 @@ namespace Kudos.Mappings.Datas.Controllers
             String[]
                 aKVPPieces = oKeyValuePair.Value.Split(SEPARATOR);
 
-            sSchemaName =
-                ArrayUtils.IsValidIndex(aKVPPieces, 0)
-                    ? aKVPPieces[0]
-                    : null;
-
-            sTableName =
-                ArrayUtils.IsValidIndex(aKVPPieces, 1)
-                    ? aKVPPieces[1]
-                    : null;
+            if (ArrayUtils.IsValidIndex(aKVPPieces, 1))
+            {
+                sSchemaName = aKVPPieces[0];
+                sTableName = aKVPPieces[1];
+            }
+            else if (ArrayUtils.IsValidIndex(aKVPPieces, 0))
+            {
+                sSchemaName = aKVPPieces[0];
+                sTableName = null;
+            }
+            else
+                sSchemaName = sTableName = null;
         }
 
         /// <summary>Nullable</summary>
-        public void GetColumnsNames(Type oType, out Dictionary<String, String> oDictionary)
+        public void GetColumnsNames(ref Type oType, out Dictionary<String, String> oDictionary)
         {
             TryGetValueFromDictionary(
                 ref _dClassFullNames2MembersNames2ColumnsNames,
@@ -144,14 +147,14 @@ namespace Kudos.Mappings.Datas.Controllers
                 return;
 
             ClassMembersNames2Names(
-                oType, 
+                ref oType, 
                 out _dClassFullNames2MembersNames2ColumnsNames, 
                 out oDictionary
             );
         }
 
         /// <summary>Nullable</summary>
-        public void GetColumnName(Type oType, String sMName, out String sName)
+        public void GetColumnName(ref Type oType, String sMName, out String sName)
         {
             TryGetValueFromDictionary(
                 ref _dClassFullNames2MembersNames2ColumnsNames,
@@ -164,48 +167,53 @@ namespace Kudos.Mappings.Datas.Controllers
                 return;
 
             GetNameFromClassMemberName(
-                oType, 
+                ref oType, 
                 sMName, 
                 out _dClassFullNames2MembersNames2ColumnsNames,
                 out sName
             );
         }
 
-        public ObjectType[] From<ObjectType>(ref DataTable oDataTable) where ObjectType : new()
+        public void From<ObjectType>(ref DataTable oDataTable, out ObjectType[] aObjects) where ObjectType : new()
         {
             if (oDataTable == null)
-                return null;
+            {
+                aObjects = null;
+                return;
+            }
 
             DataRowCollection cDataRow = oDataTable.Rows;
-            return From<ObjectType>(ref cDataRow);
+            From<ObjectType>(ref cDataRow, out aObjects);
         }
 
-        public ObjectType[] From<ObjectType>(ref DataRowCollection cDataRow) where ObjectType : new()
+        public void From<ObjectType>(ref DataRowCollection cDataRow, out ObjectType[] aObjects) where ObjectType : new()
         {
             if (cDataRow == null)
-                return null;
+            {
+                aObjects = null;
+                return;
+            }
 
-            ObjectType[]
-                aObjects = new ObjectType[cDataRow.Count];
+            aObjects = new ObjectType[cDataRow.Count];
 
             for (int i = 0; i < cDataRow.Count; i++)
             {
                 DataRow oDataRow = cDataRow[i];
-                aObjects[i] = From<ObjectType>(ref oDataRow);
+                From<ObjectType>(ref oDataRow, out aObjects[i]);
             }
-
-            return aObjects;
         }
 
-        public ObjectType From<ObjectType>(ref DataRow oDataRow) where ObjectType : new()
+        public void From<ObjectType>(ref DataRow oDataRow, out ObjectType oObject) where ObjectType : new()
         {
+            if (oDataRow == null)
+            {
+                oObject = default(ObjectType);
+                return;
+            }
+
             Type oType = typeof(ObjectType);
 
-            if (oDataRow == null)
-                return default(ObjectType);
-
-            ObjectType
-                oObject = new ObjectType();
+            oObject = new ObjectType();
 
             foreach (DataColumn oDataColumn in oDataRow.Table.Columns)
             {
@@ -216,10 +224,10 @@ namespace Kudos.Mappings.Datas.Controllers
                     continue;
 
                 String sCMemberName;
-                GetColumnName(oType, oDataColumn.ColumnName, out sCMemberName);
+                GetColumnName(ref oType, oDataColumn.ColumnName, out sCMemberName);
 
                 MemberInfo oMemberInfo;
-                GetClassMemberInfo(oType, sCMemberName, out oMemberInfo);
+                GetClassMemberInfo(ref oType, sCMemberName, out oMemberInfo);
 
                 if (oMemberInfo == null)
                     continue;
@@ -228,25 +236,17 @@ namespace Kudos.Mappings.Datas.Controllers
                     PropertyInfo
                         oPropertyInfo = (PropertyInfo)oMemberInfo;
 
-                    if (oPropertyInfo != null)
-                    {
-                        if (oPropertyInfo.SetMethod != null && oPropertyInfo.SetMethod.IsPublic)
-                            try { oPropertyInfo.SetValue(oObject, ObjectUtils.ChangeType(oDataRow[oDataColumn.ColumnName], oPropertyInfo.PropertyType)); } catch { }
-
-                        continue;
-                    }
+                    if (oPropertyInfo.SetMethod != null && oPropertyInfo.SetMethod.IsPublic)
+                        try { oPropertyInfo.SetValue(oObject, ObjectUtils.ChangeType(oDataRow[oDataColumn.ColumnName], oPropertyInfo.PropertyType)); } catch { }
                 }
                 else if (oMemberInfo.MemberType == MemberTypes.Field)
                 {
                     FieldInfo
                         oFieldInfo = (FieldInfo)oMemberInfo;
-
-                    if (oFieldInfo != null)
-                        try { oFieldInfo.SetValue(oObject, ObjectUtils.ChangeType(oDataRow[oDataColumn.ColumnName], oFieldInfo.FieldType)); } catch { }
+                    
+                    try { oFieldInfo.SetValue(oObject, ObjectUtils.ChangeType(oDataRow[oDataColumn.ColumnName], oFieldInfo.FieldType)); } catch { }
                 }
             }
-
-            return oObject;
         }
     }
 }

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Kudos.Utils.Types
 {
-    public class JSONDynamicObjectModel : DynamicObject
+    public class JSONDynamicObject : DynamicObject
     {
         private JsonElement _oJsonElement;
 
-        public JSONDynamicObjectModel(JsonElement oJsonElement)
+        public JSONDynamicObject(JsonElement oJsonElement)
         {
             _oJsonElement = oJsonElement;
         }
@@ -49,11 +49,11 @@ namespace Kudos.Utils.Types
                     oResult = oInnerJsonElement.GetString();
                     break;
                 case JsonValueKind.Object:
-                    oResult = new JSONDynamicObjectModel(oInnerJsonElement);
+                    oResult = new JSONDynamicObject(oInnerJsonElement);
                     break;
                 case JsonValueKind.Array:
                     oResult = oInnerJsonElement.EnumerateArray()
-                        .Select(o => new JSONDynamicObjectModel(oInnerJsonElement))
+                        .Select(o => new JSONDynamicObject(oInnerJsonElement))
                         .ToArray();
                     break;
             }

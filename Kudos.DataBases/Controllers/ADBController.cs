@@ -245,12 +245,18 @@ namespace Kudos.DataBases.Controllers
 
         public Boolean ChangeSchema(String sSchemaName)
         {
-            if (!IsConnectionOpened() || String.IsNullOrWhiteSpace(sSchemaName))
-                return false;
+            if (IsConnectionOpened() && !String.IsNullOrWhiteSpace(sSchemaName))
+                try 
+                {
+                    _oConnection.ChangeDatabase(sSchemaName);
+                    Config.SchemaName = sSchemaName;
+                    return true;
+                } 
+                catch
+                {
+                }
 
-            _oConnection.ChangeDatabase(sSchemaName);
-            Config.SchemaName = sSchemaName;
-            return true;
+            return false;
         }
 
         public Task<Boolean> ChangeSchemaAsync(String sSchemaName)

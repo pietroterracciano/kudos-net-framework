@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kudos.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,17 @@ namespace Kudos.Mappings.Datas.Attributes
         public DataTableMappingAttribute(String sTableName)
         {
             TableName = sTableName;
+
+            if (!TableName.Contains("."))
+                return;
+
+            String[]
+                aTNPieces = TableName.Split(".");
+
+            if (ArrayUtils.IsValidIndex(aTNPieces, 1))
+                TableName = aTNPieces[1];
+            if (ArrayUtils.IsValidIndex(aTNPieces, 0))
+                SchemaName = aTNPieces[0];
         }
 
         public DataTableMappingAttribute(String sSchemaName, String sTableName)

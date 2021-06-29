@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Kudos.Utils
+namespace Kudos.Utils.Doubles
 {
     public static class DoubleUtils
     {
