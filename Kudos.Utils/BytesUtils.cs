@@ -1,5 +1,7 @@
 ﻿using Kudos.Enums;
 using System;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Kudos.Utils
@@ -29,6 +31,46 @@ namespace Kudos.Utils
 
             return null;
         }
+
+        /// <summary>Nullable</summary>
+        public static Byte[] From(Stream oStream, Boolean bDisposeStream = false, Int32 iBufferSize = 4096)
+        {
+            if (oStream == null || !oStream.CanRead)
+                return null;
+
+            if (iBufferSize < 1)
+                iBufferSize = 4096;
+
+            Byte[]
+                aBuffer = new Byte[iBufferSize],
+                aBytes = new Byte[oStream.Length];
+
+            Int32
+                iBytesRead,
+                iTotalBytesRead = 0;
+
+            if (oStream.CanSeek)
+                try { oStream.Position = 0; } catch { }
+
+            try
+            {
+                while ((iBytesRead = oStream.Read(aBuffer, 0, aBuffer.Length)) > 0)
+                {
+                    Buffer.BlockCopy(aBuffer, 0, aBytes, iTotalBytesRead, iBytesRead);
+                    iTotalBytesRead += iBytesRead;
+                }
+            }
+            catch
+            {
+                aBytes = null;
+            }
+
+            if (bDisposeStream)
+                try { oStream.Dispose(); } catch { }
+
+            return aBytes;
+        }
+
 
         #endregion
 
@@ -240,6 +282,69 @@ namespace Kudos.Utils
         {
             return From(StringUtils.Random(iLength, eCharType), eEncoding);
         }
+
+        #endregion
+
+        #region Compress/Decompress
+
+        #region GZip
+
+        public static Byte[] CompressUsingGZip(String oString, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingGZip(oString, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingGZip(String oString, Encoding oEncoding, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingGZip(oString, oEncoding, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingGZip(Byte[] aBytes, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingGZip(aBytes, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingGZip(Stream oStream, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingGZip(oStream, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] DecompressUsingGZip(Stream oStream, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.DecompressUsingGZip(oStream, iBufferSize), true, iBufferSize);
+        }
+
+
+        #endregion
+
+        #region Deflate
+
+        public static Byte[] CompressUsingDeflate(String oString, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingDeflate(oString, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingDeflate(String oString, Encoding oEncoding, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingDeflate(oString, oEncoding, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingDeflate(Byte[] aBytes, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingDeflate(aBytes, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] CompressUsingDeflate(Stream oStream, CompressionLevel eCompressionLevel = CompressionLevel.Optimal, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.CompressUsingDeflate(oStream, eCompressionLevel, iBufferSize), true, iBufferSize);
+        }
+
+        public static Byte[] DecompressUsingDeflate(Stream oStream, Int32 iBufferSize = 4096)
+        {
+            return From(StreamUtils.DecompressUsingDeflate(oStream, iBufferSize), true, iBufferSize);
+        }
+
+        #endregion
 
         #endregion
     }

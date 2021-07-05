@@ -17,7 +17,7 @@ namespace Kudos.Mappings.Datas.Attributes
         {
             TableName = sTableName;
 
-            if (!TableName.Contains("."))
+            if (TableName == null || !TableName.Contains("."))
                 return;
 
             String[]

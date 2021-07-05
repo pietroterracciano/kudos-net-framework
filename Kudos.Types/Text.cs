@@ -1,10 +1,13 @@
-﻿using Kudos.Utils;
+﻿using Kudos.Types.Converters.JSONs;
+using Kudos.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Kudos.Types
 {
+    [JsonConverter(typeof(TextJSONConverter))]
     public struct Text
     {
         private readonly String

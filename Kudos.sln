@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Mails", "Kudos.Mails\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Mappings", "Kudos.Mappings\Kudos.Mappings.csproj", "{4226B526-EE03-4FF3-9CDA-EF6FAC0AF0C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Constants", "Kudos.Constants\Kudos.Constants.csproj", "{E02D5931-DC08-4F42-9AA4-A37C345FF747}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kudos.Constants", "Kudos.Constants\Kudos.Constants.csproj", "{E02D5931-DC08-4F42-9AA4-A37C345FF747}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Web", "Kudos.Web\Kudos.Web.csproj", "{1043FF31-28BF-45DC-9376-752F0ECE2D60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E02D5931-DC08-4F42-9AA4-A37C345FF747}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1043FF31-28BF-45DC-9376-752F0ECE2D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1043FF31-28BF-45DC-9376-752F0ECE2D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1043FF31-28BF-45DC-9376-752F0ECE2D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1043FF31-28BF-45DC-9376-752F0ECE2D60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

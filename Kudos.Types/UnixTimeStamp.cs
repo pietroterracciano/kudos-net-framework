@@ -1,8 +1,11 @@
 ﻿
+using Kudos.Types.Converters.JSONs;
 using System;
+using System.Text.Json.Serialization;
 
 namespace Kudos.Types
 {
+    [JsonConverter(typeof(UnixTimeStampJSONConverter))]
     public struct UnixTimeStamp
     {
         private UInt32
