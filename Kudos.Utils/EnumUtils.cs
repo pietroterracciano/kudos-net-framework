@@ -89,7 +89,7 @@ namespace Kudos.Utils
         /// <summary>Nullable</summary>
         public static Object ParseFrom(Type oType, Object oObject)
         {
-            if (oType != null && oObject != null && Enum.IsDefined(oType, oObject))
+            if (oType != null && oObject != null)
                 try { return Enum.ToObject(oType, oObject); } catch { }
 
             return null;
