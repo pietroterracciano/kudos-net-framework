@@ -11,7 +11,7 @@ namespace Kudos.Mappings.Datas.Helpers
 {
     public static class MDataHelper
     {
-        private static MDataController
+        private static readonly MDataController
             _oDataController = new MDataController();
 
         /// <summary>Nullable</summary>

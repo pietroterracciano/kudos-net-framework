@@ -9,35 +9,65 @@ using System.Text;
 
 namespace Kudos.Crypters.Hashes
 {
-    public abstract class AHash : ACrypter<CrypterPreferencesModel<SALTPreferencesModel>, SALTPreferencesModel>
+    public abstract class AHash<AlgorithmType, CrypterPreferencesModelType, SALTPreferencesModelType> : ACrypter<CrypterPreferencesModelType, SALTPreferencesModelType>
+        where AlgorithmType : HashAlgorithm
+        where CrypterPreferencesModelType : CrypterPreferencesModel<SALTPreferencesModelType>, new()
+        where SALTPreferencesModelType : SALTPreferencesModel, new()
     {
         private const String
             SEPARATOR = "$";
 
-        private HashAlgorithm
-            _oHashAlgorithm;
+        protected AlgorithmType Algorithm
+        {
+            get;
+            private set;
+        }
+
+        public EHashAlgorithm Type
+        {
+            get;
+            private set;
+        }
 
         protected AHash(EHashAlgorithm eHashAlgorithm)
         {
-            switch (eHashAlgorithm)
+            switch (Type = eHashAlgorithm)
             {
-                default:
-                    try { _oHashAlgorithm = System.Security.Cryptography.SHA1.Create(); } catch { }
+                case EHashAlgorithm.MD5:
+                    try { Algorithm = System.Security.Cryptography.MD5.Create() as AlgorithmType; } catch { }
+                    break;
+                case EHashAlgorithm.SHA1:
+                    try { Algorithm = System.Security.Cryptography.SHA1.Create() as AlgorithmType; } catch { }
                     break;
                 case EHashAlgorithm.SHA256:
-                    try { _oHashAlgorithm = System.Security.Cryptography.SHA256.Create(); } catch { }
+                    try { Algorithm = System.Security.Cryptography.SHA256.Create() as AlgorithmType; } catch { }
                     break;
                 case EHashAlgorithm.SHA384:
-                    try { _oHashAlgorithm = System.Security.Cryptography.SHA384.Create(); } catch { }
+                    try { Algorithm = System.Security.Cryptography.SHA384.Create() as AlgorithmType; } catch { }
                     break;
                 case EHashAlgorithm.SHA512:
-                    try { _oHashAlgorithm = System.Security.Cryptography.SHA512.Create(); } catch { }
+                    try { Algorithm = System.Security.Cryptography.SHA512.Create() as AlgorithmType; } catch { }
                     break;
-                case EHashAlgorithm.MD5:
-                    try { _oHashAlgorithm = System.Security.Cryptography.MD5.Create(); } catch { }
+
+                case EHashAlgorithm.HMACMD5:
+                    try { Algorithm = new HMACMD5() as AlgorithmType; } catch { }
+                    break;
+                case EHashAlgorithm.HMACSHA1:
+                    try { Algorithm = new HMACSHA1() as AlgorithmType; } catch { }
+                    break;
+                case EHashAlgorithm.HMACSHA256:
+                    try { Algorithm  = new HMACSHA256() as AlgorithmType; } catch { }
+                    break;
+                case EHashAlgorithm.HMACSHA384:
+                    try { Algorithm = new HMACSHA384() as AlgorithmType; } catch { }
+                    break;
+                case EHashAlgorithm.HMACSHA512:
+                    try { Algorithm = new HMACSHA512() as AlgorithmType; } catch { }
                     break;
             }
         }
+
+        //protected abstract AlgorithmType OnAlgorithmCreation();
 
         public Boolean Verify(Object o2Hash, String sHash)
         {
@@ -135,18 +165,24 @@ namespace Kudos.Crypters.Hashes
 
         private void Compute(ref Byte[] aInput, ref Byte[] aSALT, out Byte[] aOutput)
         {
-            if( _oHashAlgorithm != null && aInput != null)
-                try { aOutput =  _oHashAlgorithm.ComputeHash(BytesUtils.Prepend(aSALT, aInput)); return; } catch { }
+            if (Algorithm != null && aInput != null)
+            {
+                OnBeforeCompute();
+                try { aOutput = Algorithm.ComputeHash(BytesUtils.Prepend(aSALT, aInput)); OnAfterCompute(); return; } catch { }
+            }
 
             aOutput = null;
         }
 
+        protected virtual void OnBeforeCompute() { }
+        protected virtual void OnAfterCompute() { }
+
         public override void Dispose()
         {
-            if (_oHashAlgorithm != null)
+            if (Algorithm != null)
                 try
                 {
-                    _oHashAlgorithm.Dispose();
+                    Algorithm.Dispose();
                 }
                 catch
                 {

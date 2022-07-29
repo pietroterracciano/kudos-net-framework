@@ -326,10 +326,30 @@ namespace Kudos.Mappings.Controllers
             );
         }
 
+        #region protected void GetClassMemberNameFromName()
+
         /// <summary>Nullable</summary>
         protected void GetClassMemberNameFromName(
-            ref Type oType, 
-            String sName, 
+            ref Type oType,
+            String sName,
+            out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
+            out String sCMemberName
+            )
+        {
+            Dictionary<String, String> dStrings2Strings;
+            GetClassMemberNameFromName(
+                ref oType,
+                sName,
+                out dStrings2Strings2Strings,
+                out dStrings2Strings,
+                out sCMemberName
+            );
+        }
+
+        /// <summary>Nullable</summary>
+        protected void GetClassMemberNameFromName(
+            ref Type oType,
+            String sName,
             out Dictionary<String, Dictionary<String, String>> dStrings2Strings2Strings,
             out Dictionary<String, String> dStrings2Strings,
             out String sCMemberName)
@@ -352,6 +372,9 @@ namespace Kudos.Mappings.Controllers
                 out sCMemberName
             );
         }
+
+        #endregion
+
 
         #region private static Boolean TryGetValueFromDictionary()
 

@@ -93,8 +93,6 @@ namespace Kudos.Web.Application.HTTP
                 try { oRequest.Abort(); } catch { }
                 return null;
             }
-
-
             
 
 

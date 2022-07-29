@@ -22,7 +22,8 @@ namespace Kudos.Mappings.Datas.Controllers
             _dClassFullNames2TablesNames = new Dictionary<String, String>();
 
         private static Dictionary<String, Dictionary<String, String>>
-            _dClassFullNames2MembersNames2ColumnsNames = new Dictionary<String, Dictionary<String, String>>();
+            _dClassFullNames2MembersNames2ColumnsNames = new Dictionary<String, Dictionary<String, String>>(),
+            _dClassFullNames2ColumnsNames2MembersNames = new Dictionary<String, Dictionary<String, String>>();
 
         protected override string GetRuleFromClassAttribute(DataTableMappingAttribute oCAttribute)
         {
@@ -157,7 +158,7 @@ namespace Kudos.Mappings.Datas.Controllers
         public void GetColumnName(ref Type oType, String sMName, out String sName)
         {
             TryGetValueFromDictionary(
-                ref _dClassFullNames2MembersNames2ColumnsNames,
+                ref _dClassFullNames2ColumnsNames2MembersNames,
                 oType.FullName,
                 sMName,
                 out sName
@@ -166,10 +167,10 @@ namespace Kudos.Mappings.Datas.Controllers
             if (sName != null)
                 return;
 
-            GetNameFromClassMemberName(
-                ref oType, 
-                sMName, 
-                out _dClassFullNames2MembersNames2ColumnsNames,
+            GetClassMemberNameFromName(
+                ref oType,
+                sMName,
+                out _dClassFullNames2ColumnsNames2MembersNames,
                 out sName
             );
         }
