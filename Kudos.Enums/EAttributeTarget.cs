@@ -8,7 +8,7 @@ namespace Kudos.Enums
     [Flags]
     public enum EAttributeTarget
     {
-        Class = CBinaryFlag.__,
-        Member = CBinaryFlag._0
+        Class = CBinaryFlag._0,
+        Member = CBinaryFlag._1
     }
 }

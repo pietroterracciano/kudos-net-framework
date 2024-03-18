@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="GefyraModule\Contexts\**" />
+    <Compile Remove="GefyraModule\Enums\Contexts\**" />
+    <Compile Remove="GefyraModule\Interfaces\Contexts\**" />
+    <Compile Remove="GefyraModule\Models\Contexts\**" />
+    <Compile Remove="GefyraModule\Wrappers\**" />
+    <EmbeddedResource Remove="GefyraModule\Contexts\**" />
+    <EmbeddedResource Remove="GefyraModule\Enums\Contexts\**" />
+    <EmbeddedResource Remove="GefyraModule\Interfaces\Contexts\**" />
+    <EmbeddedResource Remove="GefyraModule\Models\Contexts\**" />
+    <EmbeddedResource Remove="GefyraModule\Wrappers\**" />
+    <None Remove="GefyraModule\Contexts\**" />
+    <None Remove="GefyraModule\Enums\Contexts\**" />
+    <None Remove="GefyraModule\Interfaces\Contexts\**" />
+    <None Remove="GefyraModule\Models\Contexts\**" />
+    <None Remove="GefyraModule\Wrappers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="GefyraModule\Models\GefyraConfigModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="GefyraModule\" />
+    <None Remove="GefyraModule\Controllers\" />
+    <None Remove="GefyraModule\Models\" />
+    <None Remove="GefyraModule\Interfaces\" />
+    <None Remove="GefyraModule\Attributes\" />
+    <None Remove="Microsoft.EntityFrameworkCore" />
+    <None Remove="GefyraModule\Contexts\" />
+    <None Remove="GefyraModule\Builders\" />
+    <None Remove="GefyraModule\Enums\" />
+    <None Remove="GefyraModule\Interfaces\Commands\" />
+    <None Remove="GefyraModule\Builders\Results\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos.Reflection\Kudos.Reflection.csproj" />
+    <ProjectReference Include="..\Kudos\Kudos.csproj" />
+    <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
+    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
+    <ProjectReference Include="..\Kudos.Databases\Kudos.Databases.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GefyraModule\Profilers\" />
+  </ItemGroup>
+</Project>

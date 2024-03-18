@@ -6,13 +6,13 @@ namespace Kudos.Enums
     [Flags]
     public enum ECharType
     {
-        StandardLowerCase = CBinaryFlag.__,
-        StandardUpperCase = CBinaryFlag._0,
-        Numeric = CBinaryFlag._1,
-        Punctuation = CBinaryFlag._2,
-        Special = CBinaryFlag._3,
-        Math = CBinaryFlag._4,
-        AccentedLowerCase = CBinaryFlag._5,
-        AccentedUpperCase = CBinaryFlag._6
+        StandardLowerCase = CBinaryFlag._0,
+        StandardUpperCase = CBinaryFlag._1,
+        Numeric = CBinaryFlag._2,
+        Punctuation = CBinaryFlag._3,
+        Special = CBinaryFlag._4,
+        Math = CBinaryFlag._5,
+        AccentedLowerCase = CBinaryFlag._6,
+        AccentedUpperCase = CBinaryFlag._7
     }
 }

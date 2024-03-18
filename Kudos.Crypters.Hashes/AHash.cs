@@ -2,6 +2,7 @@
 using Kudos.Crypters.Models;
 using Kudos.Crypters.Models.SALTs;
 using Kudos.Utils;
+using Kudos.Utils.Collections;
 using System;
 using System.Linq;
 using System.Security.Cryptography;

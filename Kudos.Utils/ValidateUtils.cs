@@ -10,11 +10,11 @@ namespace Kudos.Utils
     public static class ValidateUtils
     {
         private static readonly EmailAddressAttribute
-            _oEmailAddressAttribute = new EmailAddressAttribute();
+            __eaa = new EmailAddressAttribute();
 
         public static Boolean IsMail(String sMail)
         {
-            return _oEmailAddressAttribute.IsValid(sMail);
+            return __eaa.IsValid(sMail);
         }
     }
 }

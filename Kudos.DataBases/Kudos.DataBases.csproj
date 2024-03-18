@@ -1,21 +1,39 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\MSSQLDBController.cs" />
-    <Compile Remove="Models\Configs\MSSQLDBConfigModel.cs" />
+    <Compile Remove="Filters\**" />
+    <Compile Remove="Models\**" />
+    <EmbeddedResource Remove="Filters\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Filters\**" />
+    <None Remove="Models\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.25" />
+    <Compile Remove="Constants\CDBISColumnExtra.cs" />
+    <Compile Remove="Constants\CDBISColumnKey.cs" />
+    <Compile Remove="Constants\CDBISColumnName.cs" />
+    <Compile Remove="Constants\CDBISColumnType.cs" />
+    <Compile Remove="Constants\CDBISDataType.cs" />
+    <Compile Remove="Constants\CDBISIsNullable.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
+    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Enums\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+    <PackageReference Include="MySql.Data" Version="8.3.0" />
+  </ItemGroup>
 </Project>

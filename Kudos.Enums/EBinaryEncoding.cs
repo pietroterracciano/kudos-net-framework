@@ -11,7 +11,7 @@ namespace Kudos.Enums
     public enum EBinaryEncoding
     {
         // Hexadecimal
-        Base16 = CBinaryFlag.__,
-        Base64 = CBinaryFlag._0,
+        Base16 = CBinaryFlag._0,
+        Base64 = CBinaryFlag._1,
     }
 }

@@ -1,0 +1,787 @@
+﻿#region PrepareLazyLoad
+
+        private Boolean PrepareLazyLoads(NTREGefyraClausole eClausole, ref ModelType oModel)
+        {
+            if (oModel == null)
+                return false;
+
+            String[] aMembersNames = null;
+            //GefyraMapper.GetMembersNames(ref SRO_tModel, out aMembersNames);
+            return PrepareLazyLoads(ref eClausole, ref oModel, ref aMembersNames);
+        }
+
+        private Boolean PrepareLazyLoads(
+            NTREGefyraClausole eClausole,
+            ref Action<ModelType> oAction
+        )
+        {
+            if (oAction == null)
+                return false;
+
+            ModelType oModel = ObjectUtils.InvokeConstructor<ModelType>(SRO_ciModel);
+
+            if (oModel == null)
+                return false;
+
+            oAction.Invoke(oModel);
+
+            String[] aMembersNamesFromBodyOfAction;
+
+            return false;
+                //GetMembersNamesFromBodyOfAction(ref oAction, out aMembersNamesFromBodyOfAction)
+                //&&
+                //PrepareLazyLoads(ref eClausole, ref oModel, ref aMembersNamesFromBodyOfAction);
+        }
+
+        private Boolean PrepareLazyLoads(
+            ref NTREGefyraClausole eClausole,
+            ref ModelType oModel,
+            ref String[] aMembersNames
+        )
+        {
+            if (oModel == null || aMembersNames == null || aMembersNames.Length < 1)
+                return false;
+
+            Dictionary<String, GCParameterModel> dPKeys2Parameters = new Dictionary<String, GCParameterModel>(aMembersNames.Length);
+
+            for (int i = 0; i < aMembersNames.Length; i++)
+            {
+                MemberInfo oMember;
+                GefyraMapper.GetMember(ref SRO_tModel, ref aMembersNames[i], out oMember);
+                if (oMember == null) continue;
+                String sMemberFullName = SRO_tModel.Name + CGefyraSeparator.Dot + aMembersNames[i];
+                //dPKeys2Parameters[sMemberFullName] = new GCParameterModel(sMemberFullName, EGefyraComparator.Equal, ObjectUtils.GetMemberValue(oModel, oMember));
+            }
+             
+            //RequestLazyLoadsList().Add(new GCLazyLoadModel<Dictionary<String, GCParameterModel>>(eClausole, ref dPKeys2Parameters));
+            return true;
+        }
+
+
+
+        private Boolean PrepareLazyLoads(
+            NTREGefyraClausole eClausole, 
+            ref Expression<Func<ModelType, Boolean>> oExpression
+        )
+        {
+            return PrepareLazyLoads(ref eClausole, ref oExpression);
+        }
+
+        private Boolean PrepareLazyLoads<JoinModelType>(
+            NTREGefyraClausole eClausole, 
+            ref Expression<Func<ModelType, JoinModelType, Boolean>> oExpression
+        )
+        {
+            return PrepareLazyLoads(ref eClausole, ref oExpression);
+        }
+
+        private Boolean PrepareLazyLoads<ExpressionBodyType>
+        (
+            ref NTREGefyraClausole eClausole,
+            ref Expression<ExpressionBodyType> oExpression
+        )
+        {
+            if (oExpression == null) return false;
+
+            //RequestLazyLoadsList().Add(new GCLazyLoadModel(eClausole)); 
+
+            Object oObject;
+            PrepareLazyLoads(oExpression.Body, out oObject);
+            return true;
+        }
+
+        private void PrepareLazyLoads
+        (
+            Expression oExpression,
+            out Object oObject
+        )
+        {
+            if (oExpression != null)
+                switch (oExpression.NodeType)
+                {
+                    case ExpressionType.Equal:
+                    case ExpressionType.NotEqual:
+                    case ExpressionType.GreaterThan: 
+                    case ExpressionType.GreaterThanOrEqual:
+                    case ExpressionType.LessThan:
+                    case ExpressionType.LessThanOrEqual:
+                    case ExpressionType.OrElse:
+                    case ExpressionType.AndAlso:
+                        PrepareLazyLoads(oExpression as BinaryExpression, out oObject);
+                        return;
+                    case ExpressionType.Call:
+                        PrepareLazyLoads(oExpression as MethodCallExpression, out oObject);
+                        return;
+                    case ExpressionType.MemberAccess:
+                        PrepareLazyLoads(oExpression as MemberExpression, out oObject);
+                        return;
+                    case ExpressionType.Constant:
+                        PrepareLazyLoads(oExpression as ConstantExpression, out oObject);
+                        return;
+                    case ExpressionType.Lambda:
+                        PrepareLazyLoads(oExpression as LambdaExpression, out oObject);
+                        return;
+                    case ExpressionType.NewArrayInit:
+                        PrepareLazyLoads(oExpression as NewArrayExpression, out oObject);
+                        return;
+                    //case ExpressionType.Parameter:
+                    //    PrepareLazyLoads(oExpression as ParameterExpression, out oObject);
+                    //    return;
+                }
+
+            oObject = null;
+        }
+
+        private void PrepareLazyLoads
+        (
+            BinaryExpression expBinary,
+            out Object oObject
+        )
+        {
+            if(expBinary == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            EGefyraComparator? eInnerComparator = GefyraComparatorUtils.From(expBinary.NodeType);
+            NTREGefyraClausole? eInnerClausole = NTRGefyraClausoleUtils.From(expBinary.NodeType);
+
+            if(eInnerClausole == null && eInnerComparator == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            //Object oLeft, oRight;
+
+            //RequestLazyLoadsList().Add(new GCLazyLoadModel(EGefyraClausole.OpenBlock));
+
+            //PrepareLazyLoads(expBinary.Left, out oLeft);
+
+            //if (eInnerClausole != null)
+            //    RequestLazyLoadsList().Add(new GCLazyLoadModel(eInnerClausole.Value));
+
+            //PrepareLazyLoads(expBinary.Right, out oRight);
+
+            //if (eInnerComparator != null)
+            //    PrepareLazyLoads(ref oLeft, eInnerComparator.Value, ref oRight);
+
+            //RequestLazyLoadsList().Add(new GCLazyLoadModel(EGefyraClausole.CloseBlock));\
+
+            oObject = null;
+        }
+
+        private void PrepareLazyLoads(
+            MethodCallExpression expMethodCall,
+            out Object oObject
+        )
+        {
+            if (expMethodCall == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            List<Expression>
+                lEMCArguments = new List<Expression>();
+
+            if (expMethodCall.Object != null)
+                lEMCArguments.Add(expMethodCall.Object);
+
+            if (expMethodCall.Arguments != null)
+            {
+                for (int i = 0; i < expMethodCall.Arguments.Count; i++)
+                    lEMCArguments.Add(expMethodCall.Arguments[i]);
+            }
+
+            if (lEMCArguments.Count < 1 || lEMCArguments.Count > 2)
+            {
+                oObject = null;
+                return;
+            }
+
+            Object o0;
+            PrepareLazyLoads(lEMCArguments[0], out o0);
+
+            if (lEMCArguments.Count < 2)
+            {
+                oObject = o0;
+                return;
+            }
+
+            Object o1;
+            PrepareLazyLoads(lEMCArguments[1], out o1);
+
+            EGefyraMethod? eEMCMMethod = GefyraMethodUtils.From(expMethodCall.Method);
+
+            if (eEMCMMethod != null)
+                switch (eEMCMMethod)
+                {
+                    case EGefyraMethod.Equals:
+                        PrepareLazyLoads(ref o0, EGefyraComparator.Equal, ref o1);
+                        break;
+                    case EGefyraMethod.Contains:
+                        PrepareLazyLoads(ref o0, EGefyraComparator.Equal, ref o1);
+                        break;
+                }
+
+            oObject = null;
+
+                //if (ObjectUtils.IsEnumerable(o0))
+                //{
+                //    PrepareLazyLoads(ref o1, EGefyraComparator.In, ref o0);
+                //    oObject = null;
+                //    return;
+                //}
+        }
+
+        private void PrepareLazyLoads(
+           MemberExpression expMember,
+           out Object oObject
+        )
+        {
+            if (expMember == null)
+            {
+                oObject = null;
+                return;
+            }
+            else if(
+                expMember.Expression == null
+                || expMember.Expression.NodeType != ExpressionType.Parameter)
+            {
+                PrepareLazyLoads(expMember.Expression, out oObject);
+                oObject = ObjectUtils.GetMemberValue(oObject, expMember.Member);
+                return;
+            }
+
+            oObject = expMember.Member;
+        }
+
+        private void PrepareLazyLoads(
+           ConstantExpression expConstant,
+           out Object oObject
+        )
+        {
+            if (expConstant == null) 
+            {
+                oObject = null;
+                return;
+            }
+
+            oObject = expConstant.Value;
+        }
+
+        private void PrepareLazyLoads(
+           LambdaExpression expLambda,
+           out Object oObject
+        )
+        {
+            if (expLambda == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            try
+            {
+                oObject = expLambda.Compile().DynamicInvoke();
+            }
+            catch
+            {
+                oObject = null;
+            }
+
+            oObject = ObjectUtils.ChangeType(oObject, expLambda.ReturnType);
+        }
+
+        private void PrepareLazyLoads(
+           NewArrayExpression expNewArray,
+           out Object oObject
+        )
+        {
+            if (expNewArray == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            Array
+                oArray =
+                    ArrayUtils.CreateInstance(
+                        expNewArray.Type.GetElementType(), 
+                        expNewArray.Expressions.Count
+                    );
+
+            if(oArray == null)
+            {
+                oObject = null;
+                return;
+            }    
+
+            for(int i=0; i<expNewArray.Expressions.Count; i++)
+            {
+                Object oi;
+                PrepareLazyLoads(expNewArray.Expressions[i], out oi);
+                oArray.SetValue(oi, i);
+            }
+
+            oObject = oArray;
+        }
+
+        //private void PrepareLazyLoads(
+        //   ParameterExpression expParameter,
+        //   out Object oObject
+        //)
+        //{
+        //    if (expParameter == null)
+        //    {
+        //        oObject = null;
+        //        return;
+        //    }
+
+        //    oObject = null;
+        //}
+
+        private void PrepareLazyLoads(
+            ref Object o0,
+            EGefyraComparator eComparator,
+            ref Object o1
+        )
+        {
+            GefyraColumn oColumn;
+            GefyraColumn clmKey = null;
+            Object oValue = null;
+
+            if (PrepareLazyLoads(ref o0, out oColumn))
+            {
+                clmKey = oColumn;
+                oValue = o1;
+            }
+            else if (PrepareLazyLoads(ref o1, out oColumn))
+            {
+                clmKey = oColumn;
+                oValue = o0;
+            }
+
+            PrepareLazyLoads(ref clmKey, eComparator, ref oValue);
+        }
+
+        private void PrepareLazyLoads(
+           ref GefyraColumn clmKey,
+           EGefyraComparator eComparator,
+           ref Object oValue
+        )
+        {
+            GefyraColumn clmValue;
+            if (PrepareLazyLoads(ref oValue, out clmValue))
+                oValue = clmValue;
+
+            GCParameterModel mParameter =
+                new GCParameterModel
+                (
+                    ref clmKey,
+                    eComparator,
+                    ref oValue
+                );
+
+            //RequestLazyLoadsList()
+            //    .Add(
+            //        new GCLazyLoadModel<GCParameterModel>
+            //        (
+            //            EGefyraClausole.Where,
+            //            ref mParameter
+            //        )
+            //    );
+        }
+
+        private Boolean PrepareLazyLoads(
+            ref Object oObject,
+            out GefyraColumn oColumn
+        )
+        {
+            MemberInfo
+                oMember = oObject as MemberInfo;
+
+            if (oMember == null)
+            {
+                oColumn = null;
+                return false;
+            }
+            else if (!GefyraMapper.GetColumn(ref oMember, out oColumn))
+                return false;
+
+            return true;
+        }
+
+        //private void PrepareLazyLoads(
+        //   ParameterExpression expParameter,
+        //   out Object oObject
+        //)
+        //{
+        //    if (expParameter == null)
+        //    {
+        //        oObject = null;
+        //        return;
+        //    }
+
+        //    oObject = null;
+        //}
+
+        //if (oObject == null)
+        //    return;
+
+        //Type
+        //    tObject = oObject.GetType();
+
+        //CompilerGeneratedAttribute attCompilerGenerated =
+        //    ObjectUtils.GetClassAttribute<CompilerGeneratedAttribute>(tObject);
+
+        //if (attCompilerGenerated == null)
+        //    return;
+
+        //MemberInfo[]
+        //    aOMembers = ObjectUtils.GetMembers(tObject, MemberTypes.Property | MemberTypes.Field);
+
+        //if (aOMembers == null || aOMembers.Length != 1 || aOMembers[0] == null)
+        //    return;
+
+        //oObject = ObjectUtils.GetMemberValue(oObject, aOMembers[0]);
+
+
+
+
+
+
+
+
+
+
+
+        //ConstantExpression
+        //    expConstant = oExpression as ConstantExpression;
+
+        //if (expConstant != null)
+        //{
+        //    oObject = expConstant.Value;
+        //    return;
+        //}
+
+        //MemberExpression
+        //     expMember = oExpression as MemberExpression;
+
+        //if (expMember != null)
+        //{
+        //    oObject = expMember.Member;
+        //    return;
+        //}
+
+        //BinaryExpression 
+        //    expBinary = oExpression as BinaryExpression;
+
+        //if (expBinary != null)
+        //{
+        //    PrepareLazyLoads(ref eClausole, ref expBinary, out oObject);
+        //    return;
+        //}
+
+        //UnaryExpression
+        //    expUnary = oExpression as UnaryExpression;
+
+        //if (expUnary != null)
+        //{
+        //    PrepareLazyLoads(ref eClausole, expUnary.Operand, out oObject);
+        //    return;
+        //}
+
+        //MethodCallExpression
+        //    expMethodCall = oExpression as MethodCallExpression;
+
+        //if (expMethodCall != null)
+        //{
+        //    PrepareLazyLoads(ref eClausole, ref expMethodCall, out oObject);
+        //    return;
+        //}
+
+        //NewArrayExpression
+        //    expNewArray = oExpression as NewArrayExpression;
+
+        //if (expNewArray != null)
+        //{
+        //    PrepareLazyLoads(ref eClausole, ref expNewArray, out oObject);
+        //    return;
+        //}
+
+        //LambdaExpression
+        //    expLambda = oExpression as LambdaExpression;
+
+        //if (expLambda != null)
+        //{
+        //    PrepareLazyLoads(ref eClausole, ref expLambda, out oObject);
+        //    return;
+        //}
+
+        //oObject = null;
+        ////if (expMethodCall.Object != null)
+        ////    var objectMember = Expression.Convert(expMethodCall.Object, typeof(object));
+
+        ////    //MemberExpression prova = expMethodCall.Object as MemberExpression;
+
+        ////    if (objectMember == null)
+        ////    {
+        ////        oObject = null;
+        ////        return;
+        ////    }
+
+        ////    var lambda = Expression.Lambda<Func<Object>>(objectMember);
+
+        ////    var fff = lambda.Compile();
+
+        ////    Object a = fff();
+
+        ////    PrepareLazyLoads(ref eClausole, expMethodCall.Object, out oObject);
+        ////    return;
+        ////}
+
+        ////for (int i = 0; i < expMethodCall.Arguments.Count; i++)
+        ////{
+        ////    if (expMethodCall.Arguments[i] == null)
+        ////        continue;
+
+        ////    var objectMember = Expression.Convert(expMethodCall.Arguments[i], typeof(object));
+
+        ////    //MemberExpression prova = expMethodCall.Object as MemberExpression;
+
+        ////    if (objectMember == null)
+        ////    {
+        ////        oObject = null;
+        ////        return;
+        ////    }
+
+        ////    var lambda = Expression.Lambda<Func<Object>>(objectMember);
+
+        ////    var fff = lambda.Compile();
+
+        ////    Object a = fff();
+
+        ////    PrepareLazyLoads(ref eClausole, expMethodCall.Object, out oObject);
+
+        ////    Object oObjecti;
+        ////    PrepareLazyLoads(ref eClausole, expMethodCall.Arguments[i], out oObjecti);
+        ////}
+
+
+        //LambdaExpression expEMCAsLambda;
+
+        //try
+        //{
+        //    expEMCAsLambda = Expression.Lambda(expMethodCall);
+        //}
+        //catch
+        //{
+        //    expEMCAsLambda = null;
+        //}
+
+        //if (expEMCAsLambda == null)
+        //{
+        //    oObject = null;
+        //    return;
+        //}
+
+        //PrepareLazyLoads(expEMCAsLambda, out oObject);
+        // private void PrepareLazyLoads(
+        //     ref EGefyraClausole eClausole,
+        //     ref NewArrayExpression expNewArray,
+        //     out Object oObject
+        // )
+        // {
+        //     if (expNewArray == null)
+        //     {
+        //         oObject = null;
+        //         return;
+        //     }
+
+        //     Object[] aObjects = new Object[expNewArray.Expressions.Count];
+
+        //     for(int i=0; i< expNewArray.Expressions.Count; i++)
+        //     {
+        //         PrepareLazyLoads(ref eClausole, expNewArray.Expressions[i], out oObject);
+        //         aObjects[i] = oObject;
+        //     }
+
+        //     oObject = aObjects;
+        // }
+
+        #endregion
+
+        private void PrepareCommandBuilder(
+            ref NTRGefyraCommandBuilder oCommandBuilder,
+            ref EGefyraClausole eClausole,
+            NewArrayExpression expNewArray,
+            out Object oObject
+        )
+        {
+            if (expNewArray == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            Array
+                oArray =
+                    ArrayUtils.CreateInstance(
+                        expNewArray.Type.GetElementType(),
+                        expNewArray.Expressions.Count
+                    );
+
+            var aaa = Expression.GetFuncType(expNewArray.Type);
+            var lambda = Expression.Lambda(aaa, expNewArray);
+
+            var prova = lambda.Compile();
+            var ccc = prova.DynamicInvoke();
+
+
+            if (oArray == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            for (int i = 0; i < expNewArray.Expressions.Count; i++)
+            {
+                Object oi;
+                PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, expNewArray.Expressions[i], out oi);
+                oArray.SetValue(oi, i);
+            }
+
+            oObject = oArray;
+        }
+
+        
+        private void PrepareCommandBuilder(
+            ref NTRGefyraCommandBuilder oCommandBuilder,
+            ref EGefyraClausole eClausole,
+            ListInitExpression expListInit,
+            out Object oObject
+        )
+        {
+            if (expListInit == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            Type tENAFunction;
+            if (!Expression.TryGetFuncType(new Type[] { expListInit.Type }, out tENAFunction))
+            {
+                oObject = null;
+                return;
+            }
+
+            LambdaExpression expLambda;
+
+            try
+            {
+                expLambda = Expression.Lambda(tENAFunction, expListInit);
+            }
+            catch
+            {
+                expLambda = null;
+            }
+
+            if (expLambda == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, expLambda, out oObject);
+        }
+
+
+        private void PrepareCommandBuilder(
+            ref NTRGefyraCommandBuilder oCommandBuilder,
+            ref EGefyraClausole eClausole,
+            NewArrayExpression expNewArray,
+            out Object oObject
+        )
+        {
+            if (expNewArray == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            Type tENAFunction;
+            if(!Expression.TryGetFuncType(new Type[] { expNewArray.Type }, out tENAFunction))
+            {
+                oObject = null;
+                return;
+            }
+
+            LambdaExpression expLambda;
+
+            try
+            {
+                expLambda = Expression.Lambda(tENAFunction, expNewArray);
+            }
+            catch
+            {
+                expLambda = null;
+            }
+
+            if(expLambda == null)
+            {
+                oObject = null;
+                return;
+            }
+
+            PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, expLambda, out oObject);
+        }
+
+
+
+
+
+
+
+
+
+
+        
+        private Boolean PrepareCommandBuilder(
+            ref NTRGefyraCommandBuilder oCommandBuilder,
+            ref EGefyraClausole eClausole,
+            ref Expression<Func<ModelType, Boolean>> oExpression
+        )
+        {
+            Object oObject;
+            PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, oExpression.Body, out oObject);
+            return true;
+            //return PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, ref oExpression);
+        }
+
+        //private Boolean PrepareCommandBuilder<JoinModelType>(
+        //    ref NTRGefyraCommandBuilder oCommandBuilder,
+        //    ref NTREGefyraClausole eClausole, 
+        //    ref Expression<Func<ModelType, JoinModelType, Boolean>> oExpression
+        //)
+        //{
+        //    return PrepareCommandBuilder(ref oCommandBuilder, ref eClausole, ref oExpression);
+        //}
+
+        //private Boolean PrepareCommandBuilder<ExpressionBodyType>
+        //(
+        //    ref NTRGefyraCommandBuilder oCommandBuilder,
+        //    ref NTREGefyraClausole eClausole,
+        //    ref Expression<ExpressionBodyType> oExpression
+        //)
+        //{
+        //    if (oExpression == null) return false;
+
+        //    //RequestLazyLoadsList().Add(new GCLazyLoadModel(eClausole)); 
+
+        //    Object oObject;
+        //    PrepareCommandBuilder(ref oCommandBuilder, oExpression.Body, out oObject);
+        //    return true;
+        //}

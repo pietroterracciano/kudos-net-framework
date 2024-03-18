@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+	<OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="KaronteModule\Chains\**" />
+    <Compile Remove="KaronteModule\Packets\**" />
+    <Content Remove="KaronteModule\Chains\**" />
+    <Content Remove="KaronteModule\Packets\**" />
+    <EmbeddedResource Remove="KaronteModule\Chains\**" />
+    <EmbeddedResource Remove="KaronteModule\Packets\**" />
+    <None Remove="KaronteModule\Chains\**" />
+    <None Remove="KaronteModule\Packets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos.Constants\Kudos.Constants.csproj" />
+    <ProjectReference Include="..\Kudos.Databases\Kudos.Databases.csproj" />
+    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,7 +13,7 @@ namespace Kudos.Utils.Types
     {
         private JsonElement _oJsonElement;
 
-        public JSONDynamicObject(JsonElement oJsonElement)
+        internal JSONDynamicObject(JsonElement oJsonElement)
         {
             _oJsonElement = oJsonElement;
         }

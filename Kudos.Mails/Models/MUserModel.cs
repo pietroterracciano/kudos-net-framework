@@ -11,14 +11,14 @@ namespace Kudos.Mails.Models
         public Text Mail { get; set; }
         public Text Name { get; set; }
 
-        public Boolean IsMailValid()
+        internal Boolean IsMailValid()
         {
             return
                 ValidateUtils.IsMail(Mail);
         }
 
         /// <summary>Nullable</summary>
-        public MailAddress ToMailAddress()
+        internal MailAddress ToMailAddress()
         {
             if (IsMailValid())
                 try { return new MailAddress(Mail, Name, Encoding.UTF8); } catch { }

@@ -1,6 +1,6 @@
 ﻿using Kudos.Constants;
 using Kudos.Enums;
-using Kudos.Utils.Integers;
+using Kudos.Utils.Numerics.Integers;
 using System;
 using System.Text;
 
@@ -8,6 +8,25 @@ namespace Kudos.Utils
 {
     public static class StringUtils
     {
+        #region public static String Join()
+
+        public static String Join(String s, String[] a)
+        {
+            return a != null ? String.Join(s, a) : null;
+        }
+
+        public static String Join(Char c, String[] a)
+        {
+            return a != null ? String.Join(c, a) : null;
+        }
+
+        public static String Join(Char c, Object[] a)
+        {
+            return a != null ? String.Join(c, a) : null;
+        }
+
+        #endregion
+
         #region public static String Random()
 
         /// <summary>Nullable</summary>
@@ -172,11 +191,32 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region public static String Truncate()
+
+        public static String Truncate(String oString, UInt32 iMaxValue)
+        {
+            if (oString == null)
+                return null;
+            else if (oString.Length > iMaxValue)
+                return iMaxValue > 0
+                    ? oString.Substring(0, Int32Utils.From(iMaxValue))
+                    : String.Empty;
+            else
+                return oString;
+        }
+
+        #endregion
+
         #region public static ToNotNullable()
 
-        public static String ToNotNullable(String oString)
+        public static String Parse2NotNullableFrom(String oString)
         {
-            return oString != null ? oString : "";
+            return oString != null ? oString : String.Empty;
+        }
+
+        public static String Parse2NotNullableFrom(Object o)
+        {
+            return o != null ? o.ToString() : String.Empty;
         }
 
         #endregion

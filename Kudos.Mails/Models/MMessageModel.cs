@@ -1,5 +1,5 @@
 ﻿using Kudos.Types;
-using Kudos.Utils;
+using Kudos.Utils.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -381,7 +381,7 @@ namespace Kudos.Mails.Models
 
         #endregion
 
-        public MailMessage ToMailMessage()
+        internal MailMessage ToMailMessage()
         {
             if (
                 _mSender == null

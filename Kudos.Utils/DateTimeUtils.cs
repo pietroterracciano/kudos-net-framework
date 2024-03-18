@@ -9,9 +9,9 @@ namespace Kudos.Utils
             return GetOrigin(DateTimeKind.Utc);
         }
 
-        public static DateTime GetOrigin(DateTimeKind eDateTimeKind)
+        public static DateTime GetOrigin(DateTimeKind dtk)
         {
-            return new DateTime(1970, 1, 1, 0, 0, 0, 0, eDateTimeKind);
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0, dtk);
         }
 
         public static DateTime GetCurrent()
@@ -19,10 +19,10 @@ namespace Kudos.Utils
             return GetCurrent(DateTimeKind.Utc);
         }
 
-        public static DateTime GetCurrent(DateTimeKind eDateTimeKind)
+        public static DateTime GetCurrent(DateTimeKind dtk)
         {
             return
-                eDateTimeKind == DateTimeKind.Local
+                dtk == DateTimeKind.Local
                     ? DateTime.Now.ToLocalTime()
                     : DateTime.Now.ToUniversalTime();
         }

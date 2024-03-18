@@ -25,7 +25,7 @@ namespace Kudos.Mails.Models
             //DeliveryMethod = SmtpDeliveryMethod.Network;
         }
 
-        public SmtpClient ToSmtpClient()
+        internal SmtpClient ToSmtpClient()
         {
             return
                 !String.IsNullOrWhiteSpace(Login)

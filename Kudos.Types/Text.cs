@@ -1,7 +1,7 @@
 ﻿using Kudos.Types.Converters.JSONs;
-using Kudos.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -13,53 +13,74 @@ namespace Kudos.Types
         private readonly String
             _sValue;
 
-        public int Length
+        public Int32 Length
         {
-            get { return ToString().Length; }
+            get { return _sValue.Length; }
+        }
+
+        public Text()
+        {
+            _sValue = String.Empty;
         }
 
         public Text(String sValue)
         {
-            _sValue = sValue;
+            _sValue = StringUtils_From(sValue);
         }
 
         public Text(Object oObject)
         {
-            _sValue = StringUtils.From(oObject);
+            _sValue = StringUtils_From(oObject);
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return _sValue.GetHashCode();
         }
 
         public override String ToString()
         {
-            return _sValue != null ? _sValue : "";
+            return _sValue;
+        }
+
+        public String[] Split(String o)
+        {
+            return _sValue.Split(o);
+        }
+
+        public String[] Split(Char o)
+        {
+            return _sValue.Split(o);
+        }
+
+        public Boolean Contains(String o)
+        {
+            return _sValue.Contains(o);
+        }
+
+        public Boolean Contains(Char o)
+        {
+            return _sValue.Contains(o);
         }
 
         public Text Replace(String sOld, String sNew)
         {
-            return
-                new Text(ToString().Replace(sOld, sNew));
+            return new Text(_sValue.Replace(sOld, sNew));
         }
 
         public Text ToLower()
         {
-            return
-                new Text(ToString().ToLower());
+            return new Text(_sValue.ToLower());
         }
 
         public Text ToUpper()
         {
-            return
-                new Text(ToString().ToUpper());
+            return new Text(_sValue.ToUpper());
         }
 
         public Text Trim()
         {
-            return
-                new Text(ToString().Trim());
+            return new Text(_sValue.Trim());
         }
 
         public override Boolean Equals(Object oObject)
@@ -74,8 +95,8 @@ namespace Kudos.Types
         public Boolean Equals(Text oText)
         {
             return
-                this == oText
-                || ToString().Equals(oText.ToString());
+                ReferenceEquals(this, oText)
+                || _sValue.Equals(oText._sValue);
         }
 
         public static implicit operator Text(String oString)
@@ -97,5 +118,23 @@ namespace Kudos.Types
         {
             return !(t0 == t1);
         }
+
+        #region Kudos.Utils
+
+        #region StringUtils
+
+        private static String StringUtils_From(Object? o)
+        {
+            return o != null ? o.ToString() : String.Empty;
+        }
+
+        private static String StringUtils_From(String? s)
+        {
+            return s != null ? s : String.Empty;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

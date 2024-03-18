@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
+    <ProjectReference Include="..\Kudos.Enums\Kudos.Enums.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
+    <ProjectReference Include="..\Kudos.Constants\Kudos.Constants.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="TimeStamps\" />
+    <None Remove="TimeStamps\Enums\" />
+  </ItemGroup>
 </Project>
