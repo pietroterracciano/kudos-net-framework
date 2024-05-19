@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+	<OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="EpikyrosiModule\" />
+    <None Remove="EpikyrosiModule\Builders\" />
+    <None Remove="EpikyrosiModule\Interfaces\" />
+    <None Remove="EpikyrosiModule\Attributes\" />
+    <None Remove="EpikyrosiModule\Entities\" />
+    <None Remove="EpikyrosiModule\Interfaces\Builders\" />
+    <None Remove="EpikyrosiModule\Interfaces\Entities\" />
+    <None Remove="EpikyrosiModule\Rules\" />
+    <None Remove="EpikyrosiModule\Enums\" />
+    <None Remove="EpikyrosiModule\Builts\" />
+    <None Remove="EpikyrosiModule\Results\" />
+    <None Remove="EpikyrosiModule\Interfaces\Builds\" />
+    <None Remove="EpikyrosiModule\Interfaces\Rules\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EpikyrosiModule\" />
+    <Folder Include="EpikyrosiModule\Builders\" />
+    <Folder Include="EpikyrosiModule\Interfaces\" />
+    <Folder Include="EpikyrosiModule\Attributes\" />
+    <Folder Include="EpikyrosiModule\Entities\" />
+    <Folder Include="EpikyrosiModule\Interfaces\Builders\" />
+    <Folder Include="EpikyrosiModule\Interfaces\Entities\" />
+    <Folder Include="EpikyrosiModule\Rules\" />
+    <Folder Include="EpikyrosiModule\Enums\" />
+    <Folder Include="EpikyrosiModule\Builts\" />
+    <Folder Include="EpikyrosiModule\Results\" />
+    <Folder Include="EpikyrosiModule\Interfaces\Builds\" />
+    <Folder Include="EpikyrosiModule\Interfaces\Rules\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos\Kudos.csproj" />
+  </ItemGroup>
+</Project>

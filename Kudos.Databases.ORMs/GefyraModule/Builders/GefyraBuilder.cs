@@ -17,7 +17,7 @@ using System.Text;
 namespace Kudos.Databases.ORMs.GefyraModule.Builders
 {
     internal class
-        INTGefyraBuilder
+        GefyraBuilder
     :
         IGefyraBuilder,
         IGefyraInsertClausoleBuilder,
@@ -44,7 +44,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private static readonly String
             __sParameterPrefix;
 
-        static INTGefyraBuilder()
+        static GefyraBuilder()
         {
             // SAREBBE OPPORTUNO AGGIUNGERE UN FAKETIMESTAMP
             __sParameterPrefix =
@@ -56,7 +56,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private readonly StringBuilder _sb1;
         private /*readonly*/ List<GefyraParameter> _l;
 
-        internal INTGefyraBuilder()
+        internal GefyraBuilder()
         {
             //_lck = new object();
             _l = new List<GefyraParameter>();
@@ -362,7 +362,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraCompareClausole
 
-        private INTGefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref object? o)
+        private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref object? o)
         {
             Append(ref gc); Append(CCharacter.Space); Append(ref e); Append(CCharacter.Space);
 
@@ -387,7 +387,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             return this;
         }
 
-        private INTGefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref Action<IGefyraSelectClausole>? act)
+        private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref Action<IGefyraSelectClausole>? act)
         {
             Append(ref gc); Append(CCharacter.Space); Append(ref e); Append(CCharacter.Space);
             Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
@@ -401,7 +401,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraOpenBlockClausole
 
-        private INTGefyraBuilder _OpenBlock()
+        private GefyraBuilder _OpenBlock()
         {
             Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
             return this;
@@ -411,7 +411,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraCloseBlockClausole
 
-        private INTGefyraBuilder _CloseBlock()
+        private GefyraBuilder _CloseBlock()
         {
             Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
             return this;
@@ -421,13 +421,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraJunctionClausole
 
-        private INTGefyraBuilder _And()
+        private GefyraBuilder _And()
         {
             Append(CGefyraClausole.And); Append(CCharacter.Space);
             return this;
         }
 
-        private INTGefyraBuilder _Or()
+        private GefyraBuilder _Or()
         {
             Append(CGefyraClausole.Or); Append(CCharacter.Space);
             return this;

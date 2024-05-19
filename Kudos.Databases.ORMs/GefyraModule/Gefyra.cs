@@ -13,7 +13,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         public static IGefyraBuilder RequestBuilder()
         {
-            return new INTGefyraBuilder();
+            return new GefyraBuilder();
         }
 
         #endregion
