@@ -3,12 +3,9 @@ using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.Utils;
-using Kudos.Utils;
-using Kudos.Utils.Members;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule.Middlewares

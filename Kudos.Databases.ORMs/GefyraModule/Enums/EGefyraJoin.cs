@@ -8,6 +8,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Enums
 		Left,
         Right,
         Inner,
-        Outer
+        Full
     }
 }

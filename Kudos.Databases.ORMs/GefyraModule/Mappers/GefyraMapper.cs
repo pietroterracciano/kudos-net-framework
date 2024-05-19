@@ -1,10 +1,7 @@
 ﻿using Kudos.Databases.ORMs.GefyraModule.Attributes;
-using Kudos.Databases.ORMs.GefyraModule.Constants;
-using Kudos.Databases.ORMs.GefyraModule.Entities;
-using Kudos.Databases.ORMs.GefyraModule.Enums;
+using Kudos.Databases.ORMs.GefyraModule.Types;
 using Kudos.Databases.ORMs.GefyraModule.Utils;
 using Kudos.Utils;
-using Kudos.Utils.Members;
 using System;
 using System.Collections.Generic;
 using System.Data;

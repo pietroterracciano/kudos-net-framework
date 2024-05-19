@@ -1,7 +1,4 @@
-﻿using Kudos.Databases.ORMs.GefyraModule.Constants;
-using Kudos.Databases.ORMs.GefyraModule.Utils;
-using Kudos.Types;
-using Kudos.Utils;
+﻿using Kudos.Databases.ORMs.GefyraModule.Utils;
 
 namespace Kudos.Databases.ORMs.GefyraModule.Attributes
 {
@@ -9,7 +6,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Attributes
     public class GefyraTableAttribute : Attribute
     {
         internal readonly String? SchemaName, Name;
-        internal readonly Boolean IsWhole;
 
         public GefyraTableAttribute() : this(null) { }
         public GefyraTableAttribute(String? sName) : this(null, sName) { }
@@ -17,7 +13,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Attributes
         {
             SchemaName = sSchemaName;
             Name = sName;
-            IsWhole = !String.IsNullOrWhiteSpace(sName);
         }
     }
 }

@@ -2,7 +2,7 @@
 using Kudos.Databases.Handlers;
 using Kudos.Databases.Interfaces;
 using Kudos.Databases.Interfaces.Chains;
-using Kudos.Utils.Numerics.Integers;
+using Kudos.Utils.Numerics;
 using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using System;
@@ -31,9 +31,9 @@ namespace Kudos.Databases.Chains
             if (_MinimumPoolSize != null) scsb.MinPoolSize = _MinimumPoolSize.Value;
             if (_MaximumPoolSize != null) scsb.MaxPoolSize = _MaximumPoolSize.Value;
 
-            if (_ConnectionTimeout != null) scsb.ConnectTimeout = Int32Utils.From(_ConnectionTimeout.Value);
-            if (_SessionPoolTimeout != null) scsb.LoadBalanceTimeout = Int32Utils.From(_SessionPoolTimeout.Value);
-            if (_CommandTimeout != null) scsb.CommandTimeout = Int32Utils.From(_CommandTimeout.Value);
+            if (_ConnectionTimeout != null) scsb.ConnectTimeout = Int32Utils.NNParse(_ConnectionTimeout.Value);
+            if (_SessionPoolTimeout != null) scsb.LoadBalanceTimeout = Int32Utils.NNParse(_SessionPoolTimeout.Value);
+            if (_CommandTimeout != null) scsb.CommandTimeout = Int32Utils.NNParse(_CommandTimeout.Value);
             if (_IsCompressionEnabled != null) scsb.Encrypt = _IsCompressionEnabled.Value;
 
             return new MSSQLDatabaseHandler(ref scsb);

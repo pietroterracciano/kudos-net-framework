@@ -36,7 +36,7 @@ namespace Kudos.Databases.Chains
 
         internal DatabaseChain(DatabaseChain? o = null)
         {
-            ObjectUtils.Copy(o, this, BindingFlags.NonPublic | BindingFlags.Instance, MemberTypes.Field);
+            ObjectUtils.Copy(o, this, CBindingFlags.Instance);
         }
     }
 }

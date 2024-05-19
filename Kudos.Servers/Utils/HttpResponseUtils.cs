@@ -1,4 +1,4 @@
-﻿using Kudos.Utils.Enums;
+﻿using Kudos.Utils;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;

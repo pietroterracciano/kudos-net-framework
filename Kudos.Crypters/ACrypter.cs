@@ -2,6 +2,7 @@
 using Kudos.Crypters.Models.SALTs;
 using Kudos.Enums;
 using Kudos.Utils;
+using Kudos.Utils.Texts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,10 @@ namespace Kudos.Crypters
 
         protected void GenerateSALT(out Byte[] aSALT)
         {
-            aSALT = Preferences.SALTPreferences.Use
-                ? BytesUtils.Random(Preferences.SALTPreferences.Length, Preferences.SALTPreferences.CharType)
-                : null;
+            aSALT = null;
+            //Preferences.SALTPreferences.Use
+              //  ? BytesUtils.Random(Preferences.SALTPreferences.Length, Preferences.SALTPreferences.CharType)
+                //: null;
         }
 
         protected void GenerateSALT(out String sSALT)
@@ -47,7 +49,7 @@ namespace Kudos.Crypters
                 return;
             }
 
-            oString = StringUtils.From( aBytes, Preferences.Encoding );
+            oString = StringUtils.Parse( aBytes, Preferences.Encoding );
         }
 
         //protected void Internal_ToBytes(ref Object oInput, out Byte[] aBytes)
@@ -64,21 +66,21 @@ namespace Kudos.Crypters
                 return;
             }
 
-            aBytes = BytesUtils.From(oString, Preferences.Encoding);
+            aBytes = BytesUtils.Parse(oString, Preferences.Encoding);
         }
 
         protected void External_ToString(ref Byte[] aBytes, out String oString)
         {
             oString = Preferences.BinaryEncoding == EBinaryEncoding.Base64
-                ? StringUtils.ToBase64(aBytes)
-                : StringUtils.ToBase16(aBytes);
+                ? StringUtils.ConvertToBase64(aBytes)
+                : StringUtils.ConvertToBase16(aBytes);
         }
 
         protected void External_ToBytes(ref String oString, out Byte[] aBytes)
         {
             aBytes = Preferences.BinaryEncoding == EBinaryEncoding.Base64
-                ? BytesUtils.FromBase64(oString)
-                : BytesUtils.FromBase16(oString);
+                ? BytesUtils.ConvertFromBase64(oString)
+                : BytesUtils.ConvertFromBase16(oString);
         }
 
         public abstract void Dispose();

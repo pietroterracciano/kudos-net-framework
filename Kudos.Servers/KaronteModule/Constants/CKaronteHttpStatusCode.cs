@@ -1,4 +1,4 @@
-﻿using Kudos.Utils.Enums;
+﻿using Kudos.Utils;
 using System.Net;
 
 namespace Kudos.Servers.KaronteModule.Constants

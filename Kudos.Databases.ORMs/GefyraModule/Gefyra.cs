@@ -1,100 +1,318 @@
-﻿using Kudos.Databases.Controllers;
-using Kudos.Databases.Enums;
-using Kudos.Databases.Interfaces;
-using Kudos.Databases.ORMs.GefyraModule.Builders;
-using Kudos.Databases.ORMs.GefyraModule.Entities;
-using Kudos.Databases.ORMs.GefyraModule.Interfaces.Commands.Builders;
-using Kudos.Databases.ORMs.GefyraModule.Models;
-using Kudos.Mappings.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Kudos.Databases.ORMs.GefyraModule.Builders;
+using Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders;
+using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
+using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
 
 namespace Kudos.Databases.ORMs.GefyraModule
 {
     public static class Gefyra
     {
-        //public static IGefyraContext<ModelType> NewContext<ModelType>(IDBController? oDBController = null)
-        //{
-        //    IDBController? oDBController1 = oDBController != null ? oDBController : Config.DefaultDBController;
-        //    return new GefyraContext<ModelType, Object>(ref oDBController1);
-        //}
+        #region Builder
 
-        //public static IGefyraCommandBuilder NewCommandBuilder(EDatabaseType eDBType = EDatabaseType.Unknown)
-        //{
-        //    EDatabaseType eDBType1 = eDBType != EDatabaseType.Unknown ? eDBType : ( Config.DefaultDBController != null ? Config.DefaultDBController.Type : EDatabaseType.Unknown);
-        //    return new NTRGefyraCommandBuilder(eDBType1);
-        //}
+        #region public static IGefyraBuilder RequestBuilder()
 
-        public static IGefyraCommandBuilder? NewCommandBuilder(EDatabaseType? edbt)
+        public static IGefyraBuilder RequestBuilder()
         {
-            return edbt != null
-                ? new NTRGefyraCommandBuilder(edbt.Value)
-                : null;
+            return new INTGefyraBuilder();
         }
 
-        public static GefyraTable? GetTable<ObjectType>()
-        {
-            GefyraTable? tbl;
-            GefyraMapper.GetTable<ObjectType>(out tbl);
-            return tbl;
-        }
+        #endregion
 
-        public static GefyraColumn? GetColumn<ObjectType>(String? s)
-        {
-            GefyraColumn? clm;
-            GefyraMapper.GetColumn<ObjectType>(ref s, out clm);
-            return clm;
-        }
+        #endregion
 
-        public static ObjectType? Parse<ObjectType>(DataRow? dr)
-        {
-            ObjectType? o;
-            GefyraMapper.Parse(ref dr, out o);
-            return o;
-        }
+        #region Table
 
+        #region public static GefyraTable GetTable<...>(...)
 
-        //public static GefyraTable TableOf(String sName)
+        public static IGefyraTable GetTable<T>() { GefyraTable gt; GefyraTable.Get<T>(out gt); return gt; }
+        public static IGefyraTable GetTable(Type? t) { GefyraTable gt; GefyraTable.Get(ref t, out gt); return gt; }
+
+        //public static GefyraTable RequestTable(String? sName) { GefyraTable gt; GefyraTable.Request(ref sName, out gt); return gt; }
+        //public static GefyraTable RequestTable(String? sSchemaName, String? sName) { GefyraTable gt; GefyraTable.Request(ref sSchemaName, ref sName, out gt); return gt; }\
+
+        #endregion
+
+        #endregion
+
+        //#region Column
+
+        //internal static void __GetColumn(ref GefyraTable? gt, ref String? sn, ref String? sa, out GefyraColumn gc)
         //{
-        //    return TableOf(null, sName);
-        //}
-        //public static GefyraTable TableOf(String sSchemaName, String sName)
-        //{
-        //    lock (__oLock)
+        //    if (gt == null)
         //    {
-        //        __oStringBuilder.Length = 0;
-        //        if (!String.IsNullOrWhiteSpace(sSchemaName)) __oStringBuilder.Append(sSchemaName).Append(CGefyraSeparator.Dot);
-        //        if (!String.IsNullOrWhiteSpace(sName)) __oStringBuilder.Append(sName);
-        //        String sFullName = __oStringBuilder.ToString();
+        //        gc = GefyraColumn.Invalid;
+        //        return;
+        //    }
 
-        //        GefyraTable o;
-        //        if (__dTFullNames2Tables.TryGetValue(sFullName, out o) && o != null)
-        //            return o;
+        //    String? s;
+        //    __CalculateColumnHashKey(ref sn, ref sa, out s);
 
-        //        Type tFakeModel = null;
-        //        return __dTFullNames2Tables[sFullName] = new GefyraTable(ref tFakeModel, ref sSchemaName, ref sName);
+        //    if(s == null)
+        //    {
+        //        gc = GefyraColumn.Invalid;
+        //        return; 
+        //    }
+
+        //    lock (__lck)
+        //    {
+        //        gc = __m.Get<GefyraColumn>(s, StringComparison.OrdinalIgnoreCase);
+        //        if (gc != null) return gc;
+
+        //        MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, s);
+        //        if (mi != null)
+        //        {
+        //            StringBuilder sb;
+        //            _GetStringBuilder(out sb);
+
+        //            GefyraColumnAttribute?
+        //                gca = ReflectionUtils.GetCustomAttribute<GefyraColumnAttribute>(mi);
+
+        //            if (
+        //                gca != null
+        //                && gca.Name != null
+        //                && gca.Name.Length > 0
+        //            )
+        //                sb.Append(gca.Name);
+        //            else
+        //            {
+        //                String scp; Type? tmvt = ReflectionUtils.GetMemberValueType(mi);
+        //                GefyraTypeUtils.GetConventionalPrefix(ref tmvt, out scp);
+        //                sb.Append(scp).Append(mi.Name);
+        //            }
+
+        //            String sgcn = sb.ToString();
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref sgcn, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+        //        }
+        //        else
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref s, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+
+        //        return gc;
         //    }
         //}
 
-        //public static GefyraColumn ColumnOf(Type oType, String sMemberName)
+        //private static void __CalculateColumnHashKey(ref String? sn, ref String? sa, out String? s)
         //{
-        //    return new GefyraColumn(ref oType, ref sMemberName);
+        //    if (String.IsNullOrWhiteSpace(sn)) { s = null; return; }
+
+        //    lock (__lck)
+        //    {
+        //        __sb.Clear();
+
+        //        __sb
+        //            .Append("gc").Append(CCharacter.Dot).Append("n").Append(CCharacter.DoubleDot).Append(sn);
+
+        //        if (!String.IsNullOrWhiteSpace(sa))
+        //        {
+        //            if (__sb.Length > 0)
+        //                __sb.Append(CCharacter.Pipe);
+
+        //            __sb
+        //                .Append("gc").Append(CCharacter.Dot).Append("a").Append(CCharacter.DoubleDot).Append(sa);
+        //        }
+
+        //        s = __sb.ToString();
+        //    }
         //}
-        //public static GefyraColumn ColumnOf(String sTableName, String sColumnName)
+
+
+
+        //#endregion
+
+        //internal static void __GetColumn(ref GefyraTable? gt, ref String? s, out GefyraColumn gc)
         //{
-        //    return ColumnOf(null, sTableName, sColumnName);
+        //    if (gt == null || String.IsNullOrWhiteSpace(s))
+        //    {
+        //        gc = GefyraColumn.Invalid;
+        //        return;
+        //    }
+
+        //    lock (__lck)
+        //    {
+        //        String schk;
+        //        CalculateColumnHashKey(ref s, out schk);
+
+        //        GefyraColumn? gc = m.Get<GefyraColumn>(schk, StringComparison.OrdinalIgnoreCase);
+        //        if (gc != null) return gc;
+
+        //        MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, s);
+        //        if (mi != null)
+        //        {
+        //            StringBuilder sb;
+        //            _GetStringBuilder(out sb);
+
+        //            GefyraColumnAttribute?
+        //                gca = ReflectionUtils.GetCustomAttribute<GefyraColumnAttribute>(mi);
+
+        //            if (
+        //                gca != null
+        //                && gca.Name != null
+        //                && gca.Name.Length > 0
+        //            )
+        //                sb.Append(gca.Name);
+        //            else
+        //            {
+        //                String scp; Type? tmvt = ReflectionUtils.GetMemberValueType(mi);
+        //                GefyraTypeUtils.GetConventionalPrefix(ref tmvt, out scp);
+        //                sb.Append(scp).Append(mi.Name);
+        //            }
+
+        //            String sgcn = sb.ToString();
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref sgcn, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+        //        }
+        //        else
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref s, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+
+        //        return gc;
+        //    }
         //}
-        //public static GefyraColumn ColumnOf(String sSchemaName, String sTableName, String sColumnName)
+
+        //private static void __CalculateColumnHashKey(ref GefyraTable gt, ref String s, out String s)
         //{
-        //    return ColumnOf(TableOf(sSchemaName, sTableName), sColumnName);
+        //    __sb.Clear();
+
+        //    __sb
+        //        .Append("gt").Append(CCharacter.Dot).Append("sn").Append(CCharacter.DoubleDot).Append(sSchemaName);
+
+        //    if (__sb.Length > 0)
+        //        __sb.Append(CCharacter.Pipe);
+
+        //    __sb
+        //        .Append("gt").Append(CCharacter.Dot).Append("n").Append(CCharacter.DoubleDot).Append(sName);
+
+        //    sOut = __sb.ToString();
         //}
-        //public static GefyraColumn ColumnOf(GefyraTable mTable, String sColumnName)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //#region public static GefyraTable GetTable<...>(...)
+
+        //public static GefyraTable GetColumn(GefyraTable? gt, String? s)
         //{
-        //    return new GefyraColumn(ref mTable, ref sColumnName);
+        //    if (t == null)
+        //        return GefyraTable.Invalid;
+
+        //    lock (__lck)
+        //    {
+        //        Dictionary<Int32, GefyraTable> d;
+        //        if (!__d.TryGetValue(t.Module.MetadataToken, out d) || d == null)
+        //            __d[t.Module.MetadataToken] = d = new Dictionary<int, GefyraTable>();
+
+        //        GefyraTable? gt;
+        //        if (d.TryGetValue(t.MetadataToken, out gt) && gt != null)
+        //            return gt;
+
+        //        GefyraTableAttribute? gta;
+
+        //        #region Recupero l'Attribute per la Class
+
+        //        gta = ReflectionUtils.GetCustomAttribute<GefyraTableAttribute>(t);
+
+        //        #endregion
+
+        //        String?
+        //            sSchemaName;
+        //        String?
+        //            sName;
+
+        //        #region Recupero i dati dall'Attribute (se possibile)
+
+        //        if (gta != null && gta.Name != null && gta.Name.Length > 0)
+        //        {
+        //            sSchemaName = gta.SchemaName;
+        //            sName = gta.Name;
+        //        }
+        //        else
+        //            sSchemaName = sName = null;
+
+        //        if (String.IsNullOrWhiteSpace(sName))
+        //            sName = CGefyraConventionalPrefix.Class + t.Name;
+
+        //        #endregion
+
+        //        String? sAlias = null;
+        //        return d[t.MetadataToken] = gt = new GefyraTable(ref t, ref sSchemaName, ref sName, ref sAlias);
+        //    }
+        //}
+
+        //#endregion
+
+        //internal static void __GetColumn(ref GefyraTable? gt, ref String? s, out GefyraColumn gc)
+        //{
+        //    if (gt == null || String.IsNullOrWhiteSpace(s))
+        //    {
+        //        gc = GefyraColumn.Invalid;
+        //        return;
+        //    }
+
+        //    lock (__lck)
+        //    {
+        //        String schk;
+        //        CalculateColumnHashKey(ref s, out schk);
+
+        //        GefyraColumn? gc = m.Get<GefyraColumn>(schk, StringComparison.OrdinalIgnoreCase);
+        //        if (gc != null) return gc;
+
+        //        MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, s);
+        //        if (mi != null)
+        //        {
+        //            StringBuilder sb;
+        //            _GetStringBuilder(out sb);
+
+        //            GefyraColumnAttribute?
+        //                gca = ReflectionUtils.GetCustomAttribute<GefyraColumnAttribute>(mi);
+
+        //            if (
+        //                gca != null
+        //                && gca.Name != null
+        //                && gca.Name.Length > 0
+        //            )
+        //                sb.Append(gca.Name);
+        //            else
+        //            {
+        //                String scp; Type? tmvt = ReflectionUtils.GetMemberValueType(mi);
+        //                GefyraTypeUtils.GetConventionalPrefix(ref tmvt, out scp);
+        //                sb.Append(scp).Append(mi.Name);
+        //            }
+
+        //            String sgcn = sb.ToString();
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref sgcn, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+        //        }
+        //        else
+        //            m.Set(schk, gc = new GefyraColumn(ref _this, ref s, ref mi, ref __s), StringComparison.OrdinalIgnoreCase);
+
+        //        return gc;
+        //    }
+        //}
+
+        //private static void __CalculateColumnHashKey(ref GefyraTable gt, ref String s, out String s)
+        //{
+        //    __sb.Clear();
+
+        //    __sb
+        //        .Append("gt").Append(CCharacter.Dot).Append("sn").Append(CCharacter.DoubleDot).Append(sSchemaName);
+
+        //    if (__sb.Length > 0)
+        //        __sb.Append(CCharacter.Pipe);
+
+        //    __sb
+        //        .Append("gt").Append(CCharacter.Dot).Append("n").Append(CCharacter.DoubleDot).Append(sName);
+
+        //    sOut = __sb.ToString();
         //}
     }
 }

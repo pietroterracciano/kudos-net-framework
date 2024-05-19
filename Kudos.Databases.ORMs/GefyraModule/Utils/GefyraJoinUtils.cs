@@ -1,4 +1,5 @@
-﻿using Kudos.Databases.ORMs.GefyraModule.Enums;
+﻿using Kudos.Databases.ORMs.GefyraModule.Constants;
+using Kudos.Databases.ORMs.GefyraModule.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,44 +11,23 @@ namespace Kudos.Databases.ORMs.GefyraModule.Utils
 {
     internal static class GefyraJoinUtils
     {
-        private static readonly String
-            __sLeft = "LEFT",
-            __sRight = "RIGHT",
-            __sInner = "INNER",
-            __sOuter = "OUTER";
-
         private static readonly Dictionary<EGefyraJoin, String>
-          __dEnums2Strings = new Dictionary<EGefyraJoin, String>()
-          {
-                { EGefyraJoin.Left, __sLeft },
-                { EGefyraJoin.Right, __sRight },
-                { EGefyraJoin.Inner, __sInner },
-                { EGefyraJoin.Outer, __sOuter },
-          };
+          __d;
 
-        private static readonly Dictionary<String, EGefyraJoin>
-          __dStrings2Enums = new Dictionary<String, EGefyraJoin>()
-          {
-                { __sLeft, EGefyraJoin.Left },
-                { __sRight, EGefyraJoin.Right },
-                { __sInner, EGefyraJoin.Inner },
-                { __sOuter, EGefyraJoin.Outer },
-          };
-
-        internal static String? ToString(EGefyraJoin o)
+        static GefyraJoinUtils()
         {
-            String oString;
-            __dEnums2Strings.TryGetValue(o, out oString);
-            return oString;
+            __d = new Dictionary<EGefyraJoin, String>()
+            {
+                { EGefyraJoin.Left, CGefyraClausole.Left },
+                { EGefyraJoin.Right, CGefyraClausole.Right },
+                { EGefyraJoin.Inner, CGefyraClausole.Inner },
+                { EGefyraJoin.Full, CGefyraClausole.Full }
+            };
         }
 
-        internal static EGefyraJoin? From(String oString)
+        internal static void GetString(ref EGefyraJoin e, out String? s)
         {
-            if (oString == null) return null;
-            EGefyraJoin o;
-            return __dStrings2Enums.TryGetValue(oString.ToUpper(), out o)
-                ? o
-                : null;
+            __d.TryGetValue(e, out s);
         }
     }
 }

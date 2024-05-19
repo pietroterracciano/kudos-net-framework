@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Kudos.Constants;
 
 namespace Kudos.Servers.KaronteModule.Attributes
 {
@@ -7,8 +8,6 @@ namespace Kudos.Servers.KaronteModule.Attributes
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class KaronteControllerAttribute : Attribute
     {
-        private static readonly Char __cDot = '.';
-
         public readonly String? Version;
 
         public KaronteControllerAttribute() : this(null, null, null, null) { }
@@ -23,9 +22,9 @@ namespace Kudos.Servers.KaronteModule.Attributes
             else if (iMinor == null)
                 Version = "" + iMajor;
             else if (iPatch == null)
-                Version = "" + iMajor + __cDot + iMinor;
+                Version = "" + iMajor + CCharacter.Dot + iMinor;
             else
-                Version = "" + iMajor + __cDot + iMinor + __cDot + iPatch;
+                Version = "" + iMajor + CCharacter.Dot + iMinor + CCharacter.Dot + iPatch;
         }
     }
 }

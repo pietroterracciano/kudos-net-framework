@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos.Databases.ORMs\Kudos.Databases.ORMs.csproj" />
+    <ProjectReference Include="..\Kudos.Extensions\Kudos.Extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Kudos.Reflection">
+      <HintPath>..\Kudos.Reflection\bin\Debug\net8.0\Kudos.Reflection.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

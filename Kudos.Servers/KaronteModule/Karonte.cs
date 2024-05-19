@@ -1,6 +1,4 @@
-﻿using Kudos.Databases.Chainers;
-using Kudos.Databases.Interfaces;
-using Kudos.Databases.Interfaces.Chains;
+﻿using Kudos.Reflection.Utils;
 using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Builders;
 using Kudos.Servers.KaronteModule.Constants;
@@ -10,22 +8,15 @@ using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Interfaces;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Utils;
-using Kudos.Utils.Members;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Resources;
-using System.Runtime.Intrinsics.Arm;
-using System.Text.RegularExpressions;
 
 namespace Kudos.Servers.KaronteModule
 {
@@ -133,7 +124,7 @@ namespace Kudos.Servers.KaronteModule
                 for (int i = 0; i < ts1.Length; i++)
                 {
                     KaronteServiceAttribute? 
-                        ksa = MemberUtils.GetAttribute<KaronteServiceAttribute>(ts1[i], true);
+                        ksa = ReflectionUtils.GetCustomAttribute<KaronteServiceAttribute>(ts1[i], true);
 
                     if (ksa == null)
                         continue;
@@ -334,7 +325,7 @@ namespace Kudos.Servers.KaronteModule
         )
         {
             KaronteControllerAttribute?
-                kca = MemberUtils.GetAttribute<KaronteControllerAttribute>(t, true);
+                kca = ReflectionUtils.GetCustomAttribute<KaronteControllerAttribute>(t, true);
 
             if (kca == null)
                 return;
@@ -344,7 +335,7 @@ namespace Kudos.Servers.KaronteModule
                 return;
 
             KaronteRouteDescriptor[]? krds1;
-            if (!__MapKaronteControllers(/*ref e, */MethodUtils.Get(t), out krds1))
+            if (!__MapKaronteControllers(/*ref e, */ReflectionUtils.GetMethods(t), out krds1))
                 return;
 
             int k = 0;
@@ -407,7 +398,7 @@ namespace Kudos.Servers.KaronteModule
         )
         {
             NonActionAttribute?
-                naa = MemberUtils.GetAttribute<NonActionAttribute>(mi, true);
+                naa = ReflectionUtils.GetCustomAttribute<NonActionAttribute>(mi, true);
 
             if (naa != null)
             {
@@ -430,7 +421,7 @@ namespace Kudos.Servers.KaronteModule
             //    return false;
             //}
 
-            return __MapKaronteControllers(ref mi, MemberUtils.GetAttributes<RouteAttribute>(mi, true), out krds);
+            return __MapKaronteControllers(ref mi, ReflectionUtils.GetCustomAttributes<RouteAttribute>(mi, true), out krds);
         }
 
         private static Boolean __MapKaronteControllers

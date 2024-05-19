@@ -2,8 +2,7 @@
 using Kudos.Crypters.Symmetrics.RijndaelNS.Models;
 using Kudos.Enums;
 using Kudos.Utils;
-using Kudos.Utils.Enums;
-using Kudos.Utils.Numerics.Integers;
+using Kudos.Utils.Numerics;
 using System;
 using System.Security.Cryptography;
 
@@ -42,8 +41,7 @@ namespace Kudos.Crypters.Symmetrics.RijndaelNS
 
             try
             {
-                // TODO da rivedere
-                _oManaged.KeySize = Int32Utils.From(EnumUtils.GetValue(Preferences.KeySize));
+                _oManaged.KeySize = EnumUtils.GetNNValue(Preferences.KeySize);
             }
             catch
             {

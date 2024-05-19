@@ -8,24 +8,53 @@
 
   <ItemGroup>
     <Compile Remove="GefyraModule\Contexts\**" />
-    <Compile Remove="GefyraModule\Enums\Contexts\**" />
-    <Compile Remove="GefyraModule\Interfaces\Contexts\**" />
-    <Compile Remove="GefyraModule\Models\Contexts\**" />
+    <Compile Remove="GefyraModule\Enums\**" />
+    <Compile Remove="GefyraModule\Mappers\**" />
+    <Compile Remove="GefyraModule\Models\**" />
     <Compile Remove="GefyraModule\Wrappers\**" />
     <EmbeddedResource Remove="GefyraModule\Contexts\**" />
-    <EmbeddedResource Remove="GefyraModule\Enums\Contexts\**" />
-    <EmbeddedResource Remove="GefyraModule\Interfaces\Contexts\**" />
-    <EmbeddedResource Remove="GefyraModule\Models\Contexts\**" />
+    <EmbeddedResource Remove="GefyraModule\Enums\**" />
+    <EmbeddedResource Remove="GefyraModule\Mappers\**" />
+    <EmbeddedResource Remove="GefyraModule\Models\**" />
     <EmbeddedResource Remove="GefyraModule\Wrappers\**" />
     <None Remove="GefyraModule\Contexts\**" />
-    <None Remove="GefyraModule\Enums\Contexts\**" />
-    <None Remove="GefyraModule\Interfaces\Contexts\**" />
-    <None Remove="GefyraModule\Models\Contexts\**" />
+    <None Remove="GefyraModule\Enums\**" />
+    <None Remove="GefyraModule\Mappers\**" />
+    <None Remove="GefyraModule\Models\**" />
     <None Remove="GefyraModule\Wrappers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="GefyraModule\Models\GefyraConfigModel.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandAndOrClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandBuild.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandCloseBlockClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandDeleteClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandFromClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandGroupByClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandHavingClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandInsertClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandIntoClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandJoinClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandLimitClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandOffsetClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandOnComplexClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandOnSimpleClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandOpenBlockClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandOrderByClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandSelectClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandSelectMatchClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandSetClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandUpdateClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandValuesClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandWhereClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandWhereComplexClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandWhereMatchClausole.cs" />
+    <Compile Remove="GefyraModule\Interfaces\Commands\IGefyraCommandWhereSimpleClausole.cs" />
+    <Compile Remove="GefyraModule\Types\Entities\GefyraParameter.cs" />
+    <Compile Remove="GefyraModule\Utils\GefyraActionUtils.cs" />
+    <Compile Remove="GefyraModule\Utils\GefyraActuatorUtils.cs" />
+    <Compile Remove="GefyraModule\Utils\GefyraClausoleUtils.cs" />
+    <Compile Remove="GefyraModule\Utils\GefyraMethodUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,8 +67,13 @@
     <None Remove="GefyraModule\Contexts\" />
     <None Remove="GefyraModule\Builders\" />
     <None Remove="GefyraModule\Enums\" />
-    <None Remove="GefyraModule\Interfaces\Commands\" />
-    <None Remove="GefyraModule\Builders\Results\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="GefyraModule\Enums\EGefyraCompare.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraEntityType.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraJoin.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraOrder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kudos.Reflection\Kudos.Reflection.csproj" />
@@ -52,6 +86,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GefyraModule\Profilers\" />
+    <Folder Include="GefyraModule\Interfaces\Commands\" />
+    <Folder Include="GefyraModule\Models\Contexts\" />
   </ItemGroup>
 </Project>

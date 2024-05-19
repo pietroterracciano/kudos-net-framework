@@ -1,6 +1,6 @@
 ﻿using Kudos.Constants;
 using Kudos.Databases.Enums.Columns;
-using Kudos.Utils.Numerics.Integers;
+using Kudos.Utils.Numerics;
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +16,7 @@ namespace Kudos.Databases.Utils
 
         private static readonly UInt32
            __iUInt8__MaxValue = 255,
-           __iUInt24_MaxValue = UInt32Utils.From(Math.Pow(2, 24)) - 1;
+           __iUInt24_MaxValue = UInt32Utils.NNParse(Math.Pow(2, 24)) - 1;
 
         private static readonly Dictionary<EDatabaseColumnType, Double>
             __dEnums2MinValues = new Dictionary<EDatabaseColumnType, Double>()

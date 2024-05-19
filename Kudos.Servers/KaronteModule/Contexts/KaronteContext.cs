@@ -1,14 +1,12 @@
-﻿using Kudos.Servers.KaronteModule.Controllers;
-using Kudos.Types;
-using Kudos.Utils.Members;
+﻿using Kudos.Types;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Utils;
+using Kudos.Reflection.Utils;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
@@ -174,7 +172,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 //    l.AddRange(os);
 
                 ConstructorInfo[]? 
-                    cis = ConstructorUtils.Gets(t);
+                    cis = ReflectionUtils.GetConstructors(t);
 
                 if (cis == null)
                     return null;
@@ -184,11 +182,11 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
                 for (int i = 0; i < cis.Length; i++)
                 {
-                    Object[]? os1;
-                    if (!ConstructorUtils.CheckAndGenerateCompatibleParametersArray(cis[i], out os1, l.ToArray()))
-                        continue;
+                    Object[]? os1 = null;
+                    //if (!ReflectionUtils.CheckAndGenerateCompatibleParametersArray(cis[i], out os1, l.ToArray()))
+                        //continue;
 
-                    cti = ConstructorUtils.Invoke(cis[i], os1);
+                    cti = ReflectionUtils.InvokeConstructor(cis[i], os1);
                     break;
                 }
 
