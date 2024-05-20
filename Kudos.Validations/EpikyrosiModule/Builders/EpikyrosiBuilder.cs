@@ -10,7 +10,7 @@ using Kudos.Validations.EpikyrosiModule.Rules;
 
 namespace Kudos.Validations.EpikyrosiModule.Builders
 {
-	public class
+	internal class
 		EpikyrosiBuilder
 	:
         IEpikyrosiBuilder

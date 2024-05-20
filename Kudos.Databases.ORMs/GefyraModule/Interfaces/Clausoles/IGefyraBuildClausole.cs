@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Kudos.Databases.ORMs.GefyraModule.Builts;
 
 namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Clausoles
 {
     public interface 
         IGefyraBuildClausole
     {
-        IGefyraBuilt Build();
+        GefyraBuilt Build();
     }
 }

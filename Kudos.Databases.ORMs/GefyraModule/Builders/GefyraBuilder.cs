@@ -138,7 +138,11 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraSelectClausoleBuilder Select(params IGefyraColumn?[]? gca)
         {
-            Append(CGefyraClausole.Select); Append(CCharacter.Space); Append(ref gca); Append(CCharacter.Space);
+            Append(CGefyraClausole.Select);
+            Append(CCharacter.Space);
+            if (gca == null || gca.Length < 1) Append(CCharacter.Asterisk);
+            else Append(ref gca);
+            Append(CCharacter.Space);
             return this;
         }
 
@@ -353,9 +357,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraBuiltClausole
 
-        public IGefyraBuilt Build()
+        public GefyraBuilt Build()
         {
-            return new INTGefyraBuilt(ref _sb0, ref _l);
+            return new GefyraBuilt(ref _sb0, ref _l);
         }
 
         #endregion

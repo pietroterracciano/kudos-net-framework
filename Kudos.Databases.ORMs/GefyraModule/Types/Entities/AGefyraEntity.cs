@@ -46,14 +46,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities
 
         public string HashKey { get { return _Descriptor.HashKey; } }
 
-        string IGefyraEntityNameDescriptor.Name => throw new NotImplementedException();
-
-        string IGefyraEntityHashKeyDescriptor.HashKey => throw new NotImplementedException();
-
-        string? IGefyraEntityAliasDescriptor.Alias => throw new NotImplementedException();
-
-        bool IGefyraEntityAliasDescriptor.HasAlias => throw new NotImplementedException();
-
         #endregion
 
         protected AGefyraEntity(ref EntityType et, ref String sa) : this()

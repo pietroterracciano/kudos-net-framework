@@ -393,7 +393,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
             out GefyraColumnDescriptor gcd
         )
         {
-            MemberInfo? mi = null;
+            MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CGefyraFlags.BFOnGetMembers);
             GetColumnDescriptor(ref mi, ref sn, out gcd);
         }
         internal void GetColumnDescriptor

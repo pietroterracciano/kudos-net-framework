@@ -27,16 +27,17 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
             
             if(v0 != null)
             {
-                if(
-                    CanBeEmpty != null
-                    && !CanBeEmpty.Value
-                    && v0.Length < 1
-                )
-                {
-                    envo = EEpikyrosiNotValidOn.CanBeEmpty;
-                    return;
-                }
-                else if
+                //if(
+                //    CanBeEmpty != null
+                //    && !CanBeEmpty.Value
+                //    && v0.Length < 1
+                //)
+                //{
+                //    envo = EEpikyrosiNotValidOn.CanBeEmpty;
+                //    return;
+                //}
+                //else
+                if
                 (
                     CanBeWhitespace != null
                     && !CanBeWhitespace.Value
@@ -58,7 +59,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                 else if
                 (
                     MaxLength != null
-                        && MaxLength < v0.Length
+                    && MaxLength < v0.Length
                 )
                 {
                     envo = EEpikyrosiNotValidOn.MaxLength;

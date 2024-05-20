@@ -19,8 +19,6 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 {
 	public class
 		EpikyrosiBuilt
-	:
-		IEpikyrosiBuilt
 	{
 		private Dictionary<IEpikyrosiEntity, AEpikyrosiRule[]> _d;
 
