@@ -12,6 +12,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Constants
         internal static readonly String
             // Primary
             Insert = "INSERT",
+            Into = "INTO",
+            Values = "VALUES",
             Select = "SELECT",
             Count = "COUNT",
             From = "FROM",

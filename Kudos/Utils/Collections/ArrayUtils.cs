@@ -56,7 +56,7 @@ namespace Kudos.Utils.Collections
 
         #region UnShift(...)
 
-        public static T[] UnShift<T>(T? o, T[]? a)
+        public static T?[] UnShift<T>(T? o, T?[]? a)
         {
             int i = a != null ? a.Length : 0;
 

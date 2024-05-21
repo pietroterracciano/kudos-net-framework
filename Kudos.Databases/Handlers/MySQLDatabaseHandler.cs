@@ -22,8 +22,8 @@ namespace Kudos.Databases.Controllers
         {
             return
                 oCommand != null
-                ? oCommand.LastInsertedId
-                : -1;
+                    ? oCommand.LastInsertedId
+                    : -1;
         }
 
         protected override DatabaseErrorResult? OnException(ref Exception e)

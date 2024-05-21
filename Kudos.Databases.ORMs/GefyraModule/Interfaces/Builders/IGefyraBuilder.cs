@@ -6,7 +6,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders
     public interface
         IGefyraBuilder
     :
-        //IGefyraInsertClausole,  //C
+        IGefyraInsertClausole,  //C
         IGefyraSelectClausole//,  //R
         //IGefyraUpdateClausole,  //U
         //IGefyraDeleteClausole   //D

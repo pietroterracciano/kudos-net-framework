@@ -9,6 +9,7 @@ using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Types;
 using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Utils;
+using Kudos.Utils.Collections;
 using Kudos.Utils.Numerics;
 using Kudos.Utils.Texts;
 using System;
@@ -21,6 +22,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
     :
         IGefyraBuilder,
         IGefyraInsertClausoleBuilder,
+            IGefyraIntoClausoleBuilder,
+            IGefyraValuesClausoleBuilder,
 
         IGefyraSelectClausoleBuilder,
         IGefyraFromClausoleBuilder,
@@ -55,13 +58,14 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private /*readonly*/ StringBuilder _sb0;
         private readonly StringBuilder _sb1;
         private /*readonly*/ List<GefyraParameter> _lgp;
-        private /*readonly*/ List<IGefyraColumn> _lgc;
+        private /*readonly*/ List<IGefyraColumn> _lgcOnOutput, _lgcConsumed;
 
         internal GefyraBuilder()
         {
             //_lgpck = new object();
             _lgp = new List<GefyraParameter>();
-            _lgc = new List<IGefyraColumn>();
+            _lgcOnOutput = new List<IGefyraColumn>();
+            _lgcConsumed = new List<IGefyraColumn>();
             _sb0 = new StringBuilder();
             _sb1 = new StringBuilder();
         }
@@ -98,12 +102,18 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private void Append(ref IGefyraColumn?[]? gca)
         {
             if (gca == null) return;
-            for (int i = 0; i < gca.Length; i++) Append(ref gca[i]);
+            for (int i = 0; i < gca.Length; i++)
+            {
+                Append(ref gca[i]);
+                if (i > gca.Length - 2) continue;
+                Append(CCharacter.Comma);
+                Append(CCharacter.Space);
+            }
         }
 
         private void Append(ref IGefyraColumn? gc)
         {
-            if (gc != null) Append(gc.GetSQL());
+            if (gc != null) { Append(gc.GetSQL()); _lgcConsumed.Add(gc); }
             else Append(GefyraColumn.Invalid.GetSQL());
         }
 
@@ -136,6 +146,68 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #endregion
 
+        #region IGefyraInsertClausole
+
+        public IGefyraInsertClausoleBuilder Insert()
+        {
+            Append(CGefyraClausole.Insert);
+            Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraIntoClausole
+
+        public IGefyraIntoClausoleBuilder Into(IGefyraTable? gt, IGefyraColumn? gc, params IGefyraColumn?[]? gca)
+        {
+            Append(CGefyraClausole.Into); Append(CCharacter.Space); Append(ref gt); Append(CCharacter.Space);
+            Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+
+            IGefyraColumn?[]? gca0 = ArrayUtils.UnShift(gc, gca);
+
+            Append(ref gca0); Append(CCharacter.Space);
+
+            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            //IGefyraColumn?[]? gca0 = ArrayUtils.UnShift(gc, gca);
+            //Append(ref gca0);
+            //Append(CCharacter.Space);
+
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraValuesClausole
+
+        public IGefyraValuesClausoleBuilder Values(Object? o, params Object?[]? oa)
+        {
+            Append(CGefyraClausole.Values); Append(CCharacter.Space); Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+
+            Object?[]? oa0 = ArrayUtils.UnShift(o, oa);
+
+            if (oa0 != null)
+            {
+                IGefyraColumn? gci;
+                for (int i = 0; i < oa0.Length; i++)
+                {
+                    gci = ListUtils.Get(_lgcConsumed, i);
+                    if (gci == null) continue;
+                    AppendParameter(ref gci, ref oa0[i]);
+                    if (i < oa0.Length - 1)
+                        Append(CCharacter.Comma);
+                    Append(CCharacter.Space);
+                }
+            }
+
+
+            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+
+            return this;
+        }
+
+        #endregion
+
         #region IGefyraSelectClausole
 
         public IGefyraSelectClausoleBuilder Select(params IGefyraColumn?[]? gca)
@@ -152,7 +224,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                     for (int i = 0; i < gca.Length; i++)
                     {
                         if (gca[i] == null) continue;
-                        _lgc.Add(gca[i]);
+                        _lgcOnOutput.Add(gca[i]);
                     }
             }
             Append(CCharacter.Space);
@@ -372,7 +444,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public GefyraBuilt Build()
         {
-            return new GefyraBuilt(ref _sb0, ref _lgp, ref _lgc);
+            return new GefyraBuilt(ref _sb0, ref _lgp, ref _lgcOnOutput);
         }
 
         #endregion
@@ -385,20 +457,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
             IGefyraColumn? gc0 = o as IGefyraColumn;
             if (gc0 != null) Append(ref gc0);
-            else
-            {
-                String s; Int32 i;
-                CalculateCurrentParameterMetas(out s, out i);
-
-                //lock (_lgpck)
-                //{
-
-                if (gc == null) gc = GefyraColumn.Invalid;
-                _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
-                //}
-
-                Append(s);
-            }
+            else AppendParameter(ref gc, ref o);
 
             Append(CCharacter.Space);
             return this;
@@ -462,6 +521,15 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         }
 
         #endregion
+
+        private void AppendParameter(ref IGefyraColumn? gc, ref Object? o)
+        {
+            String s; Int32 i;
+            CalculateCurrentParameterMetas(out s, out i);
+            if (gc == null) gc = GefyraColumn.Invalid;
+            _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
+            Append(s);
+        }
 
         public override String ToString()
         {
