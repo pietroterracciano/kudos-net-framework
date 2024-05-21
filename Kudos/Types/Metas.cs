@@ -12,10 +12,13 @@ namespace Kudos.Types
         private readonly Dictionary<String, Object?> _d;
         private readonly StringComparison _e;
 
-        public Metas(StringComparison e = StringComparison.Ordinal)
+        public Metas() : this(0, StringComparison.Ordinal) { }
+        public Metas(StringComparison e) : this(0, e) { }
+        public Metas(Int32 iSize) : this(iSize, StringComparison.Ordinal) { }
+        public Metas(Int32 iSize, StringComparison e)
         {
             _e = e;
-            _d = new Dictionary<String, Object?>();
+            _d = new Dictionary<String, Object?>(iSize);
         }
 
         public bool Set(String? s, Object? o) { return Set(s, o, _e); }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Numerics;
+using System.Reflection;
 using Kudos.Utils;
 using Kudos.Validations.EpikyrosiModule.Enums;
+using Kudos.Validations.EpikyrosiModule.Results;
 
 namespace Kudos.Validations.EpikyrosiModule.Rules
 {
@@ -25,7 +27,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
         public EpikyrosiNumericRule()
             : base(typeof(T)) { }
 
-        protected override void _OnValidate(ref object v, out EEpikyrosiNotValidOn? envo)
+        protected override void _OnValidate(ref object v, ref MemberInfo mi, out EpikyrosiNotValidResult? envr)
         {
             T? v0 = ObjectUtils.Cast<T>(v);
 
@@ -37,7 +39,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                     && MinValue > v0
                 )
                 {
-                    envo = EEpikyrosiNotValidOn.MinValue;
+                    envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.MinValue, MinValue);
                     return;
                 }
                 else if
@@ -46,7 +48,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                     && MaxValue < v0
                 )
                 {
-                    envo = EEpikyrosiNotValidOn.MaxValue;
+                    envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.MaxValue, MaxValue);
                     return;
                 }
                 else if
@@ -64,7 +66,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                             && MinLength > s.Length
                         )
                         {
-                            envo = EEpikyrosiNotValidOn.MinLength;
+                            envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.MinLength, MinLength);
                             return;
                         }
                         else if
@@ -73,14 +75,14 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                             && MaxLength < s.Length
                         )
                         {
-                            envo = EEpikyrosiNotValidOn.MaxLength;
+                            envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.MaxLength, MaxLength);
                             return;
                         }
                     }
                 }
             }
 
-            envo = null;
+            envr = null;
         }
     }
 }

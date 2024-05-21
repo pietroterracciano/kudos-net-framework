@@ -25,16 +25,12 @@ namespace Kudos.Databases.Results
 
         public readonly DatabaseBenchmarkResult Benchmark;
         public readonly DatabaseErrorResult? Error;
+        public readonly Boolean HasError;
 
         internal DatabaseResult(ref DatabaseErrorResult? dber, ref DatabaseBenchmarkResult dbbr)
         {
-            Error = dber;
+            HasError = (Error = dber) != null;
             Benchmark = dbbr.Stop();
-        }
-
-        public bool HasError()
-        {
-            return Error != null;
         }
     }
 }

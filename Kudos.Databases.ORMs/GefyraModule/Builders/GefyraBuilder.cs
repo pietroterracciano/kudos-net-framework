@@ -51,15 +51,17 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                 "GefyraParameter";
         }
 
-        //private readonly Object _lck;
+        //private readonly Object _lgpck;
         private /*readonly*/ StringBuilder _sb0;
         private readonly StringBuilder _sb1;
-        private /*readonly*/ List<GefyraParameter> _l;
+        private /*readonly*/ List<GefyraParameter> _lgp;
+        private /*readonly*/ List<IGefyraColumn> _lgc;
 
         internal GefyraBuilder()
         {
-            //_lck = new object();
-            _l = new List<GefyraParameter>();
+            //_lgpck = new object();
+            _lgp = new List<GefyraParameter>();
+            _lgc = new List<IGefyraColumn>();
             _sb0 = new StringBuilder();
             _sb1 = new StringBuilder();
         }
@@ -126,7 +128,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private void CalculateCurrentParameterMetas(out String s, out Int32 i)
         {
-            i = _l.Count;
+            i = _lgp.Count;
             _sb1.Clear();
             _sb1.Append(CCharacter.At).Append(__sParameterPrefix).Append(i);
             s = _sb1.ToString();
@@ -140,8 +142,19 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         {
             Append(CGefyraClausole.Select);
             Append(CCharacter.Space);
-            if (gca == null || gca.Length < 1) Append(CCharacter.Asterisk);
-            else Append(ref gca);
+            if (gca == null || gca.Length < 1)
+                Append(CCharacter.Asterisk);
+            else
+            {
+                Append(ref gca);
+
+                if (gca != null)
+                    for (int i = 0; i < gca.Length; i++)
+                    {
+                        if (gca[i] == null) continue;
+                        _lgc.Add(gca[i]);
+                    }
+            }
             Append(CCharacter.Space);
             return this;
         }
@@ -359,7 +372,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public GefyraBuilt Build()
         {
-            return new GefyraBuilt(ref _sb0, ref _l);
+            return new GefyraBuilt(ref _sb0, ref _lgp, ref _lgc);
         }
 
         #endregion
@@ -377,11 +390,11 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                 String s; Int32 i;
                 CalculateCurrentParameterMetas(out s, out i);
 
-                //lock (_lck)
+                //lock (_lgpck)
                 //{
 
                 if (gc == null) gc = GefyraColumn.Invalid;
-                _l.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
+                _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
                 //}
 
                 Append(s);

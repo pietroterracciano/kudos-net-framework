@@ -14,10 +14,10 @@ namespace Kudos.Utils.Numerics.Internals
             oOut = oIn != null ? oIn.Value : (short)0;
         }
 
-        protected override void OnParse(ref object oIn, out Int16? oOut)
-        {
-            oOut = Convert.ToInt16(oIn);
-        }
+        //protected override void OnParse(ref object oIn, out Int16? oOut)
+        //{
+        //    oOut = Convert.ToInt16(oIn);
+        //}
 
         protected override void OnStringParse(ref string sIn, out Int16? oOut)
         {

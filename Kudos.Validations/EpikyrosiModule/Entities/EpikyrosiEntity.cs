@@ -59,8 +59,6 @@ namespace Kudos.Validations.EpikyrosiModule.Entities
                 return;
             }
 
-            string? sn;
-
             lock (__d)
             {
                 Dictionary<int, EpikyrosiEntity>? d;

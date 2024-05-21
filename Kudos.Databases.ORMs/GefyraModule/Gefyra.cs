@@ -1,7 +1,12 @@
-﻿using Kudos.Databases.ORMs.GefyraModule.Builders;
+﻿using System.Data;
+using Kudos.Constants;
+using Kudos.Databases.ORMs.GefyraModule.Builders;
+using Kudos.Databases.ORMs.GefyraModule.Builts;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
+using Kudos.Reflection.Utils;
+using Kudos.Types;
 
 namespace Kudos.Databases.ORMs.GefyraModule
 {
@@ -31,6 +36,81 @@ namespace Kudos.Databases.ORMs.GefyraModule
         //public static GefyraTable RequestTable(String? sSchemaName, String? sName) { GefyraTable gt; GefyraTable.Request(ref sSchemaName, ref sName, out gt); return gt; }\
 
         #endregion
+
+        #endregion
+
+        #region Parse
+
+        public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
+        {
+            if (dt == null)
+                return null;
+
+            List<T> l = new List<T>(dt.Rows.Count);
+
+            T? ti;
+            for(int i=0; i<dt.Rows.Count; i++)
+            {
+                ti = Parse<T>(dt.Rows[i], gb);
+                if (ti == null) continue;
+                l.Add(ti);
+            }
+
+            return l.ToArray();
+        }
+
+        public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
+        {
+            if (dr == null)
+                return default(T);
+
+            IGefyraTable
+                gt = Gefyra.GetTable<T>();
+
+            if (gt == GefyraTable.Invalid)
+                return default(T);
+
+            T? t =
+                ReflectionUtils.InvokeConstructor<T>(ReflectionUtils.GetConstructor<T>(CBindingFlags.Instance));
+
+            if (t == null)
+                return default(T);
+
+            Metas? m;
+
+            if (gb != null && gb.OutputColumns.Length > 0)
+            {
+                m = new Metas(gb.OutputColumns.Length, StringComparison.OrdinalIgnoreCase);
+
+                for (int i = 0; i < gb.OutputColumns.Length; i++)
+                {
+                    if (!gb.OutputColumns[i].HasAlias) continue;
+                    m.Set(gb.OutputColumns[i].Alias, gb.OutputColumns[i]);
+                }
+            }
+            else
+                m = null;
+
+            IGefyraColumn? gci;
+            Object? oi;
+            for(int i=0; i<dr.Table.Columns.Count; i++)
+            {
+                gci =
+                    m != null
+                        ? m.Get<IGefyraColumn>(dr.Table.Columns[i].ColumnName)
+                        : null;
+
+                if (gci == null)
+                    gci = gt.GetColumn(dr.Table.Columns[i].ColumnName);
+
+                if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember)
+                    continue;
+
+                ReflectionUtils.SetMemberValue(t, gci.DeclaringMember, dr[dr.Table.Columns[i]], true);
+            }
+
+            return t;
+        }
 
         #endregion
 

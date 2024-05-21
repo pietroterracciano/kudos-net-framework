@@ -14,10 +14,10 @@ namespace Kudos.Utils.Numerics.Internals
             oOut = oIn != null ? oIn.Value : 0.0f;
         }
 
-        protected override void OnParse(ref object oIn, out Single? oOut)
-        {
-            oOut = Convert.ToSingle(oIn);
-        }
+        //protected override void OnParse(ref object oIn, out Single? oOut)
+        //{
+        //    oOut = Convert.ToSingle(oIn);
+        //}
 
         protected override void OnStringParse(ref string sIn, out Single? oOut)
         {

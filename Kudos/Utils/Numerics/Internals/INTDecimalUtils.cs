@@ -11,10 +11,10 @@ namespace Kudos.Utils.Numerics.Internals
             oOut = oIn != null ? oIn.Value : 0.0m;
         }
 
-        protected override void OnParse(ref object oIn, out decimal? oOut)
-        {
-            oOut = Convert.ToDecimal(oIn);
-        }
+        //protected override void OnParse(ref object oIn, out decimal? oOut)
+        //{
+        //    oOut = Convert.ToDecimal(oIn);
+        //}
 
         protected override void OnStringParse(ref string sIn, out decimal? oOut)
         {

@@ -8,7 +8,7 @@ namespace Kudos.Utils.Parsings
         where T : struct, INumberBase<T>
     {
         protected abstract void OnStringParse(ref String sIn, out T? oOut);
-        protected abstract void OnParse(ref object oIn, out T? oOut);
+        //protected abstract void OnParse(ref object oIn, out T? oOut);
 
         protected override void OnParse(ref Type to, ref object oIn, out T? oOut)
         {
@@ -32,7 +32,10 @@ namespace Kudos.Utils.Parsings
                 OnStringParse(ref s, out oOut);
                 return;
             }
-            OnParse(ref oIn, out oOut);
+
+            oOut = null;
+
+            //OnParse(ref oIn, out oOut);
         }
     }
 }

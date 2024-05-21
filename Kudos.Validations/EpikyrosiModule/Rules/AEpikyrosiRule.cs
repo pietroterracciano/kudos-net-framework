@@ -4,8 +4,8 @@ using Kudos.Constants;
 using Kudos.Reflection.Utils;
 using Kudos.Types;
 using Kudos.Utils;
-using Kudos.Utils.Numerics;
 using Kudos.Validations.EpikyrosiModule.Enums;
+using Kudos.Validations.EpikyrosiModule.Results;
 
 namespace Kudos.Validations.EpikyrosiModule.Rules
 {
@@ -22,31 +22,25 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
 			DeclaringType = dt;
         }
 
-		internal void Validate(ref Object? o, ref MemberInfo? mi, out EEpikyrosiNotValidOn? envo)
+		internal void Validate(ref Object? o, ref MemberInfo? mi, out EpikyrosiNotValidResult? envr)
 		{
             Object?
                 v = ObjectUtils.Parse(DeclaringType, ReflectionUtils.GetMemberValue(o, mi));
 
-            if
-            (
-                CanBeNull != null
-                && !CanBeNull.Value
-                && v == null
-            )
+			if (v == null)
 			{
-                envo = EEpikyrosiNotValidOn.CanBeNull;
+				envr =
+					CanBeNull != null
+					&& !CanBeNull.Value
+						? new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.CanBeNull, false)
+						: null;
 				return;
 			}
-            else if (v == null)
-			{
-                envo = null;
-                return;
-			}
 
-            _OnValidate(ref v, out envo);
+            _OnValidate(ref v, ref mi, out envr);
 		}
 
-		protected abstract void _OnValidate(ref Object v, out EEpikyrosiNotValidOn? eim);
+		protected abstract void _OnValidate(ref Object v, ref MemberInfo mi, out EpikyrosiNotValidResult? envr);
 	}
 }
 

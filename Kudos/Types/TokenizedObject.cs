@@ -1,9 +1,13 @@
-﻿using Kudos.Reflection.Utils;
+﻿using Kudos.Interfaces;
+using Kudos.Reflection.Utils;
 using System;
 
 namespace Kudos.Types
 {
-    public class TokenizedObject 
+    public class
+        TokenizedObject
+    :
+        ITokenizedObject
     {
         private static readonly Object _lck;
         private static Int32 __i;
@@ -14,7 +18,7 @@ namespace Kudos.Types
             __i = 0;
         }
 
-        public readonly Int32 Token;
+        public Int32 Token { get; private set; }
         
         public TokenizedObject()
         {

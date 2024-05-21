@@ -9,9 +9,9 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         internal KaronteResponsingContext(ref KaronteContext kc) : base(ref kc) { }
 
-        public KaronteResponsingContext SetNonActionResult(Object? o)
+        public KaronteResponsingContext SetNonActionResult(Object? nar)
         {
-            NonActionResult = o;
+            NonActionResult = nar;
             return this;
         }
     }

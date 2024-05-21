@@ -10,7 +10,7 @@ namespace Kudos.Validations.EpikyrosiModule.Attributes
         private Boolean _bCanBeNull;
         public Boolean CanBeNull { get { return _bCanBeNull; } set { _bCanBeNull = value; IsCanBeNullSetted = true; } }
 
-        public String? PoolName { get; set; }
+        public String?[]? PoolNames { get; set; }
 
         internal void ParseToRule(out AEpikyrosiRule rt)
         {

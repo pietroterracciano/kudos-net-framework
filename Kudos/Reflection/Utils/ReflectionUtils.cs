@@ -471,6 +471,16 @@ namespace Kudos.Reflection.Utils
 
         #endregion
 
+        #region public static Object? CreateInstance(...)
+
+        public static T? CreateInstance<T>(params Type[]? ta) { return ObjectUtils.Cast<T>(CreateInstance(typeof(T), ta)); }
+        public static object? CreateInstance(Type? t, params Type[]? ta)
+        {
+            return InvokeConstructor(GetConstructor(t, ta));
+        }
+
+        #endregion
+
         #region public static Boolean InvokeConstructor(...)
 
         public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object[]? a) { return ObjectUtils.Cast<T>(InvokeConstructor(ci, a)); }

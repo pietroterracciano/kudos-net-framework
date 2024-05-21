@@ -132,22 +132,27 @@ namespace Kudos.Validations.EpikyrosiModule
                     Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>> dj;
                     List<AEpikyrosiRule>? lj;
                     AEpikyrosiRule erj;
-                    String? spnj;
+                    String?[]? pnaj;
 
                     for (int j=0; j<eraa.Length; j++)
                     {
-                        spnj = eraa[j].PoolName;
-                        Normalize(ref spnj, out spnj);
+                        pnaj = eraa[j].PoolNames;
+                        if (pnaj == null) pnaj = new string?[] { null };
 
+                        String? pnk;
+                        for (int k = 0; k < pnaj.Length; k++)
+                        {
+                            Normalize(ref pnaj[k], out pnk);
 
-                        if (!d2.TryGetValue(spnj, out dj) || dj == null)
-                            d2[spnj] = dj = new Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>();
+                            if (!d2.TryGetValue(pnk, out dj) || dj == null)
+                                d2[pnk] = dj = new Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>();
 
-                        if (!dj.TryGetValue(eei, out lj) || lj == null)
-                            dj[eei] = lj = new List<AEpikyrosiRule>();
+                            if (!dj.TryGetValue(eei, out lj) || lj == null)
+                                dj[eei] = lj = new List<AEpikyrosiRule>();
 
-                        eraa[j].ParseToRule(out erj);
-                        lj.Add(erj);
+                            eraa[j].ParseToRule(out erj);
+                            lj.Add(erj);
+                        }
                     }
                 }
 

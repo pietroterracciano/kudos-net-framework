@@ -22,7 +22,11 @@ namespace Kudos.Utils.Parsings
                 Type to = oIn.GetType();
                 Type? tu = Nullable.GetUnderlyingType(to);
                 if (tu != null) to = tu;
-                if (to != __) try { OnParse(ref to, ref oIn, out oOut); return; } catch { }
+                if (to != __)
+                {
+                    try { OnParse(ref to, ref oIn, out oOut); } catch { oOut = null; }
+                    if (oOut != null) return;
+                }
                 try { oOut = (T)oIn; return; } catch { }
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using Kudos.Constants;
 using Kudos.Reflection.Utils;
 using Kudos.Utils;
@@ -44,7 +45,10 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 			if (o == null)
 				return EpikyrosiResult.NotValidOnObject;
 
-			MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), CBindingFlags.Public);
+
+            Int32 k = 0;
+
+            MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), CBindingFlags.Public);
 
 			if (mia == null)
 				goto END;
@@ -58,19 +62,20 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 				if (eei == EpikyrosiEntity.Invalid) continue;
 				if (!_d.TryGetValue(eei, out erai) || erai == null) continue;
 
-                EEpikyrosiNotValidOn? envo;
+                EpikyrosiNotValidResult? envr;
 				for(int j=0; j<erai.Length; j++)
                 {
-					erai[j].Validate(ref o, ref mia[i], out envo);
-					if (envo == null) continue;
-					l.Add(new EpikyrosiNotValidResult(ref mia[i], envo.Value));
-					if (bStopOnFirstNotValid) goto END;
+					erai[j].Validate(ref o, ref mia[i], out envr);
+					k++;
+					if (envr == null) continue;
+					l.Add(envr);
+                    if (bStopOnFirstNotValid) goto END;
                 }
             }
 
 			END:
 
-            return new EpikyrosiResult(ref sw, ref l);
+            return new EpikyrosiResult(ref k, ref sw, ref l);
         }
     }
 }

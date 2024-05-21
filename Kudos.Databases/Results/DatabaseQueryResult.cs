@@ -22,6 +22,7 @@ namespace Kudos.Databases.Results
         }
 
         public readonly DataTable? Data;
+        public readonly Boolean HasData;
 
         internal DatabaseQueryResult
         (
@@ -31,12 +32,7 @@ namespace Kudos.Databases.Results
         )
         : base(ref dber, ref dbbr)
         {
-            Data = dt;
-        }
-
-        public Boolean HasData()
-        {
-            return Data != null;
+            HasData = (Data = dt) != null; 
         }
     }
 }

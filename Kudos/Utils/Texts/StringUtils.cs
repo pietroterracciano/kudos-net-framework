@@ -59,6 +59,7 @@ namespace Kudos.Utils.Texts
         #endregion
 
         #region public static String NNParse()
+
         public static String NNParse(Object? o, Encoding? enc = null) { String s; __.NNParse(ref o, out s); return s; }
 
         #endregion

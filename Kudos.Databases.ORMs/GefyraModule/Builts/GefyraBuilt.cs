@@ -1,5 +1,7 @@
 ﻿using Kudos.Databases.ORMs.GefyraModule.Interfaces;
+using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Types;
+using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
 using Kudos.Utils.Collections;
 using System;
 using System.Collections.Generic;
@@ -18,26 +20,32 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builts
         private readonly Dictionary<String, Int32> _d;
         private readonly String[] _gpaa;
         private readonly Object?[] _gpva;
+        public readonly IGefyraColumn[] InputColumns, OutputColumns;
 
         private KeyValuePair<String, Object>[]? _kvp;
 
-        internal GefyraBuilt(ref StringBuilder sb, ref List<GefyraParameter> l)
+        internal GefyraBuilt(ref StringBuilder sb, ref List<GefyraParameter> lgp, ref List<IGefyraColumn> lgc)
         {
             _lck = new object();
 
             Text = sb.ToString();
 
-            _gpaa = new String[l.Count];
-            _gpva = new object[l.Count];
-            _d = new Dictionary<String, Int32>(l.Count);
+            _gpaa = new String[lgp.Count];
+            _gpva = new object[lgp.Count];
+            InputColumns = new IGefyraColumn[lgp.Count];
+            _d = new Dictionary<String, Int32>(lgp.Count);
 
-            for (int i=0; i<l.Count; i++)
+            for (int i=0; i< lgp.Count; i++)
             {
-                _gpaa[i] = l[i].Alias;
-                _gpva[i] = l[i].Value;
-                _d[l[i].Alias] = i;
+                _gpaa[i] = lgp[i].Alias;
+                _gpva[i] = lgp[i].Value;
+                _d[lgp[i].Alias] = i;
+                InputColumns[i] = lgp[i].Column;
             }
 
+            OutputColumns = new IGefyraColumn[lgc.Count];
+            for (int i = 0; i < lgc.Count; i++)
+                OutputColumns[i] = lgc[i];
 
             //_gpa = l.ToArray();
             //_d = new Dictionary<string, int>(_gpa.Length);
