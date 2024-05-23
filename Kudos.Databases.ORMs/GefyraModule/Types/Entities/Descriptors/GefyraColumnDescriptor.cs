@@ -31,7 +31,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         static GefyraColumnDescriptor()
         {
             String sn = "!GefyraInvalidColumn!";
-            GefyraTableDescriptor.Invalid.GetColumnDescriptor(ref sn, out Invalid);
+            GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Invalid);
         }
 
         //#region internal static void Request<...>(...)

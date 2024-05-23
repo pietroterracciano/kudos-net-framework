@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kudos.Databases.Enums.Columns
+namespace Kudos.Databases.Enums
 {
     [Flags]
-    public enum EDatabaseColumnExtra
+    public enum EDatabaseKey
     {
-        None = CBinaryFlag._0,
-        AutoIncrement = CBinaryFlag._1
+        None,
+        Primary,
+        Unique,
+        Multiple
     }
 }

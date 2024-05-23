@@ -476,7 +476,10 @@ namespace Kudos.Reflection.Utils
         public static T? CreateInstance<T>(params Type[]? ta) { return ObjectUtils.Cast<T>(CreateInstance(typeof(T), ta)); }
         public static object? CreateInstance(Type? t, params Type[]? ta)
         {
-            return InvokeConstructor(GetConstructor(t, ta));
+            Object? o = InvokeConstructor(GetConstructor(t, ta));
+            if (o == null) try { return Activator.CreateInstance(t, ta); } catch { }
+            return o;
+
         }
 
         #endregion
@@ -833,6 +836,47 @@ namespace Kudos.Reflection.Utils
             }
 
             return li.ToArray();
+        }
+
+        #endregion
+
+        #region public static ... Copy<...>()
+
+        public static T? Copy<T>(Object? o, BindingFlags bf = CBindingFlags.PublicInstance) { return ObjectUtils.Cast<T>(Copy(o, bf)); }
+        public static Object? Copy(Object? o, BindingFlags bf = CBindingFlags.PublicInstance)
+        {
+            if (o == null) return null;
+            Object? o0 = ReflectionUtils.InvokeConstructor( ReflectionUtils.GetConstructor(o.GetType(), bf));
+            return Copy(o, o0, bf) ? o0 : null;
+        }
+        public static Boolean Copy(Object? oIn, Object? oOut, BindingFlags bf = CBindingFlags.PublicInstance)
+        {
+            if (oIn == null || oOut == null)
+                return false;
+
+            Type
+                to = oIn.GetType();
+
+            MemberInfo[]?
+                a = ReflectionUtils.GetMembers(to, bf);
+
+            if (a == null)
+                return true;
+
+            Type? ti, ti0;
+            Object? oi;
+            for (int i = 0; i < a.Length; i++)
+            {
+                ti = ReflectionUtils.GetMemberValueType(a[i]);
+                if (ti == null) continue;
+                oi = ReflectionUtils.GetMemberValue(oIn, a[i]);
+                ti0 = Nullable.GetUnderlyingType(ti);
+                if (ti0 != null) ti = ti0;
+                if (!ti.IsPrimitive) oi = JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
+                ReflectionUtils.SetMemberValue(oOut, a[i], oi, false);
+            }
+
+            return true;
         }
 
         #endregion

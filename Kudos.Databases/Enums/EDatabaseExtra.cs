@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Kudos.Databases.Enums
 {
     [Flags]
-    public enum EDatabaseInformationSchemaType
+    public enum EDatabaseExtra
     {
-        Tables = CBinaryFlag._1,
-        Columns = CBinaryFlag._2
+        None,
+        AutoIncrement
     }
 }

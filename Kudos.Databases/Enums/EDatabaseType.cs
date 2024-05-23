@@ -10,7 +10,7 @@ namespace Kudos.Databases.Enums
     [Flags]
     public enum EDatabaseType
     {
-        MySQL = CBinaryFlag._0,
-        MicrosoftSQL = CBinaryFlag._1
+        MySQL,
+        MicrosoftSQL
     }
 }

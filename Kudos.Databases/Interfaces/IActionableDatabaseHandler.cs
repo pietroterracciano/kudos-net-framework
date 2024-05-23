@@ -1,4 +1,5 @@
-﻿using Kudos.Databases.Results;
+﻿using Kudos.Databases.Descriptors;
+using Kudos.Databases.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +10,34 @@ namespace Kudos.Databases.Interfaces
 {
     public interface IActionableDatabaseHandler
     {
-        public DatabaseResult OpenConnection();
-        public Task<DatabaseResult> OpenConnectionAsync();
-        public DatabaseResult CloseConnection();
-        public Task<DatabaseResult> CloseConnectionAsync();
-        public Boolean IsConnectionOpened();
-        public Boolean IsConnectionBroken();
-        public Boolean IsConnectionClosed();
-        public DatabaseResult ChangeSchema(String? s);
-        public Boolean IsIntoTransaction();
-        public DatabaseResult BeginTransaction();
-        public DatabaseResult CommitTransaction();
-        public DatabaseResult RollbackTransaction();
-        public DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object>[]? aParameters);
-        public Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object>[]? aParameters);
-        public DatabaseQueryResult ExecuteQuery(String? s, params KeyValuePair<String, Object>[]? aParameters);
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object>[]? aParameters);
-        public DatabaseQueryResult ExecuteQuery(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object>[]? aParameters);
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object>[]? aParameters);
+        DatabaseResult OpenConnection();
+        Task<DatabaseResult> OpenConnectionAsync();
+        DatabaseResult CloseConnection();
+        Task<DatabaseResult> CloseConnectionAsync();
+        Boolean IsConnectionOpened();
+        Boolean IsConnectionBroken();
+        Boolean IsConnectionClosed();
+        DatabaseResult ChangeSchema(String? s);
+        Boolean IsIntoTransaction();
+        DatabaseResult BeginTransaction();
+        DatabaseResult CommitTransaction();
+        DatabaseResult RollbackTransaction();
+        DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object?>[]? aParameters);
+        Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object>[]? aParameters);
+        DatabaseQueryResult ExecuteQuery(String? s, params KeyValuePair<String, Object?>[]? aParameters);
+        Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object?>[]? aParameters);
+        DatabaseQueryResult ExecuteQuery(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? aParameters);
+        Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? aParameters);
+
+        DatabaseTableDescriptor? GetTableDescriptor(String? sName);
+        DatabaseTableDescriptor? GetTableDescriptor(String? sSchemaName, String? sName);
+
+        DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName);
+        DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName);
+        DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dbtd, String? sName);
+
+        DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName);
+        DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName);
+        DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dbtd);
     }
 }

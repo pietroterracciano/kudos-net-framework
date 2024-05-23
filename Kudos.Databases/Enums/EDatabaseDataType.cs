@@ -5,13 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kudos.Databases.Enums.Columns
+namespace Kudos.Databases.Enums
 {
     [Flags]
-    public enum EDatabaseColumnType
+    public enum EDatabaseDataType
     {
-        Unknown,
-
         TinyInteger,
         UnsignedTinyInteger,
 

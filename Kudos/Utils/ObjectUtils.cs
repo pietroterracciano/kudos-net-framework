@@ -39,13 +39,8 @@ namespace Kudos.Utils
 
         #region Cast(...)
 
-        public static T? Cast<T>(Object? o)
-        {
-            return
-                IsInstance<T>(o) 
-                    ? (T?)o
-                    : default(T);
-        }
+        public static T? Cast<T>(Object? o) { return IsInstance<T>(o) ? (T?)o : default(T); }
+        public static Object? Cast(Object? o, Type? tOf) { return IsInstance(o, tOf) ? o : null; }
 
         #endregion
 
@@ -60,12 +55,17 @@ namespace Kudos.Utils
             Type? 
                 t0 = Nullable.GetUnderlyingType(t);
 
-            if (t0 != null) t = t0;
+            if (t0 != null)
+                t = t0;
+
+            if (o != null)
+            {
+                if (t.IsEnum) return EnumUtils.Parse(t, o);
+                try { return Convert.ChangeType(o, t); } catch { }
+            }
 
             Boolean
                 bIsNullable = !bForceNotNullable && (!t.IsValueType || t0 != null);
-
-            try { return Convert.ChangeType(o, t); } catch { }
 
             return !bIsNullable ? ReflectionUtils.CreateInstance(t) : o; 
 
@@ -113,47 +113,6 @@ namespace Kudos.Utils
                     )
                     || tSubclass.IsSubclassOf(tClass)
                 );
-        }
-
-        #endregion
-
-        #region public static Boolean Copy<...>()
-
-        public static T? Copy<T>(Object? o, BindingFlags bf = CBindingFlags.PublicInstance) { return ObjectUtils.Cast<T>(Copy(o, bf)); }
-        public static Object? Copy(Object? o, BindingFlags bf = CBindingFlags.PublicInstance) 
-        { 
-            return o != null 
-                ? Copy(o, ReflectionUtils.InvokeConstructor(ReflectionUtils.GetConstructor(o.GetType())), bf) 
-                : null; 
-        }
-        public static Boolean Copy(Object? oIn, Object? oOut, BindingFlags bf = CBindingFlags.PublicInstance)
-        {
-            if (oIn == null || oOut == null)
-                return false;
-
-            Type
-                to = oIn.GetType();
-
-            MemberInfo[]?
-                a = ReflectionUtils.GetMembers(to, bf);
-
-            if (a == null)
-                return true;
-
-            Type? ti, ti0;
-            Object? oi;
-            for (int i = 0; i < a.Length; i++)
-            {
-                ti = ReflectionUtils.GetMemberValueType(a[i]);
-                if (ti == null) continue;
-                oi = ReflectionUtils.GetMemberValue(oIn, a[i]);
-                ti0 = Nullable.GetUnderlyingType(ti);
-                if (ti0 != null) ti = ti0;
-                if (!ti.IsPrimitive) oi = JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
-                ReflectionUtils.SetMemberValue(oOut, a[i], oi, false);
-            }
-
-            return true;
         }
 
         #endregion

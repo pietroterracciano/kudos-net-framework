@@ -1,5 +1,6 @@
 ﻿using Kudos.Constants;
 using Kudos.Databases.Interfaces.Chains;
+using Kudos.Reflection.Utils;
 using Kudos.Utils;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Kudos.Databases.Chains
 
         internal DatabaseChain(DatabaseChain? o = null)
         {
-            ObjectUtils.Copy(o, this, CBindingFlags.Instance);
+            ReflectionUtils.Copy(o, this, CBindingFlags.Instance);
         }
     }
 }

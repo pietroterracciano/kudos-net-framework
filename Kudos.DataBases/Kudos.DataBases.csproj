@@ -12,6 +12,9 @@
     <EmbeddedResource Remove="Models\**" />
     <None Remove="Filters\**" />
     <None Remove="Models\**" />
+    <None Remove="Descriptors\" />
+    <Compile Remove="Utils\DatabaseColumnTypeUtils.cs" />
+    <Compile Remove="Utils\DatabaseDataTypeUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,5 +38,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Descriptors\" />
   </ItemGroup>
 </Project>

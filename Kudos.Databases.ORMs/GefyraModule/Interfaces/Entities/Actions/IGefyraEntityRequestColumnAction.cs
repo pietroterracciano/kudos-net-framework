@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities.Actions
 {
     public interface
-        IGefyraEntityGetColumnAction
+        IGefyraEntityRequestColumnAction
 
     {
-        public IGefyraColumn GetColumn(String? sName);
+        public IGefyraColumn RequestColumn(String? sName);
+        public Task<IGefyraColumn> RequestColumnAsync(String? sName);
     }
 }

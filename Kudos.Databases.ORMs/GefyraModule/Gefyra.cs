@@ -1,12 +1,23 @@
 ﻿using System.Data;
+using System.Numerics;
+using System.Reflection;
 using Kudos.Constants;
+using Kudos.Databases.Descriptors;
+using Kudos.Databases.Enums;
+using Kudos.Databases.Interfaces;
 using Kudos.Databases.ORMs.GefyraModule.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Builts;
+using Kudos.Databases.ORMs.GefyraModule.Constants;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
 using Kudos.Reflection.Utils;
 using Kudos.Types;
+using Kudos.Utils;
+using Kudos.Utils.Collections;
+using Kudos.Utils.Numerics;
+using Kudos.Utils.Texts;
+using Mysqlx.Prepare;
 
 namespace Kudos.Databases.ORMs.GefyraModule
 {
@@ -29,8 +40,10 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region public static GefyraTable GetTable<...>(...)
 
-        public static IGefyraTable GetTable<T>() { GefyraTable gt; GefyraTable.Get<T>(out gt); return gt; }
-        public static IGefyraTable GetTable(Type? t) { GefyraTable gt; GefyraTable.Get(ref t, out gt); return gt; }
+        public static IGefyraTable RequestTable<T>() { GefyraTable gt; GefyraTable.Request<T>(out gt); return gt; }
+        public static IGefyraTable RequestTable(Type? t) { GefyraTable gt; GefyraTable.Request(ref t, out gt); return gt; }
+        public static Task<IGefyraTable> RequestTableAsync<T>() { return Task.Run(RequestTable<T>); }
+        public static Task<IGefyraTable> RequestTableAsync(Type? t) { return Task.Run(() => RequestTable(t)); }
 
         //public static GefyraTable RequestTable(String? sName) { GefyraTable gt; GefyraTable.Request(ref sName, out gt); return gt; }
         //public static GefyraTable RequestTable(String? sSchemaName, String? sName) { GefyraTable gt; GefyraTable.Request(ref sSchemaName, ref sName, out gt); return gt; }\
@@ -41,6 +54,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Parse
 
+        public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
         public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
         {
             if (dt == null)
@@ -59,13 +73,14 @@ namespace Kudos.Databases.ORMs.GefyraModule
             return l.ToArray();
         }
 
+        public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
         public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
         {
             if (dr == null)
                 return default(T);
 
             IGefyraTable
-                gt = Gefyra.GetTable<T>();
+                gt = Gefyra.RequestTable<T>();
 
             if (gt == GefyraTable.Invalid)
                 return default(T);
@@ -92,7 +107,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
                 m = null;
 
             IGefyraColumn? gci;
-            Object? oi;
+
             for(int i=0; i<dr.Table.Columns.Count; i++)
             {
                 gci =
@@ -101,15 +116,212 @@ namespace Kudos.Databases.ORMs.GefyraModule
                         : null;
 
                 if (gci == null)
-                    gci = gt.GetColumn(dr.Table.Columns[i].ColumnName);
+                    gci = gt.RequestColumn(dr.Table.Columns[i].ColumnName);
 
                 if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember)
                     continue;
 
-                ReflectionUtils.SetMemberValue(t, gci.DeclaringMember, dr[dr.Table.Columns[i]], true);
+                ReflectionUtils.SetMemberValue(t, gci.DeclaringMember, DataRowUtils.GetValue(dr, i), true);
             }
 
             return t;
+        }
+
+        #endregion
+
+        #region Fit
+
+        public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => {  Fit<T>(dbh, ref t0); }); }
+        public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
+        public static void Fit<T>(IDatabaseHandler? dbh, ref T? t) { T? t0; __Fit(ref dbh, ref t, out t0, true); }
+        public static T? Fit<T>(IDatabaseHandler? dbh, T? t) { T? t0; __Fit(ref dbh, ref t, out t0, false); return t0; }
+        private static void __Fit<T>(ref IDatabaseHandler? dbh, ref T? t, out T? t0, Boolean bInPlace)
+        { 
+            if (dbh == null)
+            {
+                t0 = bInPlace ? t : default(T);
+                return;
+            }
+
+            IGefyraTable
+                gt = Gefyra.RequestTable<T>();
+
+            if (gt == GefyraTable.Invalid)
+            {
+                t0 = bInPlace ? t : default(T);
+                return;
+            }
+            else if (bInPlace)
+                t0 = t;
+            else
+            {
+                t0 = ReflectionUtils.Copy<T>(t, CGefyraBindingFlags.OnGetMembers);
+                if (t0 == null) return;
+            }
+
+            MemberInfo[]?
+                mia = ReflectionUtils.GetMembers<T>(CGefyraBindingFlags.OnGetMembers);
+
+            if (mia == null) return;
+
+            IGefyraColumn? gci;
+            DatabaseColumnDescriptor? dbcdi;
+            Object? oi;
+            for (int i=0; i<mia.Length; i++)
+            {
+                gci = gt.RequestColumn(mia[i].Name);
+                if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember) continue;
+                dbcdi = dbh.GetColumnDescriptor(gci.DeclaringTable.SchemaName, gci.DeclaringTable.Name, gci.Name);
+                if (dbcdi == null) continue;
+                oi = ReflectionUtils.GetMemberValue(t, mia[i]);
+                __Fit(ref dbcdi, ref oi, out oi);
+                ReflectionUtils.SetMemberValue(t0, mia[i], oi, true);
+            }
+        }
+
+        public static Task<Object?> FitAsync(DatabaseColumnDescriptor dbcd, Object? o) { return Task.Run(() => Fit(dbcd, o)); }
+        public static Object? Fit(DatabaseColumnDescriptor? dbcd, Object? o) { Object? oOut; __Fit(ref dbcd, ref o, out oOut); return oOut; }
+        private static void __Fit(ref DatabaseColumnDescriptor? dbcd, ref Object? oIn, out Object? oOut)
+        {
+            if (dbcd == null)
+            {
+                oOut = oIn;
+                return;
+            }
+
+            oOut = ObjectUtils.Parse(dbcd.DataTypeDescriptor.SimplexType, oIn);
+
+            #region UInt16
+            if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt16)
+            {
+                UInt16? i = oOut as UInt16?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region UInt32
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt32)
+            {
+                UInt32? i = oOut as UInt32?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region UInt64
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt64)
+            {
+                UInt64? i = oOut as UInt64?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region Int16
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int16)
+            {
+                Int16? i = oOut as Int16?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region Int32
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int32)
+            {
+                Int32? i = oOut as Int32?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region Int64
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int64)
+            {
+                Int64? i = oOut as Int64?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region Single
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Single)
+            {
+                Single? i = oOut as Single?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region Double
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Double)
+            {
+                Double? i = oOut as Double?;
+                if (i != null)
+                {
+                    if (i > dbcd.DataTypeDescriptor.MaxValue) oOut = dbcd.DataTypeDescriptor.MaxValue;
+                    else if (i < dbcd.DataTypeDescriptor.MinValue) oOut = dbcd.DataTypeDescriptor.MinValue;
+                }
+            }
+            #endregion
+            #region String
+            else if (dbcd.DataTypeDescriptor.SimplexType == CType.String)
+            {
+                Int32? i = Int32Utils.Parse(dbcd.CurrentMaxLength);
+                if (i != null) oOut = StringUtils.Truncate(oOut as String, i.Value);
+            }
+            #endregion
+
+            if (oOut == null)
+                oOut = dbcd.DefaultValue;
+
+            if
+            (
+                !dbcd.IsRequired
+                || oOut != null
+                || dbcd.IsNullable
+            )
+                return;
+
+            oOut = ReflectionUtils.CreateInstance(dbcd.DataTypeDescriptor.SimplexType);
+
+            //if (oOut != null)
+            //    return;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt16)
+            //    oOut = (UInt16)0;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt32)
+            //    oOut = 0U;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt64)
+            //    oOut = 0UL;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int16)
+            //    oOut = (Int16)0;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int32)
+            //    oOut = 0;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int64)
+            //    oOut = 0L;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Single)
+            //    oOut = 0F;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Double)
+            //    oOut = 0D;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.Decimal)
+            //    oOut = 0M;
+            //else if (dbcd.DataTypeDescriptor.SimplexType == CType.String)
+            //    oOut = String.Empty;
         }
 
         #endregion

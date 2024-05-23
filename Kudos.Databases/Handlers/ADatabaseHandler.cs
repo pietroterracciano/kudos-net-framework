@@ -1,9 +1,15 @@
-﻿using Kudos.Databases.Constants;
+﻿using Kudos.Constants;
+using Kudos.Databases.Constants;
+using Kudos.Databases.Descriptors;
 using Kudos.Databases.Enums;
 using Kudos.Databases.Interfaces;
 using Kudos.Databases.Interfaces.Chains;
 using Kudos.Databases.Results;
+using Kudos.Databases.Utils;
+using Kudos.Types;
 using Kudos.Utils;
+using Kudos.Utils.Collections;
+using Kudos.Utils.Texts;
 using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using System;
@@ -13,6 +19,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -33,13 +40,6 @@ namespace Kudos.Databases.Controllers
         where DbConnectionType : DbConnection, new()
         where DbCommandType : DbCommand
     {
-        //private static readonly Dictionary<EDBInformationSchemaType, String>
-        //    __dISTypes2ISName = new Dictionary<EDBInformationSchemaType, String>()
-        //    {
-        //        { EDBInformationSchemaType.Tables, "tables" },
-        //        { EDBInformationSchemaType.Columns, "columns" }
-        //    };
-
         private readonly DbConnectionType
             _oConnection;
 
@@ -59,10 +59,14 @@ namespace Kudos.Databases.Controllers
             //_oSuperficialLock,
             _oDeeperLock;
 
+        private IDatabaseHandler
+            _this;
+
         public EDatabaseType Type { get; private set; }
 
         internal ADatabaseHandler(EDatabaseType e, ref DbConnectionStringBuilderType csb)
         {
+            _this = this;
             //_oSuperficialLock = new Object();
             _oDeeperLock = new Object();
             Type = e;
@@ -428,7 +432,7 @@ namespace Kudos.Databases.Controllers
 
         #region public DBNonQueryCommandResultModel ExecuteNonQuery
 
-        public Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object>[]? a)
+        public Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
         {
             return
                 Task.Run
@@ -439,7 +443,7 @@ namespace Kudos.Databases.Controllers
                     }
                 );
         }
-        public DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object>[]? a)
+        public DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object?>[]? a)
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
 
@@ -508,7 +512,7 @@ namespace Kudos.Databases.Controllers
 
         #region public DBQueryCommandResultModel ExecuteQuery()
 
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object>[]? a)
+        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
         {
             return
                 Task.Run
@@ -519,8 +523,8 @@ namespace Kudos.Databases.Controllers
                     }
                 );
         }
-        public DatabaseQueryResult ExecuteQuery(String? s, params KeyValuePair<String, Object>[]? a) { return ExecuteQuery(s, 0, a); }
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object>[]? a)
+        public DatabaseQueryResult ExecuteQuery(String? s, params KeyValuePair<String, Object?>[]? a) { return ExecuteQuery(s, 0, a); }
+        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? a)
         {
             return
                 Task.Run
@@ -531,7 +535,7 @@ namespace Kudos.Databases.Controllers
                     }
                 );
         }
-        public DatabaseQueryResult ExecuteQuery(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object>[]? a)
+        public DatabaseQueryResult ExecuteQuery(String? s, Int32 iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? a)
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
 
@@ -605,97 +609,48 @@ namespace Kudos.Databases.Controllers
 
         #endregion
 
-        //#region public FetchInformationSchema()
+        #region public DatabaseTableDescriptor? GetTableDescriptor(...)
 
-        //public ADBInformationSchemaModel? FetchInformationSchema(EDBInformationSchemaType eType, String? sTableName)
-        //{
-        //    return FetchInformationSchema(eType, null, sTableName);
-        //}
-        //public ADBInformationSchemaModel? FetchInformationSchema(EDBInformationSchemaType eType, String? sSchemaName, String? sTableName)
-        //{
-        //    if (String.IsNullOrWhiteSpace(sSchemaName))
-        //    {
-        //        sSchemaName = Config.SchemaName;
-        //        if (String.IsNullOrEmpty(sSchemaName))
-        //            return null;
-        //    }
+        public DatabaseTableDescriptor? GetTableDescriptor(String? sName) { return GetTableDescriptor(null, sName); }
+        public DatabaseTableDescriptor? GetTableDescriptor(String? sSchemaName, String? sName)
+        {
+            DatabaseTableDescriptor dbtd;
+            DatabaseTableDescriptor.Get(ref _this, ref sSchemaName, ref sName, out dbtd);
+            return dbtd;
+        }
 
-        //    String sISName;
-        //    if (!__dISTypes2ISName.TryGetValue(eType, out sISName) || sISName == null)
-        //        return null;
+        #endregion
 
-        //    List<KeyValuePair<String, Object>> 
-        //        lKeysValuesPairs = new List<KeyValuePair<String, Object>>(2);
+        #region public DatabaseColumnDescriptor? GetColumnDescriptor(...)
 
-        //    StringBuilder
-        //        oStringBuilder = new StringBuilder();
+        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName) { return GetColumnDescriptor(null, sTableName, sName); }
+        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName)
+        {
+            return GetColumnDescriptor(GetTableDescriptor(sSchemaName, sTableName), sName);
+        }
+        public DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dscTable, String? sName)
+        {
+            DatabaseColumnDescriptor? dbcd;
+            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, ref sName, out dbcd);
+            return dbcd;
+        }
 
-        //    oStringBuilder
-        //        .Append("SELECT * FROM information_schema.").Append(sISName).Append(" ")
-        //        .Append("WHERE TABLE_SCHEMA = @TABLE_SCHEMA ");
+        #endregion
 
-        //    lKeysValuesPairs.Add(new KeyValuePair<String, Object>("@TABLE_SCHEMA", sSchemaName));
+        #region public DatabaseColumnDescriptor[]? GetColumnsDescriptors(...)
 
-        //    if (!String.IsNullOrWhiteSpace(sTableName))
-        //    {
-        //        oStringBuilder.Append("AND TABLE_NAME = @TABLE_NAME");
-        //        lKeysValuesPairs.Add(new KeyValuePair<String, Object>("@TABLE_NAME", sTableName));
-        //    }
+        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName) { return GetColumnsDescriptors(null, sTableName); }
+        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName)
+        {
+            return GetColumnsDescriptors(GetTableDescriptor(sSchemaName, sTableName));
+        }
+        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dscTable)
+        {
+            DatabaseColumnDescriptor[]? dbcda;
+            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, out dbcda);
+            return dbcda;
+        }
 
-        //    DBQueryCommandResultModel mResult = ExecuteQueryCommand(oStringBuilder.ToString(), lKeysValuesPairs.ToArray());
-
-        //    if (!mResult.IsDone() || mResult.Data == null)
-        //        return null;
-
-        //    DBISColumnsModel oModel = new DBISColumnsModel(sSchemaName, sTableName);
-
-        //    for (int i=0; i< mResult.Data.Rows.Count; i++)
-        //        oModel.NewDescriptorFrom(mResult.Data.Rows[i]);
-
-        //    return oModel;
-        //}
-
-        //#endregion
-
-        //#region public String PrepareQueryColumnsNames()
-
-        //public String PrepareQueryColumnsNames(String sTableName, String sFakeTableName = null)
-        //{
-        //    return PrepareQueryColumnsNames(Config.SchemaName, sTableName, sFakeTableName);
-        //}
-
-        //public String PrepareQueryColumnsNames(String sSchemaName, String sTableName, String sFakeTableName = null)
-        //{
-        //    if (
-        //        String.IsNullOrWhiteSpace(sSchemaName)
-        //        || String.IsNullOrWhiteSpace(sTableName)
-        //    )
-        //        return null;
-
-        //    if (String.IsNullOrWhiteSpace(sFakeTableName))
-        //        sFakeTableName = sTableName;
-
-        //    String sCommand =
-        //        "SELECT " +
-        //            "GROUP_CONCAT( CONCAT('" + sFakeTableName + "', '.', COLUMN_NAME, ' AS " + sFakeTableName + "', COLUMN_NAME) SEPARATOR ',') AS PreparedQueryColumnsNames " +
-        //        "FROM " +
-        //            "information_schema.columns " +
-        //        "WHERE " +
-        //            "table_schema = \"" + sSchemaName + "\" " +
-        //        "AND " +
-        //            "table_name = \"" + sTableName + "\" "; 
-
-        //    DBQueryCommandResultModel
-        //        mResult = ExecuteQueryCommand(sCommand, 1);
-
-        //    return
-        //        mResult != null
-        //        && mResult.Data != null
-        //        && mResult.Data.Rows.Count > 0
-        //            ? StringUtils.From(mResult.Data.Rows[0]["PreparedQueryColumnsNames"])
-        //            : null;
-        //}
-
-        //#endregion
+        #endregion
     }
 }

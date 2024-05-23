@@ -1,11 +1,10 @@
 ﻿using Kudos.Reflection.Utils;
 using Kudos.Servers.KaronteModule.Attributes;
-using Kudos.Servers.KaronteModule.Builders;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
+using Kudos.Servers.KaronteModule.Contexts.Options;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
-using Kudos.Servers.KaronteModule.Interfaces;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -17,138 +16,126 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Kudos.Servers.KaronteModule
 {
     public static class Karonte
     {
         private static Type[]? __a;
-        private static Func<IApplicationBuilder, IKaronteAuthorizationBuilder> __f0;
-        private static Func<IApplicationBuilder, IKaronteDatabasingBuilder> __f1;
-        private static Dictionary<IApplicationBuilder, KaronteApplicationBuilderContext> __d0;
-        private static Dictionary<IApplicationBuilder, Dictionary<Type, IKaronteBuilder>> __d1;
-        //private static Dictionary<IApplicationBuilder, IKaronteDatabaseHandlerBuilder> __d2;
-        private static Boolean __bIsCoreAdded;// __bIsAuthorizationAdded, _bIsDatabasingAdded;
+        private static HashSet<String> __hsConsumedServices, __hsConsumedApplications;
 
         static Karonte()
         {
-            __f0 = ab => new KaronteAuthorizationBuilder(ref ab);
-            __f1 = ab => new KaronteDatabasingBuilder(ref ab);
-            __bIsCoreAdded = false;
-            __d0 = new Dictionary<IApplicationBuilder, KaronteApplicationBuilderContext>();
-            __d1 = new Dictionary<IApplicationBuilder, Dictionary<Type, IKaronteBuilder>>();
+            __hsConsumedServices = new HashSet<string>();
+            __hsConsumedApplications = new HashSet<string>();
+            //__f0 = ab => new KaronteAuthorizationBuilder(ref ab);
+            //__f1 = ab => new KaronteDatabasingBuilder(ref ab);
+            //__bIsCoreAdded = __bIsJSONingAdded = false;
+            //__d0 = new Dictionary<IApplicationBuilder, KaronteApplicationBuilderContext>();
+            //__d1 = new Dictionary<IApplicationBuilder, Dictionary<Type, IKaronteBuilder>>();
             //__d2 = new Dictionary<IApplicationBuilder, IKaronteDatabaseHandlerBuilder>();
         }
 
-        private static EKaronteObjectStatus FetchApplicationBuilderContext(ref IApplicationBuilder ab, out KaronteApplicationBuilderContext kabc)
+        private static Boolean ConsumeService(String? s)
         {
-            if (__d0.TryGetValue(ab, out kabc) && kabc != null) return EKaronteObjectStatus.InReuse;
-            __d0[ab] = kabc = new KaronteApplicationBuilderContext(); return EKaronteObjectStatus.New;
+            if (s == null) return false;
+            __hsConsumedServices.Add(s); return true;
         }
 
-        private static EKaronteObjectStatus FetchAuthorizationBuilder(ref IApplicationBuilder ab, out IKaronteAuthorizationBuilder kab)
+        private static Boolean IsServiceConsumed(String? s)
         {
-            return FetchBuilder(ref ab, out kab, __f0);
+            return
+                s != null
+                && __hsConsumedServices.Contains(s);
         }
 
-        private static EKaronteObjectStatus FetchDatabasingBuilder(ref IApplicationBuilder ab, out IKaronteDatabasingBuilder kab)
+        private static Boolean ConsumeApplication(String? s)
         {
-            return FetchBuilder(ref ab, out kab, __f1);
+            if (s == null) return false;
+            __hsConsumedApplications.Add(s); return true;
         }
 
-        private static EKaronteObjectStatus FetchBuilder<T>(ref IApplicationBuilder ab, out T ktb, Func<IApplicationBuilder, T> fnc) 
-            where T : IKaronteBuilder
+        private static Boolean IsApplicationConsumed(String? s)
         {
-            Dictionary<Type, IKaronteBuilder> d;
-            if (!__d1.TryGetValue(ab, out d) || d == null) __d1[ab] = d = new Dictionary<Type, IKaronteBuilder>();
-            Type t = typeof(T);
-            IKaronteBuilder? kb;
-            if (d.TryGetValue(t, out kb) && kb != null) { ktb = ObjectUtils.Cast<T>(kb); return EKaronteObjectStatus.InReuse; }
-            d[t] = kb = ktb = fnc.Invoke(ab); return EKaronteObjectStatus.New;
-        }
-
-        //private static EKaronteObjectStatus FetchDatabaseHandlerBuilder(ref IApplicationBuilder ab, out IKaronteDatabaseHandlerBuilder kab)
-        //{
-        //    if (__d1.TryGetValue(ab, out kab) && kab != null) return EKaronteObjectStatus.InReuse;
-        //    __d2[ab] = kab = new KaronteAuthorizationBuilder(ref ab); return EKaronteObjectStatus.New;
-        //}
-
-        private static void IsApplicationBuilderContextMetaEnabled(ref IApplicationBuilder ab, String s, Boolean o)
-        {
-            KaronteApplicationBuilderContext kabc;
-            FetchApplicationBuilderContext(ref ab, out kabc);
-            kabc.SetMeta(s, o);
-        }
-
-        private static Boolean IsApplicationBuilderContextMetaEnabled(ref IApplicationBuilder ab, String s)
-        {
-            KaronteApplicationBuilderContext kabc;
-            FetchApplicationBuilderContext(ref ab, out kabc);
-            Boolean? b = kabc.GetMeta<Boolean?>(s);
-            return b != null && b.Value;
-        }
-
-        private static Boolean CanApplicationBuilderContextContinue(ref IApplicationBuilder ab, String s)
-        {
-            if (IsApplicationBuilderContextMetaEnabled(ref ab, s)) return false;
-            IsApplicationBuilderContextMetaEnabled(ref ab, s, true); return true;
+            return
+                s != null
+                && __hsConsumedApplications.Contains(s);
         }
 
         #region public static IServiceCollection AddKaronteCore(...)
 
         public static IServiceCollection AddKaronteCore(this IServiceCollection sc)
         {
-            if (!__bIsCoreAdded)
-            {
-                __bIsCoreAdded = true;
+            if (IsServiceConsumed(CKaronteKey.Core)) return sc;
+            ConsumeService(CKaronteKey.Core);
 
-                sc
-                    .TryAddScoped<KaronteContext>();
-                sc
-                    .AddRouting()
-                    .AddControllers();
+            sc
+                .TryAddScoped<KaronteContext>();
+            sc
+                .AddRouting()
+                .AddControllers();
 
-                Assembly?
-                    ass = Assembly.GetEntryAssembly();
+            Assembly?
+                ass = Assembly.GetEntryAssembly();
 
-                if (ass == null)
-                    return sc;
+            if (ass == null)
+                return sc;
 
                 
-                Type[]? ts1;
-                try { ts1 = ass.GetTypes(); } catch { ts1 = null; }
-                if (ts1 == null)
-                    return sc;
+            Type[]? ts1;
+            try { ts1 = ass.GetTypes(); } catch { ts1 = null; }
+            if (ts1 == null)
+                return sc;
 
-                List<Type> l = new List<Type>();
-                for (int i = 0; i < ts1.Length; i++)
+            List<Type> l = new List<Type>();
+            for (int i = 0; i < ts1.Length; i++)
+            {
+                KaronteServiceAttribute? 
+                    ksa = ReflectionUtils.GetCustomAttribute<KaronteServiceAttribute>(ts1[i], true);
+
+                if (ksa == null)
+                    continue;
+
+                switch(ksa.Type)
                 {
-                    KaronteServiceAttribute? 
-                        ksa = ReflectionUtils.GetCustomAttribute<KaronteServiceAttribute>(ts1[i], true);
-
-                    if (ksa == null)
-                        continue;
-
-                    switch(ksa.Type)
-                    {
-                        case EKaronteServiceType.Scoped:
-                            sc.TryAddScoped(ts1[i]);
-                            break;
-                        case EKaronteServiceType.Transient:
-                            sc.TryAddTransient(ts1[i]);
-                            break;
-                        case EKaronteServiceType.Singleton:
-                            sc.TryAddSingleton(ts1[i]);
-                            break;
-                    }
-
-                    l.Add(ts1[i]);
+                    case EKaronteServiceType.Scoped:
+                        sc.TryAddScoped(ts1[i]);
+                        break;
+                    case EKaronteServiceType.Transient:
+                        sc.TryAddTransient(ts1[i]);
+                        break;
+                    case EKaronteServiceType.Singleton:
+                        sc.TryAddSingleton(ts1[i]);
+                        break;
                 }
 
-                __a = l.ToArray();
+                l.Add(ts1[i]);
             }
 
+            __a = l.ToArray();
+
             return sc;
+        }
+
+        public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, JsonSerializerOptions? jso)
+        {
+            if (IsServiceConsumed(CKaronteKey.JSONing)) return sc;
+            ConsumeService(CKaronteKey.JSONing);
+
+            if (jso == null)
+                jso
+                     = new JsonSerializerOptions()
+                     {
+                         PropertyNameCaseInsensitive = false,
+                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                         IncludeFields = true
+                     };
+
+            sc.TryAddSingleton<KaronteJSONingOptionsContext>(new KaronteJSONingOptionsContext(ref jso)); return sc;
         }
 
         #endregion
@@ -157,10 +144,12 @@ namespace Kudos.Servers.KaronteModule
 
         public static IApplicationBuilder UseKaronteCore(this IApplicationBuilder ab)
         {
-            if (!__bIsCoreAdded)
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            else if (IsApplicationConsumed(CKaronteKey.Core))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Core);
 
             return 
                 ab.Use
@@ -182,10 +171,12 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteRouting<RoutingMiddlewareType>(this IApplicationBuilder ab)
             where RoutingMiddlewareType : AKaronteRoutingMiddleware
         {
-            if (!__bIsCoreAdded || !IsApplicationBuilderContextMetaEnabled(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseRouting))
+            else if (IsApplicationConsumed(CKaronteKey.Routing))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Routing);
 
             //IKaronteAuthorizationBuilder kab;
             //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
@@ -202,10 +193,13 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteAuthorizating<AuthorizatingMiddlewareType>(this IApplicationBuilder ab)
             where AuthorizatingMiddlewareType : AKaronteAuthorizatingMiddleware
         {
-            if (!__bIsCoreAdded || !IsApplicationBuilderContextMetaEnabled(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseAuthorizating))
+            else if (IsApplicationConsumed(CKaronteKey.Authorizating))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Authorizating);
+
 
             //IKaronteAuthorizationBuilder kab;
             //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
@@ -221,14 +215,17 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteDatabasing<DatabasingMiddlewareType>(this IApplicationBuilder ab)
             where DatabasingMiddlewareType : AKaronteDatabasingMiddleware
         {
-            if (!__bIsCoreAdded || !IsApplicationBuilderContextMetaEnabled(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseDatabasing))
+            else if (IsApplicationConsumed(CKaronteKey.Databasing))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Databasing);
+
 
             //IKaronteDatabasingBuilder kdbb;
             //if (FetchDatabasingBuilder(ref ab, out kdbb) == EKaronteObjectStatus.New)
-                
+
             return
                 ab
                     .UseMiddleware<DatabasingMiddlewareType>();
@@ -242,10 +239,13 @@ namespace Kudos.Servers.KaronteModule
 
         public static IApplicationBuilder UseKaronteJSONing(this IApplicationBuilder ab)
         {
-            if (!__bIsCoreAdded)
+            if (!IsServiceConsumed(CKaronteKey.JSONing))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseJSONing))
+            else if (IsApplicationConsumed(CKaronteKey.JSONing))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.JSONing);
+
 
             return ab.UseMiddleware<KaronteJSONingMiddleware>();
         }
@@ -257,10 +257,13 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteResponsing<ResponsingMiddlewareType, NonActionResultType>(this IApplicationBuilder ab)
             where ResponsingMiddlewareType : AKaronteResponsingMiddleware<NonActionResultType>
         {
-            if (!__bIsCoreAdded || !IsApplicationBuilderContextMetaEnabled(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseResponsing))
+            else if (IsApplicationConsumed(CKaronteKey.Responsing))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Responsing);
+
 
             return ab.UseMiddleware<ResponsingMiddlewareType>();
         }
@@ -273,10 +276,13 @@ namespace Kudos.Servers.KaronteModule
             where
                 AuthenticatingMiddlewareType : AKaronteAuthenticatingMiddleware<ObjectType>
         {
-            if (!__bIsCoreAdded || !IsApplicationBuilderContextMetaEnabled(ref ab, CKaronteApplicationBuilderContextMetaKey.UseCore))
+            if (!IsServiceConsumed(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if(!CanApplicationBuilderContextContinue(ref ab, CKaronteApplicationBuilderContextMetaKey.UseAuthenticating))
+            else if (IsApplicationConsumed(CKaronteKey.Authenticating))
                 return ab;
+
+            ConsumeApplication(CKaronteKey.Authenticating);
+
 
             return
                 ab

@@ -15,6 +15,14 @@
     <EmbeddedResource Remove="KaronteModule\Packets\**" />
     <None Remove="KaronteModule\Chains\**" />
     <None Remove="KaronteModule\Packets\**" />
+    <Compile Remove="KaronteModule\Builders\AKaronteBuilder.cs" />
+    <Compile Remove="KaronteModule\Builders\KaronteAuthorizationBuilder.cs" />
+    <Compile Remove="KaronteModule\Builders\KaronteDatabasingBuilder.cs" />
+    <Compile Remove="KaronteModule\Interfaces\IKaronteDatabasingBuilder.cs" />
+    <Compile Remove="KaronteModule\Interfaces\IKaronteBuilder.cs" />
+    <Compile Remove="KaronteModule\Interfaces\IKaronteAuthorizationBuilder.cs" />
+    <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
+    <None Remove="KaronteModule\Contexts\Options\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,4 +31,7 @@
     <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="KaronteModule\Contexts\Options\" />
+  </ItemGroup>
 </Project>

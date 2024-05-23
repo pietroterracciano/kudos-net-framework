@@ -55,17 +55,17 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
             __m = new Metas(StringComparison.OrdinalIgnoreCase);
 
             String sn = "!GefyraInvalidTable!";
-            Get(ref sn, out Invalid);
+            Request(ref sn, out Invalid);
         }
 
-        #region internal static void Get<...>(...)
+        #region internal static void Request<...>(...)
 
-        internal static void Get<T>(out GefyraTableDescriptor gtd)
+        internal static void Request<T>(out GefyraTableDescriptor gtd)
         {
             Type t = typeof(T);
-            Get(ref t, out gtd);
+            Request(ref t, out gtd);
         }
-        internal static void Get(ref Type? t, out GefyraTableDescriptor gtd)
+        internal static void Request(ref Type? t, out GefyraTableDescriptor gtd)
         {
             if (t == null) 
             { 
@@ -111,7 +111,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
                 #endregion
 
-                Get(ref t, ref ssn, ref sn, out gtd);
+                Request(ref t, ref ssn, ref sn, out gtd);
                 d[t.MetadataToken] = gtd;
             }
 
@@ -125,16 +125,16 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
             //#endregion
         }
 
-        internal static void Get
+        internal static void Request
         (
             ref String? sn,
             out GefyraTableDescriptor gtd
         )
         {
             String? ssn = null;
-            Get(ref ssn, ref sn, out gtd);
+            Request(ref ssn, ref sn, out gtd);
         }
-        internal static void Get
+        internal static void Request
         (
             ref Type? t,
             ref String? sn,
@@ -142,9 +142,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         )
         {
             String? ssn = null;
-            Get(ref t, ref ssn, ref sn, out gtd);
+            Request(ref t, ref ssn, ref sn, out gtd);
         }
-        internal static void Get
+        internal static void Request
         (
             ref String? ssn,
             ref String? sn,
@@ -152,9 +152,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         )
         {
             Type? t = null;
-            Get(ref t, ref ssn, ref sn, out gtd);
+            Request(ref t, ref ssn, ref sn, out gtd);
         }
-        internal static void Get
+        internal static void Request
         (
             ref Type? t,
             ref String? ssn, 
@@ -289,7 +289,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
             #region Recupero tutti i Members del DeclaringType
 
-            mia = ReflectionUtils.GetMembers(DeclaringType, CGefyraFlags.BFOnGetMembers);
+            mia = ReflectionUtils.GetMembers(DeclaringType, CGefyraBindingFlags.OnGetMembers);
 
             #endregion
 
@@ -299,16 +299,16 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
                 gcdi;
 
             for (int i=0; i<mia.Length; i++)
-                GetColumnDescriptor(ref mia[i], out gcdi);
+                RequestColumnDescriptor(ref mia[i], out gcdi);
 
             #endregion
         }
 
         #region ColumnDescriptors
 
-        #region internal void GetColumnDescriptor(...)
+        #region internal void RequestColumnDescriptor(...)
 
-        internal void GetColumnDescriptor
+        internal void RequestColumnDescriptor
         (
             ref MemberInfo? mi, 
             out GefyraColumnDescriptor gcd
@@ -367,7 +367,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
                 #region Richiedo un ColumnDescriptor per mi,sn
 
-                GetColumnDescriptor(ref mi, ref sn, out gcd);
+                RequestColumnDescriptor(ref mi, ref sn, out gcd);
 
                 #endregion
 
@@ -382,23 +382,23 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
             GefyraColumnDescriptor gcd0;
             sn = mi.Name;
-            GetColumnDescriptor(ref mi, ref sn, out gcd0);
+            RequestColumnDescriptor(ref mi, ref sn, out gcd0);
 
             #endregion
         }
 
-        internal void GetColumnDescriptor
+        internal void RequestColumnDescriptor
         (
             ref String? sn,
             out GefyraColumnDescriptor gcd
         )
         {
-            MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CGefyraFlags.BFOnGetMembers);
-            GetColumnDescriptor(ref mi, out gcd);
+            MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CGefyraBindingFlags.OnGetMembers);
+            RequestColumnDescriptor(ref mi, out gcd);
             if (gcd != GefyraColumnDescriptor.Invalid) return;
-            GetColumnDescriptor(ref mi, ref sn, out gcd);
+            RequestColumnDescriptor(ref mi, ref sn, out gcd);
         }
-        internal void GetColumnDescriptor
+        internal void RequestColumnDescriptor
         (
             ref MemberInfo? mi,
             ref String? sn,
