@@ -95,8 +95,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private void Append(ref IGefyraTable? gt)
         {
-            if (gt != null) Append(gt.GetSQL());
-            else Append(GefyraTable.Invalid.GetSQL());
+            if (gt == null) Append(GefyraTable.Invalid.GetSQL());
+            else if (gt == GefyraTable.Ignored) return;
+            Append(gt.GetSQL());
         }
 
         private void Append(ref IGefyraColumn?[]? gca)
@@ -113,8 +114,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private void Append(ref IGefyraColumn? gc)
         {
-            if (gc != null) { Append(gc.GetSQL()); _lgcConsumed.Add(gc); }
-            else Append(GefyraColumn.Invalid.GetSQL());
+            if (gc == null) Append(GefyraColumn.Invalid.GetSQL());
+            else if (gc == GefyraColumn.Ignored) return;
+            Append(gc.GetSQL()); _lgcConsumed.Add(gc);
         }
 
         private void Append(ref Int32 i)

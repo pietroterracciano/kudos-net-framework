@@ -26,65 +26,16 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         #region ... static ...
 
         internal static readonly GefyraColumnDescriptor
-            Invalid;
+            Invalid,
+            Ignored;
 
         static GefyraColumnDescriptor()
         {
             String sn = "!GefyraInvalidColumn!";
             GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Invalid);
+            sn = "!GefyraIgnoredColumn!";
+            GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Ignored);
         }
-
-        //#region internal static void Request<...>(...)
-
-        //internal static void Request(ref Type? t, ref String? sn, out GefyraColumnDescriptor gcd)
-        //{
-        //    if(t == null)
-        //    {
-        //        gcd = Invalid;
-        //        return;
-        //    }
-
-        //    GefyraTableDescriptor gtd;
-        //    GefyraTableDescriptor.Request(ref t, out gtd);
-        //    gtd.RequestColumnDescriptor(ref mi, out gcd);
-
-        //}
-        //internal static void Request(ref MemberInfo mi, out GefyraColumnDescriptor gcd)
-        //{
-        //    if(mi == null) { gcd = Invalid; return; }
-        //    Type t = mi.DeclaringType; 
-        //    GefyraTableDescriptor.Request(ref t, out gtd);
-        //    gtd.RequestColumnDescriptor(ref mi, out gcd);
-        //}
-
-        //internal static void Request(ref Type? t, ref MemberInfo? mi, out GefyraColumnDescriptor gcd)
-        //{
-        //    if (mi == null) { gcd = Invalid; return; }
-        //    Type t = mi.DeclaringType;
-        //    GefyraTableDescriptor.Request(ref t, out gtd);
-        //    gtd.RequestColumnDescriptor(ref mi, out gcd);
-        //}
-
-        //internal static void Request(ref GefyraTableDescriptor? gtd, ref String? sn, out GefyraColumnDescriptor gcd)
-        //{
-        //    MemberInfo? mi = null;
-        //    Request(ref gtd, ref mi, ref sn, out gcd);
-        //}
-
-        //internal static void Request(ref GefyraTableDescriptor? gtd, ref MemberInfo? mi, out GefyraColumnDescriptor gcd)
-        //{
-        //    String? sn = null;
-        //    Request(ref gtd, ref mi, ref sn, out gcd);
-        //}
-
-        //internal static void Request(ref GefyraTableDescriptor? gtd, ref MemberInfo? mi, ref String? sn, out GefyraColumnDescriptor gcd)
-        //{
-        //    if (gtd == null) { gcd = Invalid; return; }
-        //    gtd.RequestColumnDescriptor(ref mi, ref sn, out gcd);
-        //}
-
-        //#endregion
-
         #endregion
 
         #region DeclaringTableDescriptor

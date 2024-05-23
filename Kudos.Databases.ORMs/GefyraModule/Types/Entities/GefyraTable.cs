@@ -29,7 +29,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities
         private static readonly Metas
             __m;
         internal static readonly GefyraTable
-            Invalid;
+            Invalid,
+            Ignored;
 
         static GefyraTable()
         {
@@ -37,6 +38,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities
 
             String sn = "!GefyraInvalidTable!";
             Request(ref sn, out Invalid);
+            sn = "!GefyraIgnoredTable!";
+            Request(ref sn, out Ignored);
         }
 
         #region internal static void Request<...>(...)

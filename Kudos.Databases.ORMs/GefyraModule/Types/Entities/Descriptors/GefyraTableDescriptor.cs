@@ -41,7 +41,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         private static readonly Metas
             __m;
         internal static readonly GefyraTableDescriptor
-            Invalid;
+            Invalid,
+            Ignored;
 
         static GefyraTableDescriptor()
         {
@@ -56,6 +57,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
             String sn = "!GefyraInvalidTable!";
             Request(ref sn, out Invalid);
+            sn = "!GefyraIgnoredTable!";
+            Request(ref sn, out Ignored);
         }
 
         #region internal static void Request<...>(...)
@@ -322,6 +325,21 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
             )
             {
                 gcd = GefyraColumnDescriptor.Invalid;
+                return;
+            }
+
+            GefyraIgnoreColumnAttribute?
+                gic;
+
+            #region Recupero l'attribute per il Member
+
+            gic = ReflectionUtils.GetCustomAttribute<GefyraIgnoreColumnAttribute>(mi);
+
+            #endregion
+
+            if (gic != null)
+            {
+                gcd = GefyraColumnDescriptor.Ignored;
                 return;
             }
 

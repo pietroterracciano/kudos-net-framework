@@ -24,11 +24,15 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities
         #region ... static ...
 
         internal static readonly GefyraColumn
-            Invalid;
+            Invalid,
+            Ignored;
 
         static GefyraColumn()
         {
-            Invalid = null;
+            String sn = "!GefyraInvalidColumn!";
+            GefyraTable.Invalid.RequestColumn(ref sn, out Invalid);
+            sn = "!GefyraIgnoredColumn!";
+            GefyraTable.Ignored.RequestColumn(ref sn, out Ignored);
         }
 
         #endregion

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Kudos.Constants;
 using Kudos.Reflection.Utils;
 using Kudos.Utils;
@@ -77,6 +78,11 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 
             return new EpikyrosiResult(ref k, ref sw, ref l);
         }
+
+		public Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid = false)
+		{
+			return Task.Run(() => Validate(o, bStopOnFirstNotValid));
+		}
     }
 }
 
