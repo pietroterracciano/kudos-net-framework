@@ -10,6 +10,6 @@ namespace Kudos.Databases.Interfaces.Chains
     public interface IBuildableDatabaseChain
     {
         IDatabaseHandler BuildHandler();
-        DatabasePoolizedHandler BuildPoolizedHandler(Int32 i);
+        //DatabasePoolizedHandler BuildPoolizedHandler(Int32 i);
     }
 }

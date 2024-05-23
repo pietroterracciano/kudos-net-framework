@@ -22,7 +22,7 @@
     <Compile Remove="KaronteModule\Interfaces\IKaronteBuilder.cs" />
     <Compile Remove="KaronteModule\Interfaces\IKaronteAuthorizationBuilder.cs" />
     <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
-    <None Remove="KaronteModule\Contexts\Options\" />
+    <None Remove="KaronteModule\Options\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="KaronteModule\Contexts\Options\" />
+    <Folder Include="KaronteModule\Options\" />
   </ItemGroup>
 </Project>

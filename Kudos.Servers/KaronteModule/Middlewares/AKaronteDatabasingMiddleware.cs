@@ -22,22 +22,16 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
         {
-            kc.DatabasingContext = new KaronteDatabasingContext(ref kc);
-
-            IBuildableDatabaseChain? bdbc = await OnDatabaseChainBuild(DatabaseChainer.NewChain());
-            IDatabaseHandler? dbh = bdbc != null ? bdbc.BuildHandler() : null;
-
-            kc.DatabasingContext.Handler = dbh;
-            return await OnDatabaseHandlerCreate(kc.DatabasingContext);
+            kc.DatabasingContext = new KaronteDatabasingContext(ref kc);    
+            return await OnReceiveContext(kc.DatabasingContext);
         }
 
         protected override async Task OnBounceReturn(KaronteContext kc)
         {
-            if (kc.DatabasingContext == null) return;
-            await kc.DatabasingContext.Handler.CloseConnectionAsync();
+            if (kc.DatabasingContext.DatabaseHandler == null) return;
+            await kc.DatabasingContext.DatabaseHandler.CloseConnectionAsync();
         }
 
-        protected abstract Task<IBuildableDatabaseChain?> OnDatabaseChainBuild(IDatabaseChain dbc);
-        protected abstract Task<EKaronteBounce> OnDatabaseHandlerCreate(KaronteDatabasingContext kdbc);
+        protected abstract Task<EKaronteBounce> OnReceiveContext(KaronteDatabasingContext kdbc);
     }
 }

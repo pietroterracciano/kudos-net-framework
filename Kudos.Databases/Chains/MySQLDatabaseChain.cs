@@ -1,4 +1,6 @@
-﻿using Kudos.Databases.Controllers;
+﻿using Kudos.Databases.Constants;
+using Kudos.Databases.Controllers;
+using Kudos.Databases.Enums;
 using Kudos.Databases.Interfaces;
 using Kudos.Databases.Interfaces.Chains;
 using MySql.Data.MySqlClient;
@@ -15,11 +17,13 @@ namespace Kudos.Databases.Chains
     public class MySQLDatabaseChain : ABuildableDatabaseChain, IMySQLDatabaseChain
     {
         internal string? _Host;
+        internal EDatabaseCharacterSet? _CharacterSet;
         internal bool? _IsSessionPoolInteractive;
         internal ushort? _Port;
         internal uint? _KeepAlive;
         internal MySqlConnectionProtocol? _ConnectionProtocol;
 
+        public IMySQLDatabaseChain SetCharacterSet(EDatabaseCharacterSet? e) { _CharacterSet = e; return this; }
         public IMySQLDatabaseChain SetHost(string? s) { _Host = s; return this; }
         public IMySQLDatabaseChain SetPort(ushort? i) { _Port = i; return this; }
         public IMySQLDatabaseChain SetKeepAlive(uint? i) { _KeepAlive = i; return this; }
@@ -40,9 +44,22 @@ namespace Kudos.Databases.Chains
             if (_UserPassword != null) mscsb.Password = _UserPassword;
             if (_SchemaName != null) mscsb.Database = _SchemaName;
 
+            mscsb.DnsSrv = false;
+
             if (_IsPoolingEnabled != null) mscsb.Pooling = _IsPoolingEnabled.Value;
             if (_MinimumPoolSize != null) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
             if (_MaximumPoolSize != null) mscsb.MaximumPoolSize = _MaximumPoolSize.Value;
+
+            if (_CharacterSet != null)
+                switch (_CharacterSet)
+                {
+                    case EDatabaseCharacterSet.utf8:
+                        mscsb.CharacterSet = CDatabaseCharacterSet.utf8;
+                        break;
+                    case EDatabaseCharacterSet.utf8mb4:
+                        mscsb.CharacterSet = CDatabaseCharacterSet.utf8mb4;
+                        break;
+                }
 
             if (_ConnectionTimeout != null) mscsb.ConnectionTimeout = _ConnectionTimeout.Value;
             if (_SessionPoolTimeout != null) mscsb.ConnectionLifeTime = _SessionPoolTimeout.Value;

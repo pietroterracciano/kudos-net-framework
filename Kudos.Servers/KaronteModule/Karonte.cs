@@ -1,11 +1,14 @@
-﻿using Kudos.Reflection.Utils;
+﻿using Kudos.Databases.Chainers;
+using Kudos.Databases.Chains;
+using Kudos.Databases.Interfaces.Chains;
+using Kudos.Reflection.Utils;
 using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
-using Kudos.Servers.KaronteModule.Contexts.Options;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Middlewares;
+using Kudos.Servers.KaronteModule.Options;
 using Kudos.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -120,13 +123,26 @@ namespace Kudos.Servers.KaronteModule
             return sc;
         }
 
-        public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, JsonSerializerOptions? jso)
+        #endregion
+
+        #region AddKaronteJSONing(..)
+
+        public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, Func<JsonSerializerOptions>? fnc)
         {
-            if (IsServiceConsumed(CKaronteKey.JSONing)) return sc;
+            if(!IsServiceConsumed(CKaronteKey.Core))
+                throw new InvalidOperationException();
+            else if (IsServiceConsumed(CKaronteKey.JSONing))
+                return sc;
+
             ConsumeService(CKaronteKey.JSONing);
 
-            if (jso == null)
-                jso
+            JsonSerializerOptions?
+                jsonso = fnc != null
+                    ? fnc.Invoke()
+                    : null;
+
+            if(jsonso == null)
+                jsonso
                      = new JsonSerializerOptions()
                      {
                          PropertyNameCaseInsensitive = false,
@@ -135,7 +151,28 @@ namespace Kudos.Servers.KaronteModule
                          IncludeFields = true
                      };
 
-            sc.TryAddSingleton<KaronteJSONingOptionsContext>(new KaronteJSONingOptionsContext(ref jso)); return sc;
+            sc.TryAddSingleton<KaronteJSONingOptions>(new KaronteJSONingOptions(ref jsonso)); return sc;
+        }
+
+        #endregion
+
+        #region AddKaronteDatabasing(..)
+
+        public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Func<IDatabaseChain, IBuildableDatabaseChain>? fnc)
+        {
+            if (!IsServiceConsumed(CKaronteKey.Core))
+                throw new InvalidOperationException();
+            else if (IsServiceConsumed(CKaronteKey.Databasing))
+                return sc;
+
+            ConsumeService(CKaronteKey.Databasing);
+
+            IBuildableDatabaseChain?
+                bdbc = fnc != null
+                    ? fnc.Invoke(DatabaseChainer.NewChain())
+                    : null;
+
+            sc.TryAddSingleton<KaronteDatabasingOptions>(new KaronteDatabasingOptions(ref bdbc)); return sc;
         }
 
         #endregion
@@ -215,7 +252,7 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteDatabasing<DatabasingMiddlewareType>(this IApplicationBuilder ab)
             where DatabasingMiddlewareType : AKaronteDatabasingMiddleware
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceConsumed(CKaronteKey.Databasing))
                 throw new InvalidOperationException();
             else if (IsApplicationConsumed(CKaronteKey.Databasing))
                 return ab;

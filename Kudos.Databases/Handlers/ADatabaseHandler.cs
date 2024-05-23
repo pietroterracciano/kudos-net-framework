@@ -46,18 +46,8 @@ namespace Kudos.Databases.Controllers
         private DbCommandType?
             _oCommand;
 
-        private readonly Queue<IDatabaseHandler> 
-            _queInStandby, _queInUse;
-
-        //private readonly IBuildableDatabaseChain
-        //    _oBuildableChain;
-
-        //private Boolean
-        //    _bIsExecuting;
-
         private readonly Object
-            //_oSuperficialLock,
-            _oDeeperLock;
+            _lck;
 
         private IDatabaseHandler
             _this;
@@ -67,8 +57,7 @@ namespace Kudos.Databases.Controllers
         internal ADatabaseHandler(EDatabaseType e, ref DbConnectionStringBuilderType csb)
         {
             _this = this;
-            //_oSuperficialLock = new Object();
-            _oDeeperLock = new Object();
+            _lck = new Object();
             Type = e;
             _oConnection = new DbConnectionType() { ConnectionString = csb.ToString() };
         }
@@ -321,72 +310,6 @@ namespace Kudos.Databases.Controllers
 
         #region Command
 
-        //private Boolean Command__Prepare(
-        //    ref String s, 
-        //    ref KeyValuePair<String, Object>[] a,
-        //    out DbCommandType? cmd,
-        //    out DatabaseErrorResult? err
-        //)
-        //{
-        //    if (!IsConnectionOpened())
-        //    {
-        //        cmd = null;
-        //        err = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
-        //        return false;
-        //    }
-        //    else if (String.IsNullOrWhiteSpace(s))
-        //    {
-        //        cmd = null;
-        //        err = new DatabaseErrorResult(CDatabaseErrorCode.ParameterIsInvalid, "Parameter is invalid");
-        //        return false;
-        //    }
-
-        //    try
-        //    {
-        //        cmd = _oConnection.CreateCommand() as DbCommandType;
-        //    }
-        //    catch
-        //    {
-        //        cmd = null;
-        //    }
-
-        //    if (cmd == null)
-        //    {
-        //        cmd = null;
-        //        err = new DatabaseErrorResult(CDatabaseErrorCode.InternalFailure, "Create Command is failed");
-        //        return false;
-        //    }
-
-        //    //oCommand.CommandTimeout = (Int32)Config.CommandTimeout;
-        //    cmd.CommandText = s;
-
-        //    if (a != null)
-        //        foreach (KeyValuePair<String, Object> kvp in a)
-        //        {
-        //            if (String.IsNullOrWhiteSpace(kvp.Key))
-        //                continue;
-
-        //            DbParameter oDbParameter = cmd.CreateParameter();
-        //            oDbParameter.ParameterName = kvp.Key.Trim().Replace("@", "");
-        //            oDbParameter.Value = kvp.Value;
-        //            cmd.Parameters.Add(oDbParameter);
-        //        }
-
-        //    //if (!Config.IsAutoCommitEnabled)
-        //    //{
-        //    //    RollbackTransaction();
-        //    //    if (!BeginTransaction())
-        //    //    {
-        //    //        Command__DisposeAsync(ref oCommand);
-        //    //        mError = new DBErrorModel(0, "Impossible to Begin Transaction");
-        //    //        return false;
-        //    //    }
-        //    //}
-
-        //    err = null;
-        //    return true;
-        //}
-
         private Boolean Command__Prepare(
             ref String s,
             ref KeyValuePair<String, Object>[] a,
@@ -416,6 +339,15 @@ namespace Kudos.Databases.Controllers
                     DbParameter oDbParameter = _oCommand.CreateParameter();
                     oDbParameter.ParameterName = kvp.Key.Trim().Replace("@", "");
                     oDbParameter.Value = kvp.Value;
+
+                    //if(kvp.Value != null)
+                    //{
+                    //    Type t = kvp.Value.GetType();
+
+                    //    if (t == CType.String)
+                    //        oDbParameter.DbType = DbType.;
+                    //}
+
                     _oCommand.Parameters.Add(oDbParameter);
                 }
 
@@ -452,26 +384,7 @@ namespace Kudos.Databases.Controllers
             Int64 lLastInsertedID;
             Int32 iUpdatedRows;
 
-            //lock(_oSuperficialLock)
-            //{
-            //    if (_bIsExecuting)
-            //    {
-            //        IDatabaseHandler dbh = _oBuildableChain.BuildHandler();
-
-            //        if (dbh.OpenConnection().HasError())
-            //            goto EXECUTE;
-
-            //        DatabaseNonQueryResult dbnqr = dbh.ExecuteNonQuery(s, a);
-            //        dbh.CloseConnectionAsync();
-            //        return dbnqr;
-            //    }
-
-            //    _bIsExecuting = true;
-            //}
-            
-            //EXECUTE:
-
-            lock (_oDeeperLock)
+            lock (_lck)
             {
                 dbbr.StopOnWaiting().StartOnExecution();
 
@@ -495,11 +408,6 @@ namespace Kudos.Databases.Controllers
             }
 
             END_METHOD:
-
-            //lock (_oSuperficialLock)
-            //{
-            //    _bIsExecuting = false;
-            //}
 
             return new DatabaseNonQueryResult(ref lLastInsertedID, ref iUpdatedRows, ref err, ref dbbr);
         }
@@ -542,26 +450,7 @@ namespace Kudos.Databases.Controllers
             DataTable? oDataTable;
             DatabaseErrorResult? err;
 
-            //lock (_oSuperficialLock)
-            //{
-            //    if (_bIsExecuting)
-            //    {
-            //        IDatabaseHandler dbh = _oBuildableChain.BuildHandler();
-
-            //        if (dbh.OpenConnection().HasError())
-            //            goto EXECUTE;
-
-            //        DatabaseQueryResult dbqr = dbh.ExecuteQuery(s, iExpectedRowsNumber, a);
-            //        dbh.CloseConnectionAsync();
-            //        return dbqr;
-            //    }
-
-            //    _bIsExecuting = true;
-            //}
-
-            //EXECUTE:
-
-            lock (_oDeeperLock)
+            lock (_lck)
             {
                 dbbr.StopOnWaiting().StartOnExecution();
 
@@ -598,11 +487,6 @@ namespace Kudos.Databases.Controllers
             }
 
             END_METHOD:
-
-            //lock (_oSuperficialLock)
-            //{
-            //    _bIsExecuting = false;
-            //}
 
             return new DatabaseQueryResult(ref oDataTable, ref err, ref dbbr);
         }

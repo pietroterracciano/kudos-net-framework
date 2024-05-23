@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Kudos.Databases.Enums;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Kudos.Databases.Interfaces.Chains
 {
     public interface IMySQLDatabaseChain : IBuildableDatabaseChain
     {
+        IMySQLDatabaseChain SetCharacterSet(EDatabaseCharacterSet? e);
         IMySQLDatabaseChain SetHost(String? s);
         IMySQLDatabaseChain SetPort(UInt16? i);
         IMySQLDatabaseChain SetKeepAlive(UInt32? i);

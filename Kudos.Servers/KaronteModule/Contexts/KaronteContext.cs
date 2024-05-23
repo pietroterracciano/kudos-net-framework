@@ -7,6 +7,8 @@ using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Utils;
 using Kudos.Reflection.Utils;
+using Kudos.Servers.KaronteModule.Constants;
+using Kudos.Constants;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
@@ -158,40 +160,24 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 if (httpc == null)
                     return null;
 
-                List<Object?> l = new List<Object?>();
-                l.Add(this);
-                l.Add(httpc);
+                List<Object?>
+                    lo = new List<Object?>();
+
+
+                lo.Add(this);
+                lo.Add(httpc);
 
                 if (rss != null)
-                    for (int i = 0; i < rss.Length; i++)
-                    {
-                        l.Add(GetService(rss[i]));
-                    }
-
-                //if (os != null)
-                //    l.AddRange(os);
-
-                ConstructorInfo[]? 
-                    cis = ReflectionUtils.GetConstructors(t);
-
-                if (cis == null)
-                    return null;
-
-                Object?
-                    cti = null;
-
-                for (int i = 0; i < cis.Length; i++)
                 {
-                    Object[]? os1 = null;
-                    //if (!ReflectionUtils.CheckAndGenerateCompatibleParametersArray(cis[i], out os1, l.ToArray()))
-                        //continue;
-
-                    cti = ReflectionUtils.InvokeConstructor(cis[i], os1);
-                    break;
+                    for (int i = 0; i < rss.Length; i++)
+                        lo.Add(GetService(rss[i]));
                 }
 
-                _mts.Set(t.FullName, cti);
-                return cti;
+                Object?
+                    cnti = ReflectionUtils.CreateInstance(t, lo.ToArray());
+
+                _mts.Set(t.FullName, cnti);
+                return cnti;
             }
         }
     }

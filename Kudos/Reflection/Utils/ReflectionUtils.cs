@@ -473,58 +473,82 @@ namespace Kudos.Reflection.Utils
 
         #region public static Object? CreateInstance(...)
 
-        public static T? CreateInstance<T>(params Type[]? ta) { return ObjectUtils.Cast<T>(CreateInstance(typeof(T), ta)); }
-        public static object? CreateInstance(Type? t, params Type[]? ta)
+        public static T? CreateInstance<T>() { return CreateInstance<T>(CBindingFlags.PublicInstance); }
+        public static T? CreateInstance<T>(BindingFlags bf) { return CreateInstance<T>(bf, null); }
+        public static T? CreateInstance<T>(Object?[]? oa) { return CreateInstance<T>(CBindingFlags.PublicInstance, oa); }
+        public static T? CreateInstance<T>(BindingFlags bf, Object?[]? oa) { return CreateInstance<T>(bf, null, oa); }
+        public static T? CreateInstance<T>(Type[]? ta, Object?[]? oa) { return CreateInstance<T>(CBindingFlags.PublicInstance, ta, oa); }
+        public static T? CreateInstance<T>(BindingFlags bf, Type[]? ta, Object?[]? oa) { return ObjectUtils.Cast<T>(CreateInstance(typeof(T), bf, ta, oa)); }
+        public static object? CreateInstance(Type? t) { return CreateInstance(t, CBindingFlags.PublicInstance); }
+        public static object? CreateInstance(Type? t, BindingFlags bf) { return CreateInstance(t, bf, null); }
+        public static object? CreateInstance(Type? t, Object?[]? oa) { return CreateInstance(t, CBindingFlags.PublicInstance, null, oa); }
+        public static object? CreateInstance(Type? t, Type[]? ta, Object?[]? oa) { return CreateInstance(t, CBindingFlags.PublicInstance, ta, oa); }
+        public static object? CreateInstance(Type? t, BindingFlags bf, Object?[]? oa) { return CreateInstance(t, bf, null, oa); }
+        public static object? CreateInstance(Type? t, BindingFlags bf, Type[]? ta, Object?[]? oa)
         {
-            Object? o = InvokeConstructor(GetConstructor(t, ta));
-            if (o == null) try { return Activator.CreateInstance(t, ta); } catch { }
-            return o;
+            Object? o = InvokeConstructor<Object>( GetConstructor(t, bf, ta), oa );
+            if (o != null)
+                return o;
 
+            Object?[]? oa0;
+            ConstructorInfo? ci;
+            __FindCompatibleConstructor(ref t, ref oa, out ci, out oa0);
+            if (ci != null)
+            {
+                o = InvokeConstructor<Object>(ci, oa0);
+                if (o != null) return o;
+            }
+
+            try
+            {
+                return Activator.CreateInstance(t, oa);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion
 
         #region public static Boolean InvokeConstructor(...)
 
-        public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object[]? a) { return ObjectUtils.Cast<T>(InvokeConstructor(ci, a)); }
-        public static object? InvokeConstructor(ConstructorInfo? ci, params object[]? a)
+        public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object?[]? a)
         {
             if (ci != null)
-                try { return ci.Invoke(a); } catch { }
+                try { return ObjectUtils.Cast<T>(ci.Invoke(a)); } catch { }
 
-            return null;
+            return default(T);
         }
 
         #endregion
 
         #region public static Boolean InvokeMethod(...)
 
-        public static T? InvokeMethod<T>(object? o, MethodInfo? mi, params object[]? a) { return ObjectUtils.Cast<T>(InvokeMethod(o, mi, a)); }
-        public static object? InvokeMethod(object? o, MethodInfo? mi, params object[]? a)
+        public static T? InvokeMethod<T>(object? o, MethodInfo? mi, params object[]? a)
         {
             if (mi != null && o != null)
-                try { return mi.Invoke(o, a); } catch { }
+                try { return ObjectUtils.Cast<T>(mi.Invoke(o, a)); } catch { }
 
-            return null;
+            return default(T);
         }
 
         #endregion
 
         #region public static Object? InvokeMember(...)
 
-        public static T? InvokeMember<T>(object? o, MemberInfo? mi, params object[]? a) { return ObjectUtils.Cast<T>(InvokeMember(o, mi, a)); }
-        public static object? InvokeMember(object? o, MemberInfo? mi, params object[]? a)
+        public static T? InvokeMember<T>(object? o, MemberInfo? mi, params object[]? a)
         {
             if (mi != null)
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Method:
-                        return InvokeMethod(o, mi as MethodInfo, a);
+                        return InvokeMethod<T>(o, mi as MethodInfo, a);
                     case MemberTypes.Constructor:
-                        return InvokeConstructor(mi as ConstructorInfo, a);
+                        return InvokeConstructor<T>(mi as ConstructorInfo, a);
                 }
 
-            return null;
+            return default(T);
         }
 
         #endregion
@@ -842,14 +866,13 @@ namespace Kudos.Reflection.Utils
 
         #region public static ... Copy<...>()
 
-        public static T? Copy<T>(Object? o, BindingFlags bf = CBindingFlags.PublicInstance) { return ObjectUtils.Cast<T>(Copy(o, bf)); }
-        public static Object? Copy(Object? o, BindingFlags bf = CBindingFlags.PublicInstance)
+        public static T? Copy<T>(T? o, BindingFlags bf = CBindingFlags.PublicInstance)
         {
-            if (o == null) return null;
-            Object? o0 = ReflectionUtils.InvokeConstructor( ReflectionUtils.GetConstructor(o.GetType(), bf));
-            return Copy(o, o0, bf) ? o0 : null;
+            if (o == null) return default(T);
+            T? o0 = ReflectionUtils.InvokeConstructor<T>(ReflectionUtils.GetConstructor(o.GetType(), bf));
+            return Copy(ref o, ref o0, bf) ? o0 : default(T);
         }
-        public static Boolean Copy(Object? oIn, Object? oOut, BindingFlags bf = CBindingFlags.PublicInstance)
+        public static Boolean Copy<T>(ref T? oIn, ref T? oOut, BindingFlags bf = CBindingFlags.PublicInstance)
         {
             if (oIn == null || oOut == null)
                 return false;
@@ -1507,6 +1530,92 @@ namespace Kudos.Reflection.Utils
 
             o = ObjectUtils.Cast<T>(o0);
             return o != null;
+        }
+
+        #endregion
+
+        #region private static void __FindCompatibleConstructor<...>(...)
+
+        private static void __FindCompatibleConstructor(ref Type? t, ref Object?[]? oa, out ConstructorInfo? ci, out Object?[]? oaOut)
+        {
+            ConstructorInfo[]?
+                cia = ReflectionUtils.GetConstructors(t);
+
+            if (cia != null)
+                for (int i = 0; i < cia.Length; i++)
+                {
+                    __FindCompatibleConstructorParameters(ref cia[i], ref oa, out oaOut);
+                    if (oaOut == null) continue;
+                    ci = cia[i];
+                    return;
+                }
+
+            ci = null;
+            oaOut = null;
+            return;
+        }
+
+
+        #endregion
+
+        #region private static Boolean __FindCompatibleConstructorParameters()
+
+        private static void __FindCompatibleConstructorParameters
+        (
+            ref ConstructorInfo? ci,
+            ref Object?[]? oaIn,
+            out Object?[]? oaOut
+        )
+        {
+            if (ci == null)
+            {
+                oaOut = null;
+                return;
+            }
+
+            ParameterInfo[] pia = ci.GetParameters();
+
+            if (pia == null)
+            {
+                oaOut = null;
+                return;
+            }
+            else if (pia.Length < 1)
+            {
+                oaOut = new Object[0];
+                return;
+            }
+            else if (oaIn == null || oaIn.Length < 1)
+            {
+                oaOut = null;
+                return;
+            }
+
+            oaOut = new Object[pia.Length];
+
+            for (int i = 0; i < pia.Length; i++)
+            {
+                if (pia[i] == null) continue;
+
+                for (int j = 0; j < oaIn.Length; j++)
+                {
+                    if
+                    (
+                        oaIn[j] == null
+                        || !oaIn[j].GetType().Equals(pia[i].ParameterType)
+                    )
+                        continue;
+
+                    oaOut[i] = oaIn[j];
+                    break;
+                }
+
+                if (oaOut[i] == null)
+                {
+                    oaOut = null;
+                    return;
+                }
+            }
         }
 
         #endregion

@@ -16,9 +16,13 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
 	:
         INumber<T>
     {
-		public T?
-			MinValue,
-			MaxValue;
+        private Boolean _bIsMinValueSetted;
+        private T? _iMinValue;
+        public T? MinValue { get { return _iMinValue; } set { _iMinValue = value; _bIsMinValueSetted = true; } }
+
+        private Boolean _bIsMaxValueSetted;
+        private T? _iMaxValue;
+        public T? MaxValue { get { return _iMaxValue; } set { _iMaxValue = value; _bIsMaxValueSetted = true; } }
 
 		public UInt16?
 			MinLength,
@@ -35,7 +39,8 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
             {
                 if
                 (
-                    MinValue != null
+                    _bIsMinValueSetted
+                    && MinValue != null
                     && MinValue > v0
                 )
                 {
@@ -44,7 +49,8 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                 }
                 else if
                 (
-                    MaxValue != null
+                    _bIsMaxValueSetted
+                    && MaxValue != null
                     && MaxValue < v0
                 )
                 {

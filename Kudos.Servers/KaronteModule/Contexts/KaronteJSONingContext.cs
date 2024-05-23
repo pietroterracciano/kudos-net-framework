@@ -1,29 +1,27 @@
 ﻿using Kudos.Utils;
 using System;
-using System.Text.Json.Serialization;
+using Kudos.Servers.KaronteModule.Options;
 using System.Text.Json;
-using System.Text.Encodings.Web;
-using Kudos.Servers.KaronteModule.Contexts.Options;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteJSONingContext : AKaronteChildContext
     {
-        private readonly KaronteJSONingOptionsContext _kjsonoc;
+        private readonly JsonSerializerOptions _jsonso;
 
         public KaronteJSONingContext(ref KaronteContext kc) : base(ref kc)
         {
-            _kjsonoc = KaronteContext.GetRequiredService<KaronteJSONingOptionsContext>();
+            _jsonso = KaronteContext.GetRequiredService<KaronteJSONingOptions>().JsonSerializerOptions;
         }
 
         public String? Serialize(object? o)
         {
-            return JSONUtils.Serialize(o, _kjsonoc.JsonSerializerOptions);
+            return JSONUtils.Serialize(o, _jsonso);
         }
 
         public ObjectType? Deserialize<ObjectType>(dynamic? dnm)
         {
-            return JSONUtils.Deserialize<ObjectType>(dnm, _kjsonoc.JsonSerializerOptions);
+            return JSONUtils.Deserialize<ObjectType>(dnm, _jsonso);
         }
     }
 }
