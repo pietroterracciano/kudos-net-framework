@@ -11,4 +11,26 @@
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="KryptoModule\" />
+    <None Remove="KryptoModule\Builders\" />
+    <None Remove="KryptoModule\Descriptors\" />
+    <None Remove="KryptoModule\SymmetricModule\" />
+    <None Remove="KryptoModule\SymmetricModule\Builders\" />
+    <None Remove="KryptoModule\HashModule\" />
+    <None Remove="KryptoModule\SymmetricModule\Enums\" />
+    <None Remove="KryptoModule\SymmetricModule\Descriptors\" />
+    <None Remove="KryptoModule\SymmetricModule\Utils\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="KryptoModule\" />
+    <Folder Include="KryptoModule\Builders\" />
+    <Folder Include="KryptoModule\Descriptors\" />
+    <Folder Include="KryptoModule\SymmetricModule\" />
+    <Folder Include="KryptoModule\SymmetricModule\Builders\" />
+    <Folder Include="KryptoModule\HashModule\" />
+    <Folder Include="KryptoModule\SymmetricModule\Enums\" />
+    <Folder Include="KryptoModule\SymmetricModule\Descriptors\" />
+    <Folder Include="KryptoModule\SymmetricModule\Utils\" />
+  </ItemGroup>
 </Project>

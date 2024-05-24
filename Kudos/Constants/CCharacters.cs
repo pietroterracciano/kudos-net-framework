@@ -5,13 +5,13 @@ namespace Kudos.Constants
     public static class CCharacters
     {
         public const String
-            STANDARD_UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            STANDARD_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz",
-            NUMERIC = "0123456789",
-            PUNCTUATION = "¡!·\"'()‘’,-./:;~<>¿? [\\]_`{}«»“”⁓…",
-            SPECIAL = "☞™℠®•°-∎№ç#×‽⸘†‡◊$%‰‱&@©℗ºª^*⁂`§_|‖¦~⁓¶′″‴☙¤₳​฿​₿₵​¢​₡​₢​$​₫​₯₠​€ƒ​₣₲₴₭₺ℳ​₥₦₧​₱​₰​£៛​₽​₹₨₪৳​₸​₮₩¥",
-            MATH = "+-=:*",
-            ACCENTED_LOWER_CASE = "ßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ",
-            ACCENTED_UPPER_CASE = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ";
+            StandardUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            StandardLowerCase = "abcdefghijklmnopqrstuvwxyz",
+            Numeric = "0123456789",
+            Punctuation = "¡!·\"'()‘’,-./:;~<>¿? [\\]_`{}«»“”⁓…",
+            Special = "☞™℠®•°-∎№ç#×‽⸘†‡◊$%‰‱&@©℗ºª^*⁂`§_|‖¦~⁓¶′″‴☙¤₳​฿​₿₵​¢​₡​₢​$​₫​₯₠​€ƒ​₣₲₴₭₺ℳ​₥₦₧​₱​₰​£៛​₽​₹₨₪৳​₸​₮₩¥",
+            Mathematical = "+-=:*<>/%",
+            AccentedLowerCase = "ßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ",
+            AccentedUpperCase = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ";
     }
-}
+}   

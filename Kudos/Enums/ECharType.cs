@@ -11,7 +11,7 @@ namespace Kudos.Enums
         Numeric = CBinaryFlag._2,
         Punctuation = CBinaryFlag._3,
         Special = CBinaryFlag._4,
-        Math = CBinaryFlag._5,
+        Mathematical = CBinaryFlag._5,
         AccentedLowerCase = CBinaryFlag._6,
         AccentedUpperCase = CBinaryFlag._7
     }

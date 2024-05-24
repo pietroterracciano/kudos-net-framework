@@ -1,20 +1,16 @@
-﻿using Kudos.Constants;
+﻿using System;
+using System.Text;
+using Kudos.Constants;
 using Kudos.Enums;
 using Kudos.Utils.Numerics;
-using Kudos.Utils.Texts.Internals;
-using System;
-using System.Text;
 
 namespace Kudos.Utils.Texts
 {
     public static class StringUtils
     {
-        private static readonly INTStringUtils __;
-        static StringUtils() { __ = new INTStringUtils(); }
-
         #region public static String? Join()
 
-        public static string? Join(string s, string[]? a)
+        public static string? Join(string? s, string[]? a)
         {
             if (s != null && a != null)
                 try { return string.Join(s, a); } catch { }
@@ -54,19 +50,29 @@ namespace Kudos.Utils.Texts
 
         #region public static String? Parse()
 
-        public static String? Parse(Object? o, Encoding? enc = null) { String? s; __.Parse(ref o, out s); return s; }
+        public static String? Parse(Object? o) { return ObjectUtils.Parse<String>(o); }
+        public static String? Parse(Byte[]? ba) { return Parse(ba, Encoding.UTF8); }
+        public static String? Parse(Byte[]? ba, Encoding? enc)
+        {
+            if (ba != null && enc != null)
+                try { return enc.GetString(ba); } catch { }
+
+            return null;
+        }
 
         #endregion
 
         #region public static String NNParse()
 
-        public static String NNParse(Object? o, Encoding? enc = null) { String s; __.NNParse(ref o, out s); return s; }
+        public static String NNParse(Object? o) { return ObjectUtils.Parse<String>(o, true); }
+        public static String NNParse(Byte[]? ba) { return NNParse(Parse(ba)); }
+        public static String NNParse(Byte[]? ba, Encoding? enc) { return NNParse(Parse(ba, enc)); }
 
         #endregion
 
         #region public static String? Truncate()
 
-        public static string? Truncate(string s, int i)
+        public static string? Truncate(string? s, int i)
         {
             if (s == null)
                 return null;
@@ -76,6 +82,54 @@ namespace Kudos.Utils.Texts
                     : string.Empty;
             else
                 return s;
+        }
+
+        #endregion
+
+        #region public static String? Random()
+
+        public static String Random(Int32 i, ECharType ect)
+        {
+            if (i < 1)
+                return String.Empty;
+
+            StringBuilder sb = new StringBuilder();
+
+            if (ect.HasFlag(ECharType.StandardLowerCase))
+                sb.Append(CCharacters.StandardLowerCase);
+
+            if (ect.HasFlag(ECharType.StandardUpperCase))
+                sb.Append(CCharacters.StandardUpperCase);
+
+            if (ect.HasFlag(ECharType.AccentedLowerCase))
+                sb.Append(CCharacters.AccentedLowerCase);
+
+            if (ect.HasFlag(ECharType.AccentedUpperCase))
+                sb.Append(CCharacters.AccentedUpperCase);
+
+            if (ect.HasFlag(ECharType.Punctuation))
+                sb.Append(CCharacters.Punctuation);
+
+            if (ect.HasFlag(ECharType.Numeric))
+                sb.Append(CCharacters.Numeric);
+
+            if (ect.HasFlag(ECharType.Mathematical))
+                sb.Append(CCharacters.Mathematical);
+
+            if (ect.HasFlag(ECharType.Special))
+                sb.Append(CCharacters.Special);
+
+            String s = sb.ToString();
+
+            if (s.Length < 1)
+                return String.Empty;
+
+            sb.Clear();
+
+            for (Int32 j = 0; j < i; j++)
+                sb.Append(s[Int32Utils.Random(0, s.Length) % s.Length]);
+
+            return sb.ToString();
         }
 
         #endregion

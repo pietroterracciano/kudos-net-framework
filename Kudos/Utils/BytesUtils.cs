@@ -64,6 +64,73 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region public static Byte[] Append(...)
+
+        public static Byte[] Append(Byte[]? ba0, Byte[]? ba1)
+        {
+            Int32
+                iLength = 0,
+                iOffset = 0;
+
+            if (ba0 != null)
+                iLength += ba0.Length;
+
+            if (ba1 != null)
+                iLength += ba1.Length;
+
+            Byte[]
+                baOut = new Byte[iLength];
+
+            if (ba0 != null)
+            {
+                Array.Copy(
+                    ba0,
+                    0,
+                    baOut,
+                    0,
+                    ba0.Length
+                );
+
+                iOffset = ba0.Length;
+            }
+
+            if (ba1 != null)
+                Array.Copy(
+                    ba1,
+                    0,
+                    baOut,
+                    iOffset,
+                    ba1.Length
+                );
+
+            return baOut;
+        }
+
+        #endregion
+
+        #region public static Byte[] Prepend(...)
+
+        public static Byte[] Prepend(Byte[]? ba0, Byte[]? ba1)
+        {
+            return Append(ba1, ba0);
+        }
+
+        #endregion
+
+        #region Random
+
+        public static Byte[] Random(Int32 i, ECharType ect = ECharType.StandardLowerCase | ECharType.StandardUpperCase | ECharType.Numeric)
+        {
+            return Random(i, Encoding.UTF8, ect);
+        }
+
+        public static Byte[]? Random(Int32 i, Encoding? enc, ECharType ect = ECharType.StandardLowerCase | ECharType.StandardUpperCase | ECharType.Numeric)
+        {
+            return Parse(StringUtils.Random(i, ect), enc);
+        }
+
+        #endregion
+
         #region Base16
 
         #region public static Byte[]? ConvertToBase16()

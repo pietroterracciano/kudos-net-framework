@@ -30,6 +30,7 @@ namespace Kudos.Constants
             RightSquareBracket = ']',
             Equal = '=',
             Minor = '<',
-            Major = '>';
+            Major = '>',
+            Dollar = '$';
     }
 }

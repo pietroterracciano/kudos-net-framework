@@ -1,5 +1,7 @@
-﻿namespace Kudos.Crypters.Hashes.Enums
+﻿using System;
+namespace Kudos.Crypters.KryptoModule.HashModule.Enums
 {
+    [Flags]
     public enum EHashAlgorithm
     {
         MD5,
@@ -9,3 +11,4 @@
         SHA512
     }
 }
+
