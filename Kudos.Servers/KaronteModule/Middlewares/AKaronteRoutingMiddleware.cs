@@ -3,7 +3,7 @@ using Kudos.Databases.Interfaces.Chains;
 using Kudos.Databases.Interfaces;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
-using Kudos.Servers.Utils;
+using Kudos.Servers.KaronteModule.Utils;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Threading.Tasks;

@@ -1,4 +1,5 @@
-﻿using Kudos.Databases.Chainers;
+﻿using Kudos.Crypters.KryptoModule.SymmetricModule;
+using Kudos.Databases.Chainers;
 using Kudos.Databases.Chains;
 using Kudos.Databases.Interfaces.Chains;
 using Kudos.Reflection.Utils;
@@ -7,8 +8,11 @@ using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
+using Kudos.Servers.KaronteModule.Interfaces;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Servers.KaronteModule.Options;
+using Kudos.Servers.KaronteModule.Services;
+using Kudos.Types;
 using Kudos.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -28,12 +32,13 @@ namespace Kudos.Servers.KaronteModule
     public static class Karonte
     {
         private static Type[]? __a;
-        private static HashSet<String> __hsConsumedServices, __hsConsumedApplications;
+        private static HashSet<String> __hsRegisteredApplications;
+        private static readonly Metas __mRegisteredServices;
 
         static Karonte()
         {
-            __hsConsumedServices = new HashSet<string>();
-            __hsConsumedApplications = new HashSet<string>();
+            __mRegisteredServices = new Metas(StringComparison.OrdinalIgnoreCase);
+            __hsRegisteredApplications = new HashSet<string>();
             //__f0 = ab => new KaronteAuthorizationBuilder(ref ab);
             //__f1 = ab => new KaronteDatabasingBuilder(ref ab);
             //__bIsCoreAdded = __bIsJSONingAdded = false;
@@ -42,38 +47,36 @@ namespace Kudos.Servers.KaronteModule
             //__d2 = new Dictionary<IApplicationBuilder, IKaronteDatabaseHandlerBuilder>();
         }
 
-        private static Boolean ConsumeService(String? s)
+        private static void RegisterService(String? s) { RegisterService(s, null); }
+        private static void RegisterService(String? s, IKaronteServiceCollection? ksc) { __mRegisteredServices.Set(s, ksc); }
+        private static Boolean IsServiceRegistered(String? s) { return __mRegisteredServices.Contains(s); }
+
+        private static T RequestRegisteredService<T>(String? s)
         {
-            if (s == null) return false;
-            __hsConsumedServices.Add(s); return true;
+            T? t = __mRegisteredServices.Get<T>(s);
+            if(t == null) throw new InvalidOperationException();
+            return t;
         }
 
-        private static Boolean IsServiceConsumed(String? s)
+        private static Boolean RegisterApplication(String? s)
+        {
+            if (s == null) return false;
+            __hsRegisteredApplications.Add(s); return true;
+        }
+
+        private static Boolean IsApplicationRegistered(String? s)
         {
             return
                 s != null
-                && __hsConsumedServices.Contains(s);
-        }
-
-        private static Boolean ConsumeApplication(String? s)
-        {
-            if (s == null) return false;
-            __hsConsumedApplications.Add(s); return true;
-        }
-
-        private static Boolean IsApplicationConsumed(String? s)
-        {
-            return
-                s != null
-                && __hsConsumedApplications.Contains(s);
+                && __hsRegisteredApplications.Contains(s);
         }
 
         #region public static IServiceCollection AddKaronteCore(...)
 
         public static IServiceCollection AddKaronteCore(this IServiceCollection sc)
         {
-            if (IsServiceConsumed(CKaronteKey.Core)) return sc;
-            ConsumeService(CKaronteKey.Core);
+            if (IsServiceRegistered(CKaronteKey.Core)) return sc;
+            RegisterService(CKaronteKey.Core);
 
             sc
                 .TryAddScoped<KaronteContext>();
@@ -129,12 +132,12 @@ namespace Kudos.Servers.KaronteModule
 
         public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, Func<JsonSerializerOptions>? fnc)
         {
-            if(!IsServiceConsumed(CKaronteKey.Core))
+            if(!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsServiceConsumed(CKaronteKey.JSONing))
+            else if (IsServiceRegistered(CKaronteKey.JSONing))
                 return sc;
 
-            ConsumeService(CKaronteKey.JSONing);
+            RegisterService(CKaronteKey.JSONing);
 
             JsonSerializerOptions?
                 jsonso = fnc != null
@@ -156,16 +159,33 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region AddKaronteCrypting(..)
+
+        public static IKaronteCryptingServiceCollection AddKaronteCrypting(this IServiceCollection sc)
+        {
+            if (!IsServiceRegistered(CKaronteKey.Core))
+                throw new InvalidOperationException();
+            else if (IsServiceRegistered(CKaronteKey.Crypting))
+                return RequestRegisteredService<IKaronteCryptingServiceCollection>(CKaronteKey.Crypting);
+
+            KaronteCryptingService kcs = new KaronteCryptingService(ref sc);
+            RegisterService(CKaronteKey.Crypting, kcs);
+            sc.TryAddSingleton<KaronteCryptingService>(kcs);
+            return kcs;
+        }
+
+        #endregion
+
         #region AddKaronteDatabasing(..)
 
         public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Func<IDatabaseChain, IBuildableDatabaseChain>? fnc)
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsServiceConsumed(CKaronteKey.Databasing))
+            else if (IsServiceRegistered(CKaronteKey.Databasing))
                 return sc;
 
-            ConsumeService(CKaronteKey.Databasing);
+            RegisterService(CKaronteKey.Databasing);
 
             IBuildableDatabaseChain?
                 bdbc = fnc != null
@@ -181,12 +201,12 @@ namespace Kudos.Servers.KaronteModule
 
         public static IApplicationBuilder UseKaronteCore(this IApplicationBuilder ab)
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Core))
+            else if (IsApplicationRegistered(CKaronteKey.Core))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Core);
+            RegisterApplication(CKaronteKey.Core);
 
             return 
                 ab.Use
@@ -208,12 +228,12 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteRouting<RoutingMiddlewareType>(this IApplicationBuilder ab)
             where RoutingMiddlewareType : AKaronteRoutingMiddleware
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Routing))
+            else if (IsApplicationRegistered(CKaronteKey.Routing))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Routing);
+            RegisterApplication(CKaronteKey.Routing);
 
             //IKaronteAuthorizationBuilder kab;
             //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
@@ -225,17 +245,37 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IApplicationBuilder UseKaronteCrypting(...)
+
+        public static IApplicationBuilder UseKaronteCrypting(this IApplicationBuilder ab)
+        {
+            if (!IsServiceRegistered(CKaronteKey.Crypting))
+                throw new InvalidOperationException();
+            else if (IsApplicationRegistered(CKaronteKey.Crypting))
+                return ab;
+
+            RegisterApplication(CKaronteKey.Crypting);
+
+            //IKaronteAuthorizationBuilder kab;
+            //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
+            return
+                ab
+                    .UseMiddleware<KaronteCryptingMiddleware>();
+        }
+
+        #endregion
+
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
 
         public static IApplicationBuilder UseKaronteAuthorizating<AuthorizatingMiddlewareType>(this IApplicationBuilder ab)
             where AuthorizatingMiddlewareType : AKaronteAuthorizatingMiddleware
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Authorizating))
+            else if (IsApplicationRegistered(CKaronteKey.Authorizating))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Authorizating);
+            RegisterApplication(CKaronteKey.Authorizating);
 
 
             //IKaronteAuthorizationBuilder kab;
@@ -252,12 +292,12 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteDatabasing<DatabasingMiddlewareType>(this IApplicationBuilder ab)
             where DatabasingMiddlewareType : AKaronteDatabasingMiddleware
         {
-            if (!IsServiceConsumed(CKaronteKey.Databasing))
+            if (!IsServiceRegistered(CKaronteKey.Databasing))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Databasing))
+            else if (IsApplicationRegistered(CKaronteKey.Databasing))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Databasing);
+            RegisterApplication(CKaronteKey.Databasing);
 
 
             //IKaronteDatabasingBuilder kdbb;
@@ -276,12 +316,12 @@ namespace Kudos.Servers.KaronteModule
 
         public static IApplicationBuilder UseKaronteJSONing(this IApplicationBuilder ab)
         {
-            if (!IsServiceConsumed(CKaronteKey.JSONing))
+            if (!IsServiceRegistered(CKaronteKey.JSONing))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.JSONing))
+            else if (IsApplicationRegistered(CKaronteKey.JSONing))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.JSONing);
+            RegisterApplication(CKaronteKey.JSONing);
 
 
             return ab.UseMiddleware<KaronteJSONingMiddleware>();
@@ -294,12 +334,12 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteResponsing<ResponsingMiddlewareType, NonActionResultType>(this IApplicationBuilder ab)
             where ResponsingMiddlewareType : AKaronteResponsingMiddleware<NonActionResultType>
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Responsing))
+            else if (IsApplicationRegistered(CKaronteKey.Responsing))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Responsing);
+            RegisterApplication(CKaronteKey.Responsing);
 
 
             return ab.UseMiddleware<ResponsingMiddlewareType>();
@@ -313,12 +353,12 @@ namespace Kudos.Servers.KaronteModule
             where
                 AuthenticatingMiddlewareType : AKaronteAuthenticatingMiddleware<ObjectType>
         {
-            if (!IsServiceConsumed(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsApplicationConsumed(CKaronteKey.Authenticating))
+            else if (IsApplicationRegistered(CKaronteKey.Authenticating))
                 return ab;
 
-            ConsumeApplication(CKaronteKey.Authenticating);
+            RegisterApplication(CKaronteKey.Authenticating);
 
 
             return

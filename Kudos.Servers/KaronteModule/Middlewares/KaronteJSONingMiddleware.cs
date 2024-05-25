@@ -11,7 +11,7 @@ using System.Text.Encodings.Web;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
-    public sealed class KaronteJSONingMiddleware : AKaronteMiddleware
+    internal sealed class KaronteJSONingMiddleware : AKaronteMiddleware
     {
         public KaronteJSONingMiddleware(RequestDelegate rd) : base(ref rd) { }
 

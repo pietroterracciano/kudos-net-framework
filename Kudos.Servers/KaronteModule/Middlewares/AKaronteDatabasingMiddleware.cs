@@ -6,7 +6,7 @@ using Kudos.Databases.Results;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
-using Kudos.Servers.Utils;
+using Kudos.Servers.KaronteModule.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;

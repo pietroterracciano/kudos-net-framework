@@ -11,6 +11,7 @@ namespace Kudos.Servers.KaronteModule.Constants
             Authorizating = "Authorizating",
             Databasing = "Databasing",
             JSONing = "JSONing",
+            Crypting = "Crypting",
             Responsing = "Responsing";
     }
 }

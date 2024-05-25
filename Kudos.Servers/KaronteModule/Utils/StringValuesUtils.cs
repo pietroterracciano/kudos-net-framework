@@ -2,7 +2,7 @@
 using Kudos.Utils.Collections;
 using Microsoft.Extensions.Primitives;
 
-namespace Kudos.Servers.Utils
+namespace Kudos.Servers.KaronteModule.Utils
 {
     public class StringValuesUtils
     {

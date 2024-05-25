@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
 
-namespace Kudos.Servers.Utils
+namespace Kudos.Servers.KaronteModule.Utils
 {
     public static class HttpResponseUtils
     {

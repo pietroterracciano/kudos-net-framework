@@ -3,7 +3,7 @@ using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
-using Kudos.Servers.Utils;
+using Kudos.Servers.KaronteModule.Utils;
 using Kudos.Utils;
 using Microsoft.AspNetCore.Http;
 using System;

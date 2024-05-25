@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Org.BouncyCastle.Asn1.Crmf;
 using System;
 
-namespace Kudos.Servers.Utils
+namespace Kudos.Servers.KaronteModule.Utils
 {
     public static class EndpointUtils
     {

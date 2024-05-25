@@ -21,34 +21,36 @@ namespace Kudos.Types
             _d = new Dictionary<String, Object?>(iSize);
         }
 
+        public Boolean Contains(String? s) { return Contains(s, _e); }
+        public Boolean Contains(String? s, StringComparison e)
+        {
+            Boolean? b; Object? o;
+            _TryGet(ref s, ref e, out b, out o);
+            return b != null && b.Value;
+        }
+
         public bool Set(String? s, Object? o) { return Set(s, o, _e); }
         public bool Set(String? s, Object? o, StringComparison e)
         {
-            if (!Normalize(ref s, ref e)) return false;
+            if (!_Normalize(ref s, ref e)) return false;
             _d[s] = o;
             return true;
         }
 
         public T? Get<T>(String? s) { return Get<T>(s, _e); }
-        public T? Get<T>(String? s, StringComparison e)
-        {
-            return ObjectUtils.Cast<T>(Get(s, e));
-        }
-
+        public T? Get<T>(String? s, StringComparison e) { return ObjectUtils.Cast<T>(Get(s, e)); }
         public Object? Get(String? s) { return Get(s, _e); }
-        public Object? Get(String? s, StringComparison e)
-        {
-            if (Normalize(ref s, ref e))
-            {
-                Object? o;
-                if (_d.TryGetValue(s, out o))
-                    return o;
-            }
+        public Object? Get(String? s, StringComparison e) { Object? o; _TryGet(ref s, ref e, out o); return o; }
 
-            return null;
+        private void _TryGet(ref String? s, ref StringComparison e, out Object? o) { Boolean? b; _TryGet(ref s, ref e, out b, out o); }
+        private void _TryGet(ref String? s, ref StringComparison e, out Boolean? b, out Object? o)
+        {
+            if (!_Normalize(ref s, ref e)) { b = null; o = null; return; }
+            else if (!_d.TryGetValue(s, out o)) { b = false; return; }
+            b = true;
         }
 
-        private static Boolean Normalize(ref String? s, ref StringComparison e)
+        private static Boolean _Normalize(ref String? s, ref StringComparison e)
         {
             if (s == null) return false;
 

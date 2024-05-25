@@ -22,7 +22,9 @@
     <Compile Remove="KaronteModule\Interfaces\IKaronteBuilder.cs" />
     <Compile Remove="KaronteModule\Interfaces\IKaronteAuthorizationBuilder.cs" />
     <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
-    <None Remove="KaronteModule\Options\" />
+    <None Remove="KaronteModule\Utils\" />
+    <None Remove="KaronteModule\Interfaces\" />
+    <None Remove="KaronteModule\Services\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="KaronteModule\Options\" />
+    <Folder Include="KaronteModule\Utils\" />
+    <Folder Include="KaronteModule\Interfaces\" />
+    <Folder Include="KaronteModule\Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Kudos.Crypters">
+      <HintPath>..\Kudos.Crypters\bin\Debug\net8.0\Kudos.Crypters.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
