@@ -51,12 +51,11 @@ namespace Kudos.Utils.Collections
             return a0[0];
         }
 
-
         #endregion
 
-        #region UnShift(...)
+        #region public static T?[]? UnShift(...)
 
-        public static T?[] UnShift<T>(T? o, T?[]? a)
+        public static T?[]? UnShift<T>(T? o, T?[]? a)
         {
             int i = a != null ? a.Length : 0;
 
@@ -67,6 +66,70 @@ namespace Kudos.Utils.Collections
                 Array.Copy(a, 0, a1, 1, a.Length);
 
             return a1;
+        }
+
+        #endregion
+
+        #region public static T[]? Append<T>(...)
+
+        public static T[]? Append<T>(T[]? ta0, T[]? ta1)
+        {
+            if (ta0 == null && ta1 == null)
+                return null;
+            else if (ta0 != null && ta1 == null)
+                return ta0;
+            else if (ta0 == null && ta1 != null)
+                return ta1;
+
+            T[]
+                ta = new T[ta0.Length + ta1.Length];
+
+            Array.Copy(
+                ta0,
+                0,
+                ta,
+                0,
+                ta0.Length
+            );
+
+            Array.Copy(
+                ta1,
+                0,
+                ta,
+                ta0.Length,
+                ta1.Length
+            );
+
+            return ta;
+        }
+
+        #endregion
+
+        #region public static T[]? Prepend<T>(...)
+
+        public static Byte[]? Prepend(Byte[]? ta0, Byte[]? ta1)
+        {
+            return Append(ta1, ta0);
+        }
+
+        #endregion
+
+        #region public static void Split<T>(...)
+
+        public static void Split<T>(T[]? tai, int i, out T[]? tao0, out T[]? tao1)
+        {
+            if (!IsValidIndex(tai, i))
+            {
+                tao0 = null;
+                tao1 = tai;
+                return;
+            }
+
+            tao0 = new T[i];
+            tao1 = new T[tai.Length - i];
+
+            Array.Copy(tai, 0, tao0, 0, tao0.Length);
+            Array.Copy(tai, i, tao1, 0, tao1.Length);
         }
 
         #endregion

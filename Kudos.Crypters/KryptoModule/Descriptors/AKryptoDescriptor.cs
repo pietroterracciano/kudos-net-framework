@@ -16,13 +16,12 @@ namespace Kudos.Crypters.KryptoModule.Descriptors
         internal DescriptorType Inject(ref DescriptorType dsc)
         {
             Encoding = dsc.Encoding;
-            SALTDescriptor.CharType = dsc.SALTDescriptor.CharType;
             SALTDescriptor.Length = dsc.SALTDescriptor.Length;
             BinaryEncoding = dsc.BinaryEncoding;
             OnInject(ref dsc);
             return this as DescriptorType;
         }
 
-        internal abstract void OnInject(ref DescriptorType dsc);
+        protected abstract void OnInject(ref DescriptorType dsc);
     }
 }

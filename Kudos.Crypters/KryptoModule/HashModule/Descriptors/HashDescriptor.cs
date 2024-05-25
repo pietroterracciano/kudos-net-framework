@@ -10,7 +10,7 @@ namespace Kudos.Crypters.KryptoModule.HashModule.Descriptors
 	{
         internal EHashAlgorithm? Algorithm;
 
-        internal override void OnInject(ref HashDescriptor dsc)
+        protected override void OnInject(ref HashDescriptor dsc)
         {
             Algorithm = dsc.Algorithm;
         }

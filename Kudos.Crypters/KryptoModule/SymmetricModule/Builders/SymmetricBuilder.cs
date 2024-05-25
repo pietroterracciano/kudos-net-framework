@@ -21,15 +21,21 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule.Builders
         private readonly SymmetricDescriptor _sd;
         internal SymmetricBuilder(ref SymmetricDescriptor sd) : base(ref sd) { _sd = sd; }
 
-        public SymmetricBuilder SetBlockSize(ESymmetricSize ess)
+        //public SymmetricBuilder SetBlockSize(ESymmetricSize ess)
+        //{
+        //    _sd.BlockSize = ess;
+        //    return this;
+        //}
+
+        public SymmetricBuilder SetKeySize(ESymmetricKeySize esks)
         {
-            _sd.BlockSize = ess;
+            _sd.KeySize = esks;
             return this;
         }
 
-        public SymmetricBuilder SetKeySize(ESymmetricSize ess)
+        public SymmetricBuilder SetCipherMode(CipherMode ecm)
         {
-            _sd.KeySize = ess;
+            _sd.CipherMode = ecm;
             return this;
         }
 
@@ -63,6 +69,5 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule.Builders
         {
             smm = new Symmetric(ref sd);
         }
-
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
-
 namespace Kudos.Crypters.KryptoModule.SymmetricModule.Enums
 {
     [Flags]
-    public enum ESymmetricSize
+    public enum ESymmetricKeySize
     {
         _128bit,
         _160bit,

@@ -7,6 +7,7 @@ using Kudos.Constants;
 using Kudos.Crypters.KryptoModule.HashModule.Builders;
 using Kudos.Crypters.KryptoModule.HashModule.Descriptors;
 using Kudos.Crypters.KryptoModule.HashModule.Enums;
+using Kudos.Enums;
 using Kudos.Utils;
 using Kudos.Utils.Collections;
 
@@ -24,6 +25,50 @@ namespace Kudos.Crypters.KryptoModule.HashModule
         {
             HashDescriptor hd = new HashDescriptor();
             return new HashBuilder(ref hd);
+        }
+
+        private static HashBuilder __RequestPreconfiguredBuilder()
+        {
+            return
+                RequestBuilder()
+                    .SetBinaryEncoding(EBinaryEncoding.Base64)
+                    .SetEncoding(Encoding.UTF8);
+        }
+
+        public static HashBuilder RequestPreconfiguredMD5Builder()
+        {
+            return
+                __RequestPreconfiguredBuilder()
+                    .SetAlgorithm(EHashAlgorithm.MD5);
+        }
+
+        public static HashBuilder RequestPreconfiguredSHA1Builder()
+        {
+            return
+                __RequestPreconfiguredBuilder()
+                    .SetAlgorithm(EHashAlgorithm.SHA1);
+        }
+
+
+        public static HashBuilder RequestPreconfiguredSHA256Builder()
+        {
+            return
+                __RequestPreconfiguredBuilder()
+                    .SetAlgorithm(EHashAlgorithm.SHA256);
+        }
+
+        public static HashBuilder RequestPreconfiguredSHA384Builder()
+        {
+            return
+                __RequestPreconfiguredBuilder()
+                    .SetAlgorithm(EHashAlgorithm.SHA384);
+        }
+
+        public static HashBuilder RequestPreconfiguredSHA512Builder()
+        {
+            return
+                __RequestPreconfiguredBuilder()
+                    .SetAlgorithm(EHashAlgorithm.SHA512);
         }
 
         #endregion
@@ -54,53 +99,41 @@ namespace Kudos.Crypters.KryptoModule.HashModule
 
         public Boolean Verify(Object? o, String? s)
         {
-            if (s == null)
+            if (_ha == null)
                 return false;
 
-            String?
-                sSALT;
+            Byte[]? baOut;
+            _ParseToBytesArray(ref s, out baOut);
 
-            if (s.Contains(CCharacter.Dollar))
-            {
-                String[]
-                    sa = s.Split(CCharacter.Dollar);
+            Int32 iSALTLength;
+            _FindSALTLength(ref baOut, out iSALTLength);
 
-                if (ArrayUtils.IsValidIndex(sa, 1))
-                {
-                    sSALT = sa[0];
-                    s = sa[1];
-                }
-                else if (ArrayUtils.IsValidIndex(sa, 0))
-                    sSALT = sa[0];
-                else
-                    sSALT = null;
-            }
-            else
-                sSALT = null;
+            Byte[]? baSALT;
+            _SplitBytes(ref baOut, ref iSALTLength, out baSALT, out baOut);
+            if (baOut == null)
+                return false;
 
             Byte[]? baObject;
-            _Compute(ref o, ref sSALT, out baObject);
+            _Compute(ref o, ref baSALT, out baObject);
+            String? sObject;
+            _ConvertToBaseXString(ref baObject, out sObject);
+            _ParseToBytesArray(ref sObject, out baObject);
 
-            if (baObject == null)
-                return false;
-
-            Byte[]? baHash;
-            _ConvertToBaseXBytesArray(ref s, out baHash);
-
-            if (baHash == null)
-                return false;
-
-            return baObject.SequenceEqual(baHash);
+            return
+                baObject != null
+                && baObject.SequenceEqual(baOut);
         }
 
         public String? Compute(Object? o)
         {
+            if (_ha == null)
+                return null;
+
             Byte[]? baSALT;
-            _RandomSALT(out baSALT);
+            _RandomSALT(true, out baSALT);
 
             Byte[]? baOut;
             _Compute(ref o, ref baSALT, out baOut);
-
             String? sOut;
             _ConvertToBaseXString(ref baOut, out sOut);
 
@@ -108,42 +141,36 @@ namespace Kudos.Crypters.KryptoModule.HashModule
                 return null;
 
             String? sSALT;
-            if (baSALT != null)
-                _ParseToString(ref baSALT, out sSALT);
-            else
-                sSALT = null;
+            _ParseToString(ref baSALT, out sSALT);
 
             return
                 (
                     sSALT != null
-                        ? sSALT + CCharacter.Dollar
+                        ? sSALT
                         : String.Empty
                 )
                 +
                 sOut;
         }
 
-        private void _Compute(ref Object? oIn, ref String? sSALT, out Byte[]? baOut)
-        {
-            Byte[]? baSALT; _ParseToBytesArray(ref sSALT, out baSALT);
-            _Compute(ref oIn, ref baSALT, out baOut);
-        }
-
         private void _Compute(ref Object? oIn, ref Byte[]? baSALT, out Byte[]? baOut)
         {
-            Byte[]? baIn; String? s = JSONUtils.Serialize(oIn); _ParseToBytesArray(ref s, out baIn);
+            String? s = JSONUtils.Serialize(oIn);
+            Byte[]? baIn;
+            _ParseToBytesArray(ref s, out baIn);
             _Compute(ref baIn, ref baSALT, out baOut);
         }
 
         private void _Compute(ref Byte[]? baIn, ref Byte[]? baSALT, out Byte[]? baOut)
         {
-            _PrependSALT(ref baIn, ref baSALT, out baIn);
+            if (baIn == null) { baOut = null; return; }
+            _PrependBytes(ref baIn, ref baSALT, out baIn);
             _Compute(ref baIn, out baOut);
         }
 
         private void _Compute(ref Byte[]? baIn, out Byte[]? baOut)
         {
-            if (_ha != null && baIn != null)
+            if (baIn != null)
                 try { baOut = _ha.ComputeHash(baIn); return; } catch { }
 
             baOut = null;

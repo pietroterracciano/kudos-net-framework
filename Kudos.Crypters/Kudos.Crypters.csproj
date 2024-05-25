@@ -33,4 +33,7 @@
     <Folder Include="KryptoModule\SymmetricModule\Descriptors\" />
     <Folder Include="KryptoModule\SymmetricModule\Utils\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="KryptoModule\SymmetricModule\Enums\ESRBlockSize.cs" />
+  </ItemGroup>
 </Project>

@@ -35,12 +35,6 @@ namespace Kudos.Crypters.KryptoModule.Builders
             return this;
         }
 
-        public SALTBuilder<BuilderType, BuiltType, DescriptorType> SetCharType(ECharType? ect)
-        {
-            _dsc.SALTDescriptor.CharType = ect;
-            return this;
-        }
-
         public BuilderType RequestBuilder()
         {
             return _bt;
