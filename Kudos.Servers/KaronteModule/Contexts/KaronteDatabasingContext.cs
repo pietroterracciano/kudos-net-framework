@@ -1,17 +1,30 @@
-﻿using Kudos.Databases.Interfaces;
+﻿using System;
+using Kudos.Databases.Interfaces;
 using Kudos.Databases.Interfaces.Chains;
 using Kudos.Servers.KaronteModule.Options;
+using Kudos.Servers.KaronteModule.Services;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteDatabasingContext : AKaronteChildContext
     {
+        private readonly KaronteDatabasingService _kdbs;
+
         public readonly IDatabaseHandler? DatabaseHandler;
+        public readonly Boolean HasDatabaseHandler;
 
         internal KaronteDatabasingContext(ref KaronteContext kc) : base(ref kc)
         {
-            IBuildableDatabaseChain? bdbc = KaronteContext.GetRequiredService<KaronteDatabasingOptions>().BuildableDatabaseChain;
-            DatabaseHandler = bdbc != null ? bdbc.BuildHandler() : null;
+            _kdbs = kc.GetRequiredService<KaronteDatabasingService>();
+            DatabaseHandler = _kdbs.BuildableDatabaseChain != null ? _kdbs.BuildableDatabaseChain.BuildHandler() : null;
+            HasDatabaseHandler = DatabaseHandler != null;
         }
+
+        //public IDatabaseHandler? GetDatabaseHandler() { return _dbh; }
+        //public IDatabaseHandler RequestDatabaseHandler()
+        //{
+        //    if (_dbh == null) throw new InvalidOperationException();
+        //    return _dbh;
+        //}
     }
 }

@@ -23,7 +23,6 @@
     <Compile Remove="KaronteModule\Interfaces\IKaronteAuthorizationBuilder.cs" />
     <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
     <None Remove="KaronteModule\Utils\" />
-    <None Remove="KaronteModule\Interfaces\" />
     <None Remove="KaronteModule\Services\" />
   </ItemGroup>
 
@@ -35,7 +34,6 @@
 
   <ItemGroup>
     <Folder Include="KaronteModule\Utils\" />
-    <Folder Include="KaronteModule\Interfaces\" />
     <Folder Include="KaronteModule\Services\" />
   </ItemGroup>
   <ItemGroup>

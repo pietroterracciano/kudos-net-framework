@@ -22,13 +22,13 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
         {
-            kc.DatabasingContext = new KaronteDatabasingContext(ref kc);    
+            kc.DatabasingContext = await Task.Run(() => new KaronteDatabasingContext(ref kc));    
             return await OnReceiveContext(kc.DatabasingContext);
         }
 
         protected override async Task OnBounceReturn(KaronteContext kc)
         {
-            if (kc.DatabasingContext.DatabaseHandler == null) return;
+            if (!kc.DatabasingContext.HasDatabaseHandler) return;
             await kc.DatabasingContext.DatabaseHandler.CloseConnectionAsync();
         }
 

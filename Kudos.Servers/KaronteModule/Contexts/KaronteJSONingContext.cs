@@ -5,23 +5,24 @@ using System.Text.Json;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
-    public sealed class KaronteJSONingContext : AKaronteChildContext
+    public sealed class KaronteJSONingContext
+        : AKaronteChildContext
     {
-        private readonly JsonSerializerOptions _jsonso;
+        private readonly KaronteJSONingService _kjsons;
 
-        public KaronteJSONingContext(ref KaronteContext kc) : base(ref kc)
+        internal KaronteJSONingContext(ref KaronteContext kc) : base(ref kc)
         {
-            _jsonso = KaronteContext.GetRequiredService<KaronteJSONingOptions>().JsonSerializerOptions;
+            _kjsons = KaronteContext.GetRequiredService<KaronteJSONingService>();
         }
 
         public String? Serialize(object? o)
         {
-            return JSONUtils.Serialize(o, _jsonso);
+            return JSONUtils.Serialize(o, _kjsons.JsonSerializerOptions);
         }
 
         public ObjectType? Deserialize<ObjectType>(dynamic? dnm)
         {
-            return JSONUtils.Deserialize<ObjectType>(dnm, _jsonso);
+            return JSONUtils.Deserialize<ObjectType>(dnm, _kjsons.JsonSerializerOptions);
         }
     }
 }

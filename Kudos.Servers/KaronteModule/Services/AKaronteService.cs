@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kudos.Servers.KaronteModule.Services
 {
-	internal abstract class AKaronteService
+	public abstract class AKaronteService
 	{
 		public IServiceCollection ServiceCollection { get; private set; }
 

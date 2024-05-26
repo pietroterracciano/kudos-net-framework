@@ -1,39 +1,47 @@
 ﻿using System;
 using Kudos.Crypters.KryptoModule.HashModule;
+using Kudos.Crypters.KryptoModule.HashModule.Builders;
 using Kudos.Crypters.KryptoModule.SymmetricModule;
-using Kudos.Servers.KaronteModule.Interfaces;
+using Kudos.Crypters.KryptoModule.SymmetricModule.Builders;
 using Kudos.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kudos.Servers.KaronteModule.Services
 {
-	internal class KaronteCryptingService
-		: AKaronteService, IKaronteCryptingServiceCollection
+	public class
+		KaronteCryptingService
+	:
+		AKaronteService
 	{
-		private readonly Metas
-			_mSymmetrics,
-			_mHashes;
+		internal readonly Metas Symmetrics, Hashes;
 
 		internal KaronteCryptingService(ref IServiceCollection sc) : base(ref sc)
 		{
-			_mSymmetrics = new Metas(StringComparison.OrdinalIgnoreCase);
-			_mHashes = new Metas(StringComparison.OrdinalIgnoreCase);
+			Symmetrics = new Metas(StringComparison.OrdinalIgnoreCase);
+			Hashes = new Metas(StringComparison.OrdinalIgnoreCase);
 		}
 
-		public IKaronteCryptingServiceCollection RegisterSymmetric(string? sn, Func<Symmetric>? fnc)
+		public KaronteCryptingService RegisterSymmetric(string? sn, Action<SymmetricBuilder>? act)
 		{
-			_mSymmetrics.Set(sn, fnc != null ? fnc.Invoke() : null);
+			if(sn != null && act != null)
+			{
+				SymmetricBuilder sb = Symmetric.RequestBuilder();
+				act.Invoke(sb);
+				Symmetrics.Set(sn, sb.Build());
+            }
+
 			return this;
 		}
 
-		public IKaronteCryptingServiceCollection RegisterHash(string? sn, Func<Hash>? fnc)
+		public KaronteCryptingService RegisterHash(string? sn, Action<HashBuilder>? act)
 		{
-			_mHashes.Set(sn, fnc != null ? fnc.Invoke() : null);
-			return this;
+            if (sn != null && act != null)
+            {
+                HashBuilder sb = Hash.RequestBuilder();
+                act.Invoke(sb);
+                Hashes.Set(sn, sb.Build());
+            }
+            return this;
 		}
-
-		internal Symmetric? GetSymmetric(String? sn) { return _mSymmetrics.Get<Symmetric>(sn); }
-        internal Hash? GetHash(String? sn) { return _mHashes.Get<Hash>(sn); }
-
     }
 }

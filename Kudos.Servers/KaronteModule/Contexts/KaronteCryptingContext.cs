@@ -1,12 +1,12 @@
 ﻿using System;
 using Kudos.Crypters.KryptoModule.HashModule;
 using Kudos.Crypters.KryptoModule.SymmetricModule;
-using Kudos.Servers.KaronteModule.Options;
 using Kudos.Servers.KaronteModule.Services;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
-	public class KaronteCryptingContext : AKaronteChildContext
+	public sealed class KaronteCryptingContext
+        : AKaronteChildContext
 	{
 		private readonly KaronteCryptingService _kcs;
 
@@ -15,8 +15,8 @@ namespace Kudos.Servers.KaronteModule.Contexts
             _kcs = kc.GetRequiredService<KaronteCryptingService>();
         }
 
-		public Symmetric? GetSymmetric(String? sn) { return _kcs.GetSymmetric(sn); }
-        public Hash? GetHash(String? sn) { return _kcs.GetHash(sn); }
+		public Symmetric? GetSymmetric(String? sn) { return _kcs.Symmetrics.Get<Symmetric>(sn); }
+        public Hash? GetHash(String? sn) { return _kcs.Hashes.Get<Hash>(sn); }
 
         public Symmetric RequestSymmetric(String? sn)
         {

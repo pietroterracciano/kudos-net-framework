@@ -2,17 +2,11 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using System.Reflection;
-using Kudos.Servers.KaronteModule.Attributes;
-using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Utils;
 using Kudos.Reflection.Utils;
-using Kudos.Servers.KaronteModule.Constants;
-using Kudos.Constants;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
-    [KaronteService(EKaronteServiceType.Scoped)]
     public sealed class KaronteContext
     {
         private readonly Object _lck0, _lck1;

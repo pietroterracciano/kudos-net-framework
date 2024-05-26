@@ -8,7 +8,6 @@ using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
-using Kudos.Servers.KaronteModule.Interfaces;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Servers.KaronteModule.Options;
 using Kudos.Servers.KaronteModule.Services;
@@ -48,7 +47,7 @@ namespace Kudos.Servers.KaronteModule
         }
 
         private static void RegisterService(String? s) { RegisterService(s, null); }
-        private static void RegisterService(String? s, IKaronteServiceCollection? ksc) { __mRegisteredServices.Set(s, ksc); }
+        private static void RegisterService(String? s, AKaronteService? ks) { __mRegisteredServices.Set(s, ks); }
         private static Boolean IsServiceRegistered(String? s) { return __mRegisteredServices.Contains(s); }
 
         private static T RequestRegisteredService<T>(String? s)
@@ -128,71 +127,80 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
-        #region AddKaronteJSONing(..)
+        #region public static IServiceCollection AddKaronteJSONing(..)
 
-        public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, Func<JsonSerializerOptions>? fnc)
+        public static IServiceCollection AddKaronteJSONing(this IServiceCollection sc, Action<KaronteJSONingService>? act)
         {
-            if(!IsServiceRegistered(CKaronteKey.Core))
+            if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsServiceRegistered(CKaronteKey.JSONing))
-                return sc;
 
-            RegisterService(CKaronteKey.JSONing);
+            KaronteJSONingService kjsons;
 
-            JsonSerializerOptions?
-                jsonso = fnc != null
-                    ? fnc.Invoke()
-                    : null;
+            if (!IsServiceRegistered(CKaronteKey.JSONing))
+            {
+                kjsons = new KaronteJSONingService(ref sc);
+                RegisterService(CKaronteKey.JSONing, kjsons);
+                sc.TryAddSingleton<KaronteJSONingService>(kjsons);
+            }
+            else
+                kjsons = RequestRegisteredService<KaronteJSONingService>(CKaronteKey.JSONing);
 
-            if(jsonso == null)
-                jsonso
-                     = new JsonSerializerOptions()
-                     {
-                         PropertyNameCaseInsensitive = false,
-                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                         IncludeFields = true
-                     };
+            if (act != null)
+                act.Invoke(kjsons);
 
-            sc.TryAddSingleton<KaronteJSONingOptions>(new KaronteJSONingOptions(ref jsonso)); return sc;
+            return sc;
         }
 
         #endregion
 
-        #region AddKaronteCrypting(..)
+        #region public static IServiceCollection AddKaronteCrypting(..)
 
-        public static IKaronteCryptingServiceCollection AddKaronteCrypting(this IServiceCollection sc)
+        public static IServiceCollection AddKaronteCrypting(this IServiceCollection sc, Action<KaronteCryptingService>? act)
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsServiceRegistered(CKaronteKey.Crypting))
-                return RequestRegisteredService<IKaronteCryptingServiceCollection>(CKaronteKey.Crypting);
 
-            KaronteCryptingService kcs = new KaronteCryptingService(ref sc);
-            RegisterService(CKaronteKey.Crypting, kcs);
-            sc.TryAddSingleton<KaronteCryptingService>(kcs);
-            return kcs;
+            KaronteCryptingService kcs;
+
+            if (!IsServiceRegistered(CKaronteKey.Crypting))
+            {
+                kcs = new KaronteCryptingService(ref sc);
+                RegisterService(CKaronteKey.Crypting, kcs);
+                sc.TryAddSingleton<KaronteCryptingService>(kcs);
+            }
+            else
+                kcs = RequestRegisteredService<KaronteCryptingService>(CKaronteKey.Crypting);
+
+            if (act != null)
+                act.Invoke(kcs);
+
+            return sc;
         }
 
         #endregion
 
-        #region AddKaronteDatabasing(..)
+        #region public static IServiceCollection AddKaronteDatabasing(..)
 
-        public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Func<IDatabaseChain, IBuildableDatabaseChain>? fnc)
+        public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Action<KaronteDatabasingService>? act)
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
-            else if (IsServiceRegistered(CKaronteKey.Databasing))
-                return sc;
 
-            RegisterService(CKaronteKey.Databasing);
+            KaronteDatabasingService kdbs;
 
-            IBuildableDatabaseChain?
-                bdbc = fnc != null
-                    ? fnc.Invoke(DatabaseChainer.NewChain())
-                    : null;
+            if (!IsServiceRegistered(CKaronteKey.Databasing))
+            {
+                kdbs = new KaronteDatabasingService(ref sc);
+                RegisterService(CKaronteKey.Databasing, kdbs);
+                sc.TryAddSingleton<KaronteDatabasingService>(kdbs);
+            }
+            else
+                kdbs = RequestRegisteredService<KaronteDatabasingService>(CKaronteKey.Databasing);
 
-            sc.TryAddSingleton<KaronteDatabasingOptions>(new KaronteDatabasingOptions(ref bdbc)); return sc;
+            if (act != null)
+                act.Invoke(kdbs);
+
+            return sc;
         }
 
         #endregion
@@ -256,8 +264,6 @@ namespace Kudos.Servers.KaronteModule
 
             RegisterApplication(CKaronteKey.Crypting);
 
-            //IKaronteAuthorizationBuilder kab;
-            //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
             return
                 ab
                     .UseMiddleware<KaronteCryptingMiddleware>();
@@ -299,15 +305,9 @@ namespace Kudos.Servers.KaronteModule
 
             RegisterApplication(CKaronteKey.Databasing);
 
-
-            //IKaronteDatabasingBuilder kdbb;
-            //if (FetchDatabasingBuilder(ref ab, out kdbb) == EKaronteObjectStatus.New)
-
             return
                 ab
                     .UseMiddleware<DatabasingMiddlewareType>();
-
-            //return kdbb;
         }
 
         #endregion
@@ -322,7 +322,6 @@ namespace Kudos.Servers.KaronteModule
                 return ab;
 
             RegisterApplication(CKaronteKey.JSONing);
-
 
             return ab.UseMiddleware<KaronteJSONingMiddleware>();
         }

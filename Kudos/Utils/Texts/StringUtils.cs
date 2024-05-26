@@ -88,6 +88,7 @@ namespace Kudos.Utils.Texts
 
         #region public static String? Random()
 
+        public static String Random(Int32 i) { return Random(i, CCharType.StandardNumeric); }
         public static String Random(Int32 i, ECharType ect)
         {
             if (i < 1)
