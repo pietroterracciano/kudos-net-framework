@@ -273,8 +273,10 @@ namespace Kudos.Servers.KaronteModule
 
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
 
-        public static IApplicationBuilder UseKaronteAuthorizating<AuthorizatingMiddlewareType>(this IApplicationBuilder ab)
-            where AuthorizatingMiddlewareType : AKaronteAuthorizatingMiddleware
+        public static IApplicationBuilder UseKaronteAuthorizating<AuthorizatingMiddlewareType, AuthorizatingAttributeType, EAuthorizationType>(this IApplicationBuilder ab)
+            where AuthorizatingMiddlewareType : AKaronteAuthorizatingMiddleware<AuthorizatingAttributeType, EAuthorizationType>
+            where AuthorizatingAttributeType : AKaronteAuthorizatingAttribute<EAuthorizationType>
+            where EAuthorizationType : Enum
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();

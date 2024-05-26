@@ -24,6 +24,7 @@
     <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
     <None Remove="KaronteModule\Utils\" />
     <None Remove="KaronteModule\Services\" />
+    <None Remove="KaronteModule\Descriptors\Tokens\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,7 @@
   <ItemGroup>
     <Folder Include="KaronteModule\Utils\" />
     <Folder Include="KaronteModule\Services\" />
+    <Folder Include="KaronteModule\Descriptors\Tokens\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Kudos.Crypters">

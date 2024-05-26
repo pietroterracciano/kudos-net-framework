@@ -1,56 +1,40 @@
 ﻿using Kudos.Constants;
 using Kudos.Servers.KaronteModule.Constants;
+using Kudos.Servers.KaronteModule.Descriptors.Tokens;
 using Kudos.Servers.KaronteModule.Enums;
+using Kudos.Utils;
 using System;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteAuthorizatingContext : AKaronteChildContext
     {
-        public String? RequestToken { get; internal set; }
-        public EKaronteAuthorization RequestAuthorizationType { get; internal set; }
-        public EKaronteAuthorization EndpointAuthorizationType { get; internal set; }
+        public readonly KaronteAuthorizatingDescriptor? RequestDescriptor, EndpointDescriptor;
+        public readonly Boolean HasRequestDescriptor, HasEndpointDescriptor;
+        public readonly Boolean IsEndpointAuthorized;
 
-        internal KaronteAuthorizatingContext(ref KaronteContext kc) : base(ref kc) { }
-
-        public Boolean IsEndpointAuthorized()
+        internal
+            KaronteAuthorizatingContext
+            (
+                ref KaronteAuthorizatingDescriptor? rd,
+                ref KaronteAuthorizatingDescriptor? ed,
+                ref KaronteContext kc
+            )
+        :
+            base
+            (
+                ref kc
+            )
         {
-            return RequestAuthorizationType.HasFlag(EndpointAuthorizationType);
+            HasRequestDescriptor = (RequestDescriptor = rd) != null;
+            HasEndpointDescriptor = (EndpointDescriptor = ed) != null;
+            IsEndpointAuthorized =
+                !HasEndpointDescriptor
+                ||
+                (
+                    HasRequestDescriptor
+                    && EnumUtils.HasFlag<Enum>(RequestDescriptor.Type, EndpointDescriptor.Type)
+                );
         }
-
-        //public KaronteAuthorizationContext(String? s)
-        //{
-        //    if (s == null) s = String.Empty;
-        //    else s = s.Trim();
-
-        //    if (Normalize(ref s, EKaronteAuthorization.Access))
-        //        Type = EKaronteAuthorization.Access;
-        //    else if (Normalize(ref s, EKaronteAuthorization.Bearer))
-        //        Type = EKaronteAuthorization.Bearer;
-        //    else
-        //        Type = EKaronteAuthorization.None;
-
-        //    Token = s;
-        //}
-
-        //private static Boolean Normalize(ref String s, EKaronteAuthorization e)
-        //{
-        //    String? s1;
-        //    switch(e)
-        //    {
-        //        case EKaronteAuthorization.Access:
-        //            s1 = CKaronteAuthorization.Access;
-        //            break;
-        //        case EKaronteAuthorization.Bearer:
-        //            s1 = CKaronteAuthorization.Bearer;
-        //            break;
-        //        default:
-        //            s1 = null;
-        //            break;
-        //    }
-
-        //    if (s1 == null || !s.StartsWith(s1, StringComparison.OrdinalIgnoreCase)) return false;
-        //    s = s.Substring(s1.Length).Trim(); return true;//while (s.StartsWith(CCharacter.Space)) s = s.Substring(1); return true;
-        //}
     }
 }

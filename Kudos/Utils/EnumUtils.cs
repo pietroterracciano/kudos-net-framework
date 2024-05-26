@@ -61,6 +61,32 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region public static Boolean IsValid(...)
+
+        public static Boolean IsValid<T>(Enum? e) where T: Enum
+        {
+            if (e == null)
+                return false;
+
+            Int32?[]?
+                a = GetValues<T>();
+
+            if (a != null)
+            {
+                Int32 ie = GetNNValue(e);
+
+                for (int i = 0; i < a.Length; i++)
+                {
+                    if (!ie.Equals(a[i])) continue;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
         #region public static String[]? GetNNKey<...>(...)
 
         public static String GetNNKey(Enum? e)

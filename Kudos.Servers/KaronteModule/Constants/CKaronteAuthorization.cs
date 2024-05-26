@@ -3,12 +3,11 @@ using System;
 
 namespace Kudos.Servers.KaronteModule.Constants
 {
-    
-    internal static class CKaronteAuthorization
+    public static class CKaronteAuthorization
     {
-        public static readonly String
-            None = "None",
-            Access = "Access",
-            Bearer = "Bearer";
+        public const String
+            None = nameof(None),
+            Access = nameof(Access),
+            Bearer = nameof(Bearer);
     }
 }

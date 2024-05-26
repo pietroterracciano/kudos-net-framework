@@ -1,16 +1,11 @@
-﻿using Kudos.Servers.KaronteModule.Enums;
-using System;
+﻿using System;
+using Kudos.Servers.KaronteModule.Enums;
 
 namespace Kudos.Servers.KaronteModule.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class KaronteAuthorizatingAttribute : Attribute
+    public class KaronteAuthorizatingAttribute : AKaronteAuthorizatingAttribute<EKaronteAuthorization>
     {
-        public readonly EKaronteAuthorization Value;
-
-        public KaronteAuthorizatingAttribute(EKaronteAuthorization e)
-        {
-            Value = e;
-        }
+        public KaronteAuthorizatingAttribute(EKaronteAuthorization e) : base(e) { }
     }
 }
+
