@@ -17,29 +17,36 @@ using System.Threading.Tasks;
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
     public abstract class
-        AKaronteAuthorizatingMiddleware<AuthorizatingAttribute, EAuthorizationType>
+        AKaronteAuthorizatingMiddleware<AttributeType, EnumType>
     :
         AKaronteMiddleware
     where
-        AuthorizatingAttribute : AKaronteAuthorizatingAttribute<EAuthorizationType>
+        AttributeType : AKaronteAuthorizatingAttribute<EnumType>
     where
-        EAuthorizationType : Enum
+        EnumType : Enum
     {
         public AKaronteAuthorizatingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
         {
+            KaronteHeadingContext khc;
+            kc.RequestObject<KaronteHeadingContext>(CKaronteKey.Heading, out khc);
+
+            KaronteAttributingContext kac;
+            kc.RequestObject<KaronteAttributingContext>(CKaronteKey.Attributing, out kac);
+
             KaronteAuthorizatingDescriptor? rd = null;
-            StringValues sv;
-            if (kc.HttpContext.Request.Headers.TryGetValue(CKaronteHttpHeader.Authorization, out sv))
-                for (int i = 0; i < sv.Count; i++)
+            if(khc.HasHeaderValues)
+                for (int i = 0; i < khc.HeaderValues.Count; i++)
                 {
-                    if (!FetchRequestDescriptor(sv[i], out rd)) continue;
+                    if (!FetchRequestDescriptor(khc.HeaderValues[i], out rd)) continue;
                     break;
                 }
 
-            KaronteAuthorizatingDescriptor? ed;
-            FetchEndpointDescriptor(ref kc, out ed);
+            AttributeType? at = kac.GetAttribute<AttributeType>();
+            KaronteAuthorizatingDescriptor? ed = at != null
+                ? new KaronteAuthorizatingDescriptor(null, at.Value)
+                : null;
 
             kc.AuthorizatingContext = new KaronteAuthorizatingContext(ref rd, ref ed, ref kc);
             return await OnReceiveContext(kc.AuthorizatingContext);
@@ -70,32 +77,17 @@ namespace Kudos.Servers.KaronteModule.Middlewares
                 return false;
             }
 
-            EAuthorizationType?
-                eat = EnumUtils.Parse<EAuthorizationType>(sa[0]);
+            EnumType?
+                et = EnumUtils.Parse<EnumType>(sa[0]);
 
-            if (!EnumUtils.IsValid<EAuthorizationType>(eat))
+            if (!EnumUtils.IsValid<EnumType>(et))
             {
                 kad = null;
                 return false;
             }
 
-            kad = new KaronteAuthorizatingDescriptor(sa[1], eat);
+            kad = new KaronteAuthorizatingDescriptor(sa[1], et);
             return true;
-        }
-
-        private static void FetchEndpointDescriptor(ref KaronteContext kc, out KaronteAuthorizatingDescriptor? kad)
-        {
-            AuthorizatingAttribute?
-                aa = EndpointUtils.GetLastMetadata<AuthorizatingAttribute>
-                    (
-                        kc.RoutingContext != null
-                            ? kc.RoutingContext.Endpoint
-                            : kc.HttpContext.GetEndpoint()
-                    );
-
-            kad = aa != null
-                ? new KaronteAuthorizatingDescriptor(null, aa.Value)
-                : null;
         }
     }
 }

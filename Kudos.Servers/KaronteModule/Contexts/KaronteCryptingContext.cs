@@ -12,7 +12,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
 		internal KaronteCryptingContext(ref KaronteContext kc) : base(ref kc)
 		{
-            _kcs = kc.GetRequiredService<KaronteCryptingService>();
+            _kcs = kc.RequestService<KaronteCryptingService>();
         }
 
 		public Symmetric? GetSymmetric(String? sn) { return _kcs.Symmetrics.Get<Symmetric>(sn); }

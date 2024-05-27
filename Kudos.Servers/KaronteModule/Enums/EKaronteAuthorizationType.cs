@@ -4,7 +4,7 @@ using System;
 namespace Kudos.Servers.KaronteModule.Enums
 {
     [Flags]
-    public enum EKaronteAuthorization
+    public enum EKaronteAuthorizationType
     {
         None = CBinaryFlag._0,
         Access = None | CBinaryFlag._1,

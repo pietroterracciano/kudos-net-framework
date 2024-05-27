@@ -1,8 +1,13 @@
-﻿namespace Kudos.Servers.KaronteModule.Constants
+﻿using System;
+namespace Kudos.Servers.KaronteModule.Constants
 {
-    public class CKaronteHttpHeader
-    {
-        public static readonly string
-            Authorization = "Authorization";
-    }
+	public static class CKaronteHttpHeader
+	{
+        public static readonly String
+			Authorization = nameof(Authorization),
+			ContentType = "Content-Type",
+			Accept = "Accept",
+			AcceptContent = "Accept-Content";
+	}
 }
+

@@ -12,7 +12,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         internal KaronteJSONingContext(ref KaronteContext kc) : base(ref kc)
         {
-            _kjsons = KaronteContext.GetRequiredService<KaronteJSONingService>();
+            _kjsons = KaronteContext.RequestService<KaronteJSONingService>();
         }
 
         public String? Serialize(object? o)

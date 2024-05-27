@@ -2,6 +2,7 @@
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule.Middlewares

@@ -22,7 +22,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
         {
-            kc.DatabasingContext = await Task.Run(() => new KaronteDatabasingContext(ref kc));    
+            kc.DatabasingContext = new KaronteDatabasingContext(ref kc);
             return await OnReceiveContext(kc.DatabasingContext);
         }
 

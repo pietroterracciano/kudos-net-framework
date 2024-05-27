@@ -15,7 +15,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         internal KaronteDatabasingContext(ref KaronteContext kc) : base(ref kc)
         {
-            _kdbs = kc.GetRequiredService<KaronteDatabasingService>();
+            _kdbs = kc.RequestService<KaronteDatabasingService>();
             DatabaseHandler = _kdbs.BuildableDatabaseChain != null ? _kdbs.BuildableDatabaseChain.BuildHandler() : null;
             HasDatabaseHandler = DatabaseHandler != null;
         }

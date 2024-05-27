@@ -25,6 +25,7 @@
     <None Remove="KaronteModule\Utils\" />
     <None Remove="KaronteModule\Services\" />
     <None Remove="KaronteModule\Descriptors\Tokens\" />
+    <Compile Remove="KaronteModule\Services\KaronteHeadingService.cs" />
   </ItemGroup>
 
   <ItemGroup>

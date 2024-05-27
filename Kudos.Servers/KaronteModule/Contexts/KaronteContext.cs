@@ -9,8 +9,9 @@ namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteContext
     {
-        private readonly Object _lck0, _lck1;
+        private readonly Object _lck0, _lck1, _lckObjects;
         private readonly Metas _mts;
+        private readonly Metas _mObjects;
 
         internal Type[]? RegisteredServices;
 
@@ -23,11 +24,13 @@ namespace Kudos.Servers.KaronteModule.Contexts
         public KaronteJSONingContext? JSONingContext { get; internal set; }
         public KaronteCryptingContext? CryptingContext { get; internal set; }
 
-        public KaronteContext()
+        internal KaronteContext()
         {
             _lck0 = new Object();
             _lck1 = new Object();
             _mts = new Metas();
+            _lckObjects = new Object();
+            _mObjects = new Metas();
         }
 
         private void throwRequiredServiceException(Type? t)
@@ -46,7 +49,23 @@ namespace Kudos.Servers.KaronteModule.Contexts
             );
         }
 
-        public ServiceType GetRequiredService<ServiceType>()
+        internal void RegisterObject<T>(String? s, ref T? o)
+        {
+            _mObjects.Set(s, o);
+        }
+
+        internal void GetObject<T>(String? s, out T? o)
+        {
+            o = _mObjects.Get<T>(s);
+        }
+
+        internal void RequestObject<T>(String? s, out T o)
+        {
+            GetObject<T>(s, out o);
+            if (o == null) throw new InvalidOperationException();
+        }
+
+        public ServiceType RequestService<ServiceType>()
         {
             Type 
                 t = typeof(ServiceType);
@@ -60,7 +79,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             return srv;
         }
 
-        private Object GetRequiredService(Type? t)
+        private Object RequestService(Type? t)
         {
             Object?
                 srv = GetService(t);
@@ -103,7 +122,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             }
         }
 
-        public ControllerType GetRequiredController<ControllerType>()
+        public ControllerType RequestController<ControllerType>()
         {
             Type
                 t = typeof(ControllerType);
@@ -117,7 +136,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             return cnt;
         }
 
-        private Object GetRequiredController(Type? t)
+        private Object RequestController(Type? t)
         {
             Object?
                 cnt = GetController(t);

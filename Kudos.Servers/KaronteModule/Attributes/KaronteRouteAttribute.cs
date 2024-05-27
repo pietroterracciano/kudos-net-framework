@@ -1,6 +1,6 @@
 ﻿namespace Kudos.Servers.KaronteModule.Attributes
 {
-    public class KaronteRouteAttribute
+    public sealed class KaronteRouteAttribute
     {
     }
 }

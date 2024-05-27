@@ -7,10 +7,12 @@ using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
+using Kudos.Servers.KaronteModule.Descriptors.Tokens;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Servers.KaronteModule.Options;
 using Kudos.Servers.KaronteModule.Services;
+using Kudos.Servers.KaronteModule.Utils;
 using Kudos.Types;
 using Kudos.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -19,12 +21,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule
 {
@@ -38,12 +42,6 @@ namespace Kudos.Servers.KaronteModule
         {
             __mRegisteredServices = new Metas(StringComparison.OrdinalIgnoreCase);
             __hsRegisteredApplications = new HashSet<string>();
-            //__f0 = ab => new KaronteAuthorizationBuilder(ref ab);
-            //__f1 = ab => new KaronteDatabasingBuilder(ref ab);
-            //__bIsCoreAdded = __bIsJSONingAdded = false;
-            //__d0 = new Dictionary<IApplicationBuilder, KaronteApplicationBuilderContext>();
-            //__d1 = new Dictionary<IApplicationBuilder, Dictionary<Type, IKaronteBuilder>>();
-            //__d2 = new Dictionary<IApplicationBuilder, IKaronteDatabaseHandlerBuilder>();
         }
 
         private static void RegisterService(String? s) { RegisterService(s, null); }
@@ -78,7 +76,13 @@ namespace Kudos.Servers.KaronteModule
             RegisterService(CKaronteKey.Core);
 
             sc
-                .TryAddScoped<KaronteContext>();
+                .TryAddScoped<KaronteContext>
+                (
+                    (sp) =>
+                    {
+                        return new KaronteContext();
+                    }
+                );
             sc
                 .AddRouting()
                 .AddControllers();
@@ -266,17 +270,32 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseMiddleware<KaronteCryptingMiddleware>();
+                    .Use
+                    (
+                        async (httpc, rd) =>
+                        {
+                            KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
+                            kc.CryptingContext = new KaronteCryptingContext(ref kc);
+                            await rd.Invoke();
+                        }
+                    );
         }
 
         #endregion
 
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
 
-        public static IApplicationBuilder UseKaronteAuthorizating<AuthorizatingMiddlewareType, AuthorizatingAttributeType, EAuthorizationType>(this IApplicationBuilder ab)
-            where AuthorizatingMiddlewareType : AKaronteAuthorizatingMiddleware<AuthorizatingAttributeType, EAuthorizationType>
-            where AuthorizatingAttributeType : AKaronteAuthorizatingAttribute<EAuthorizationType>
-            where EAuthorizationType : Enum
+        public static IApplicationBuilder UseKaronteAuthorizating(this IApplicationBuilder ab)
+        {
+            return
+                ab
+                    .UseKaronteAuthorizating<KaronteAuthorizatingMiddleware, KaronteAuthorizatingAttribute, EKaronteAuthorizationType>();
+        }
+
+        public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType, AttributeType, EnumType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteAuthorizatingMiddleware<AttributeType, EnumType>
+            where AttributeType : AKaronteAuthorizatingAttribute<EnumType>
+            where EnumType : Enum
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
@@ -285,20 +304,19 @@ namespace Kudos.Servers.KaronteModule
 
             RegisterApplication(CKaronteKey.Authorizating);
 
-
-            //IKaronteAuthorizationBuilder kab;
-            //if( FetchAuthorizationBuilder(ref ab, out kab) == EKaronteObjectStatus.New )
             return
                 ab
-                    .UseMiddleware<AuthorizatingMiddlewareType>();
+                    .UseKaronteHeading(CKaronteHttpHeader.Authorization)
+                    .UseKaronteAttributing<AttributeType>()
+                    .UseMiddleware<MiddlewareType>();
         }
 
         #endregion
 
         #region public static IApplicationBuilder UseKaronteDatabasing(...)
 
-        public static IApplicationBuilder UseKaronteDatabasing<DatabasingMiddlewareType>(this IApplicationBuilder ab)
-            where DatabasingMiddlewareType : AKaronteDatabasingMiddleware
+        public static IApplicationBuilder UseKaronteDatabasing<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteDatabasingMiddleware
         {
             if (!IsServiceRegistered(CKaronteKey.Databasing))
                 throw new InvalidOperationException();
@@ -309,7 +327,95 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseMiddleware<DatabasingMiddlewareType>();
+                    .UseMiddleware<MiddlewareType>();
+        }
+
+        #endregion
+
+        #region public static IApplicationBuilder UseKaronteHeading(...)
+
+        public static IApplicationBuilder UseKaronteHeading<MiddlewareType>(this IApplicationBuilder ab, String? s)
+            where MiddlewareType : AKaronteHeadingMiddleware
+        {
+            return
+                ab
+                    .UseKaronteHeading(s)
+                    .UseMiddleware<MiddlewareType>();
+        }
+
+        internal static IApplicationBuilder UseKaronteHeading(this IApplicationBuilder ab, String? s)
+        {
+            if (!IsServiceRegistered(CKaronteKey.Core))
+                throw new InvalidOperationException();
+
+            RegisterApplication(CKaronteKey.Heading);
+
+            return
+                ab
+                    .Use
+                    (
+                        async (httpc, rq) =>
+                        {
+                            KaronteContext
+                                kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
+
+                            StringValues sv;
+
+                            if (s != null)
+                                httpc.Request.Headers.TryGetValue(s, out sv);
+                            else
+                                sv = new StringValues();
+
+                            KaronteHeadingContext khc = new KaronteHeadingContext(ref s, ref sv, ref kc);
+
+                            kc.RegisterObject(CKaronteKey.Heading, ref khc);
+
+                            await rq.Invoke();
+                        }
+                    );
+        }
+
+        #endregion
+
+        #region public static IApplicationBuilder UseKaronteAttributing(...)
+
+        public static IApplicationBuilder UseKaronteAttributing<MiddlewareType, AttributeType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteAttributingMiddleware<AttributeType>
+            where AttributeType : Attribute
+        {
+            return
+                ab
+                    .UseKaronteAttributing<AttributeType>()
+                    .UseMiddleware<MiddlewareType>();
+        }
+
+        internal static IApplicationBuilder UseKaronteAttributing<AttributeType>(this IApplicationBuilder ab)
+            where AttributeType : Attribute
+        {
+            if (!IsServiceRegistered(CKaronteKey.Core))
+                throw new InvalidOperationException();
+
+            RegisterApplication(CKaronteKey.Attributing);
+
+            return
+                ab
+                    .Use
+                    (
+                        async (httpc, rq) =>
+                        {
+                            KaronteContext
+                                kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
+
+                            Attribute?
+                                att = EndpointUtils.GetLastMetadata<AttributeType>(httpc.GetEndpoint());
+
+                            KaronteAttributingContext hac = new KaronteAttributingContext(ref att, ref kc);
+
+                            kc.RegisterObject(CKaronteKey.Attributing, ref hac);
+
+                            await rq.Invoke();
+                        }
+                    );
         }
 
         #endregion
@@ -325,7 +431,17 @@ namespace Kudos.Servers.KaronteModule
 
             RegisterApplication(CKaronteKey.JSONing);
 
-            return ab.UseMiddleware<KaronteJSONingMiddleware>();
+            return
+                ab
+                    .Use
+                    (
+                        async (httpc, rd) =>
+                        {
+                            KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
+                            kc.JSONingContext = new KaronteJSONingContext(ref kc);
+                            await rd.Invoke();
+                        }
+                    );
         }
 
         #endregion
@@ -341,7 +457,6 @@ namespace Kudos.Servers.KaronteModule
                 return ab;
 
             RegisterApplication(CKaronteKey.Responsing);
-
 
             return ab.UseMiddleware<ResponsingMiddlewareType>();
         }

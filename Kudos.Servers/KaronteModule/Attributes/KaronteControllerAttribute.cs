@@ -6,7 +6,7 @@ namespace Kudos.Servers.KaronteModule.Attributes
 {
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class KaronteControllerAttribute : Attribute
+    public sealed class KaronteControllerAttribute : Attribute
     {
         public readonly String? Version;
 
