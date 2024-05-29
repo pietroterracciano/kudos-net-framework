@@ -3,7 +3,6 @@ using Kudos.Constants;
 using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
-using Kudos.Servers.KaronteModule.Descriptors.Tokens;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Utils;
 using Kudos.Utils;
@@ -17,19 +16,15 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class
         AKaronteHeadingMiddleware
     :
-        AKaronteMiddleware
+        AContexizedKaronteMiddleware<KaronteHeadingContext>
     {
         public AKaronteHeadingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
+        protected override async Task<KaronteHeadingContext> OnContextCreate(KaronteContext kc)
         {
             KaronteHeadingContext khc;
             kc.RequestObject<KaronteHeadingContext>(CKaronteKey.Heading, out khc);
-            return await OnReceiveContext(khc);
+            return khc;
         }
-
-        protected override async Task OnBounceReturn(KaronteContext cc) { }
-
-        protected abstract Task<EKaronteBounce> OnReceiveContext(KaronteHeadingContext khc);
     }
 }

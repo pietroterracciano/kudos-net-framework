@@ -10,20 +10,17 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class
         AKaronteAttributingMiddleware<AttributeType>
     :
-        AKaronteMiddleware
+        AContexizedKaronteMiddleware<KaronteAttributingContext>
     {
         public AKaronteAttributingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
+        protected override async Task<KaronteAttributingContext?> OnContextCreate(KaronteContext kc)
         {
             KaronteAttributingContext kac;
             kc.RequestObject<KaronteAttributingContext>(CKaronteKey.Attributing, out kac);
-            return await OnReceiveContext(kc.RequestService<KaronteAttributingContext>());
+            return kac;
         }
 
-        protected override async Task OnBounceReturn(KaronteContext cc) { }
-
-        protected abstract Task<EKaronteBounce> OnReceiveContext(KaronteAttributingContext kac);
+        protected override async Task OnBounceEnd(KaronteContext kc) { }
     }
 }
-

@@ -15,19 +15,22 @@ using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
-    public abstract class AKaronteResponsingMiddleware<NonActionResultType> : AKaronteMiddleware
+    public abstract class AKaronteResponsingMiddleware<NonActionResultType>
+        : AContexizedKaronteMiddleware<KaronteResponsingContext>
     {
         public AKaronteResponsingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
+        protected override async Task<KaronteResponsingContext> OnContextCreate(KaronteContext kc)
         {
-            kc.ResponsingContext = new KaronteResponsingContext(ref kc);
-            //kc.ResponsingContext.StatusCode = HttpStatusCode.OK;
-            //kc.ResponsingContext.SetNonActionResult = OnNonActionResultCreation();
+            return kc.ResponsingContext = new KaronteResponsingContext(ref kc);
+        }
+
+        protected override async Task<EKaronteBounce> OnContextReceive(KaronteResponsingContext krc)
+        {
             return EKaronteBounce.MoveForward;
         }
 
-        protected override async Task OnBounceReturn(KaronteContext kc)
+        protected override async Task OnBounceEnd(KaronteContext kc)
         {
             NonActionResultType?
                 nar = ObjectUtils.Cast<NonActionResultType>(kc.ResponsingContext.NonActionResult);

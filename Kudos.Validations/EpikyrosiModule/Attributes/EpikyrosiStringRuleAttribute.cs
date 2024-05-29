@@ -4,35 +4,30 @@ using System.Numerics;
 
 namespace Kudos.Validations.EpikyrosiModule.Attributes
 {
-    public class EpikyrosiStringRuleAttribute : AEpikyrosiRuleAttribute
+    public sealed class EpikyrosiStringRuleAttribute : AEpikyrosiRuleAttribute
     {
-        internal Boolean IsMinLengthSetted { get; private set; }
+        internal Boolean _bIsMinLengthSetted;
         private UInt16 _iMinLength;
-        public UInt16 MinLength { get { return _iMinLength; } set { _iMinLength = value; IsMinLengthSetted = true; } }
+        public UInt16 MinLength { get { return _iMinLength; } set { _iMinLength = value; _bIsMinLengthSetted = true; } }
 
-        internal Boolean IsMaxLengthSetted { get; private set; }
+        internal Boolean _bIsMaxLengthSetted;
         private UInt16 _iMaxLength;
-        public UInt16 MaxLength { get { return _iMaxLength; } set { _iMaxLength = value; IsMaxLengthSetted = true; } }
+        public UInt16 MaxLength { get { return _iMaxLength; } set { _iMaxLength = value; _bIsMaxLengthSetted = true; } }
 
-        //internal Boolean IsCanBeEmptySetted { get; private set; }
-        //private Boolean _bCanBeEmpty;
-        //public Boolean CanBeEmpty { get { return _bCanBeEmpty; } set { _bCanBeEmpty = value; IsCanBeEmptySetted = true; } }
-
-        internal Boolean IsCanBeWhitespaceSetted { get; private set; }
-        private Boolean _bCanBeWhitespace;
-        public Boolean CanBeWhitespace { get { return _bCanBeWhitespace; } set { _bCanBeWhitespace = value; IsCanBeWhitespaceSetted = true; } }
+        private Boolean _bIsCanBeWhitespaceSetted, _bCanBeWhitespace;
+        public Boolean CanBeWhitespace { get { return _bCanBeWhitespace; } set { _bCanBeWhitespace = value; _bIsCanBeWhitespaceSetted = true; } }
 
         protected override void _OnParseToRule(out AEpikyrosiRule rt)
         {
             EpikyrosiStringRule esr = new EpikyrosiStringRule();
 
-            if (IsMinLengthSetted)
+            if (_bIsMinLengthSetted)
                 esr.MinLength = MinLength;
-            if (IsMaxLengthSetted)
+            if (_bIsMaxLengthSetted)
                 esr.MaxLength = MaxLength;
             //if (IsCanBeEmptySetted)
             //    esr.CanBeEmpty = CanBeEmpty;
-            if (IsCanBeWhitespaceSetted)
+            if (_bIsCanBeWhitespaceSetted)
                 esr.CanBeWhitespace = CanBeWhitespace;
 
             rt = esr;

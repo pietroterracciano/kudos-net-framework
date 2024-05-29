@@ -15,13 +15,13 @@ namespace Kudos.Validations.EpikyrosiModule.Results
         public readonly MemberInfo? DeclaringMember;
         public readonly EEpikyrosiNotValidOn On;
         public readonly Boolean HasThreshold;
-        public readonly Object Threshold;
+        public readonly Object? Threshold;
 
         internal EpikyrosiNotValidResult
         (
             ref MemberInfo? dm,
             EEpikyrosiNotValidOn on,
-            Object t
+            Object? t
         )
         {
             HasDeclaringMember = (DeclaringMember = dm) != null;
@@ -41,7 +41,7 @@ namespace Kudos.Validations.EpikyrosiModule.Results
                             .Append(CCharacter.DoubleDot)
                             .Append(Enum.GetName(On))
                             .Append(CCharacter.DoubleDot)
-                            .Append(Threshold)
+                            .Append(HasThreshold ? Threshold : String.Empty)
                             .ToString();
 
                 return _s;

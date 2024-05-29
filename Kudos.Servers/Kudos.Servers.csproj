@@ -24,8 +24,12 @@
     <Compile Remove="KaronteModule\Builders\AKaronteServiceBuilder.cs" />
     <None Remove="KaronteModule\Utils\" />
     <None Remove="KaronteModule\Services\" />
-    <None Remove="KaronteModule\Descriptors\Tokens\" />
     <Compile Remove="KaronteModule\Services\KaronteHeadingService.cs" />
+    <None Remove="KaronteModule\Descriptors\Authorizatings\" />
+    <None Remove="KaronteModule\Descriptors\Authenticatings\" />
+    <Compile Remove="KaronteModule\Middlewares\KaronteAuthorizatingMiddleware.cs" />
+    <Compile Remove="KaronteModule\Attributes\KaronteAuthorizatingAttribute.cs" />
+    <Compile Remove="KaronteModule\Attributes\KaronteRouteAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +41,8 @@
   <ItemGroup>
     <Folder Include="KaronteModule\Utils\" />
     <Folder Include="KaronteModule\Services\" />
-    <Folder Include="KaronteModule\Descriptors\Tokens\" />
+    <Folder Include="KaronteModule\Descriptors\Authorizatings\" />
+    <Folder Include="KaronteModule\Descriptors\Authenticatings\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Kudos.Crypters">

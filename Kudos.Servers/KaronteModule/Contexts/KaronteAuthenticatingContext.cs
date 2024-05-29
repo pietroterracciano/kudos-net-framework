@@ -1,4 +1,6 @@
 ﻿using Azure.Core.GeoJson;
+using Kudos.Servers.KaronteModule.Descriptors.Authenticatings;
+using Kudos.Servers.KaronteModule.Descriptors.Authorizatings;
 using Kudos.Utils;
 using System;
 
@@ -6,38 +8,51 @@ namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteAuthenticatingContext : AKaronteChildContext
     {
-        internal Object? AuthenticationData;
-        public Boolean EndpointHasAuthentication { get; internal set; }
+        public readonly KaronteAuthenticationDescriptor? AuthenticationEndpointDescriptor;
+        public readonly Boolean HasAuthenticationEndpointDescriptor, HasAuthenticationData, IsAuthenticated;
+        public readonly Object AuthenticationData;
 
-        internal KaronteAuthenticatingContext(ref KaronteContext kc) : base(ref kc) { }
+        internal
+            KaronteAuthenticatingContext
+            (
+                ref KaronteAuthenticationDescriptor? aed,
+                ref Object? ad,
+                ref KaronteContext kc
+            )
+        :
+            base
+            (
+                ref kc
+            )
+        {
+            HasAuthenticationEndpointDescriptor = (AuthenticationEndpointDescriptor = aed) != null;
+            HasAuthenticationData = ( AuthenticationData = ad ) != null;
+            IsAuthenticated =
+                !HasAuthenticationEndpointDescriptor
+                || HasAuthenticationData;
+        }
 
-        //internal KaronteAuthenticatingContext(ref KaronteContext kc, Object o, Boolean b) : base(ref kc)
-        //{
-        //    _oAuthenticationData = o;
-        //    EndpointHasAuthetication = b;
-        //}
         private void throwRequiredAuthenticationDataException(Type? t)
         {
             throw new InvalidOperationException
             (
-                "Required AuthenticationData " + (t != null ? t.Name + " " : String.Empty) + "not registered correctly in AKaronteAuthenticatingMiddleware"
+                "Required AuthenticationData " + (t != null ? t.Name + " " : String.Empty) + "not registered correctly in KaronteAuthenticatingContext"
             );
         }
 
-        public ObjectType GetRequiredAuthenticationData<ObjectType>()
+        public T RequireAuthenticationData<T>()
         {
-            ObjectType?
-                ad = GetAuthenticationData<ObjectType>();
-
-            if (ad == null)
-                throwRequiredAuthenticationDataException(typeof(ObjectType));
-
+            T? ad = GetAuthenticationData<T>();
+            if (ad == null) throwRequiredAuthenticationDataException(typeof(T));
             return ad;
         }
 
-        public ObjectType? GetAuthenticationData<ObjectType>()
+        public T? GetAuthenticationData<T>()
         {
-            return ObjectUtils.Cast<ObjectType>(AuthenticationData);
+            return
+                HasAuthenticationData
+                    ? ObjectUtils.Cast<T>(AuthenticationData)
+                    : default(T);
         }
     }
 }

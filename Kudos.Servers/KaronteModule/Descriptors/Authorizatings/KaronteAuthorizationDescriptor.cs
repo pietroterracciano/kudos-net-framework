@@ -2,15 +2,15 @@
 using System;
 using Kudos.Utils;
 
-namespace Kudos.Servers.KaronteModule.Descriptors.Tokens
+namespace Kudos.Servers.KaronteModule.Descriptors.Authorizatings
 {
-	public class KaronteAuthorizatingDescriptor
+	public class KaronteAuthorizationDescriptor
 	{
 		public readonly String? Code;
 		public readonly Boolean HasCode;
 		internal readonly Enum Type;
 
-		internal KaronteAuthorizatingDescriptor(String? s, Enum t)
+		internal KaronteAuthorizationDescriptor(String? s, Enum t)
 		{
 			HasCode = (Code = s) != null;
 			Type = t;

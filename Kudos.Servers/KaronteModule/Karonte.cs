@@ -7,7 +7,6 @@ using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
 using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
-using Kudos.Servers.KaronteModule.Descriptors.Tokens;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Middlewares;
 using Kudos.Servers.KaronteModule.Options;
@@ -285,16 +284,16 @@ namespace Kudos.Servers.KaronteModule
 
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
 
-        public static IApplicationBuilder UseKaronteAuthorizating(this IApplicationBuilder ab)
-        {
-            return
-                ab
-                    .UseKaronteAuthorizating<KaronteAuthorizatingMiddleware, KaronteAuthorizatingAttribute, EKaronteAuthorizationType>();
-        }
+        //public static IApplicationBuilder UseKaronteAuthorizating(this IApplicationBuilder ab)
+        //{
+        //    return
+        //        ab
+        //            .UseKaronteAuthorizating<KaronteAuthorizatingMiddleware, KaronteAuthorizatingAttribute, EKaronteAuthorizationType>();
+        //}
 
         public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType, AttributeType, EnumType>(this IApplicationBuilder ab)
             where MiddlewareType : AKaronteAuthorizatingMiddleware<AttributeType, EnumType>
-            where AttributeType : AKaronteAuthorizatingAttribute<EnumType>
+            where AttributeType : AKaronteEnumizedAttribute<EnumType>
             where EnumType : Enum
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
@@ -465,9 +464,13 @@ namespace Kudos.Servers.KaronteModule
 
         #region public static IApplicationBuilder UseKaronteAuthenticating(...)
 
-        public static IApplicationBuilder UseKaronteAuthenticating<AuthenticatingMiddlewareType, ObjectType>(this IApplicationBuilder ab)
+        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, AttributeType, EnumType>(this IApplicationBuilder ab)
             where
-                AuthenticatingMiddlewareType : AKaronteAuthenticatingMiddleware<ObjectType>
+                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType, EnumType>
+            where
+                AttributeType : AKaronteEnumizedAttribute<EnumType>
+            where
+                EnumType : Enum
         {
             if (!IsServiceRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
@@ -479,7 +482,8 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseMiddleware<AuthenticatingMiddlewareType>();
+                    .UseKaronteAttributing<AttributeType>()
+                    .UseMiddleware<MiddlewareType>();
         }
 
         #endregion

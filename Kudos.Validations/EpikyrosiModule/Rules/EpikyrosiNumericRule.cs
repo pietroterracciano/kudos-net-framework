@@ -7,7 +7,7 @@ using Kudos.Validations.EpikyrosiModule.Results;
 
 namespace Kudos.Validations.EpikyrosiModule.Rules
 {
-	public class
+	public sealed class
         EpikyrosiNumericRule<T>
     :
 		AEpikyrosiRule

@@ -1,6 +1,7 @@
 ﻿using System;
 using Kudos.Enums;
 using System.Text;
+using Kudos.Crypters.KryptoModule.Enums;
 
 namespace Kudos.Crypters.KryptoModule.Descriptors
 {
@@ -10,6 +11,7 @@ namespace Kudos.Crypters.KryptoModule.Descriptors
         internal Encoding? Encoding;
         internal SALTDescriptor SALTDescriptor;
         internal EBinaryEncoding? BinaryEncoding;
+        internal EInternalSerialization? InternalSerialization;
 
         internal AKryptoDescriptor() { SALTDescriptor = new SALTDescriptor(); }
 
@@ -18,6 +20,7 @@ namespace Kudos.Crypters.KryptoModule.Descriptors
             Encoding = dsc.Encoding;
             SALTDescriptor.Length = dsc.SALTDescriptor.Length;
             BinaryEncoding = dsc.BinaryEncoding;
+            InternalSerialization = dsc.InternalSerialization;
             OnInject(ref dsc);
             return this as DescriptorType;
         }

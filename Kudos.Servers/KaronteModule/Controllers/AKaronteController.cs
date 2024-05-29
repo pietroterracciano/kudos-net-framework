@@ -1,5 +1,8 @@
-﻿using Kudos.Servers.KaronteModule.Attributes;
+﻿using System;
+using System.Threading.Tasks;
+using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Contexts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kudos.Servers.KaronteModule.Controllers
@@ -8,10 +11,30 @@ namespace Kudos.Servers.KaronteModule.Controllers
     public abstract class AKaronteController
     {
         protected readonly KaronteContext KaronteContext;
+        //protected readonly KaronteDatabasingContext? KaronteDatabasingContext;
+        //protected readonly Boolean HasKaronteDatabasingContext;
+        //protected readonly KaronteJSONingContext? KaronteJSONingContext;
+        //protected readonly Boolean HasJSONingContext;
+        //protected readonly KaronteAuthenticatingContext? KaronteAuthenticatingContext;
+        //protected readonly Boolean HasKaronteAuthenticatingContext;
+        //protected readonly KaronteAuthorizatingContext? KaronteAuthorizatingContext;
+        //protected readonly Boolean HasKaronteAuthorizatingContext;
+        //protected readonly KaronteCryptingContext? KaronteCryptingContext;
+        //protected readonly Boolean HasKaronteCryptingContext;
+        //protected readonly KaronteResponsingContext? KaronteResponsingContext;
+        //protected readonly Boolean HasKaronteResponsingContext;
+        //protected readonly HttpContext HttpContext;
 
         public AKaronteController(ref KaronteContext kc)
         {
+            //HttpContext = kc.HttpContext;
             KaronteContext = kc;
+            //HasKaronteDatabasingContext = (KaronteDatabasingContext = kc.DatabasingContext) != null;
+            //HasJSONingContext = (KaronteJSONingContext = kc.JSONingContext) != null;
+            //HasKaronteAuthenticatingContext = (KaronteAuthenticatingContext = kc.AuthenticatingContext) != null;
+            //HasKaronteAuthorizatingContext = (KaronteAuthorizatingContext = kc.AuthorizatingContext) != null;
+            //HasKaronteCryptingContext = (KaronteCryptingContext = kc.CryptingContext) != null;
+            //HasKaronteResponsingContext = (KaronteResponsingContext = kc.ResponsingContext) != null;
 
             //if
             //(

@@ -12,6 +12,7 @@ using System.Text;
 using Kudos.Crypters.KryptoModule.SymmetricModule.Utils;
 using Kudos.Utils.Numerics;
 using Kudos.Enums;
+using Kudos.Crypters.KryptoModule.Enums;
 
 namespace Kudos.Crypters.KryptoModule.SymmetricModule
 {
@@ -111,10 +112,14 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
         private readonly Int32 _iKeySizeInBytes;
         private Int32 _iIVSizeInBytes;//, BlockSizeInBytes;
         private readonly SymmetricAlgorithm? _sa;
+        private readonly EInternalSerialization? _eis;
 
         internal Symmetric(ref SymmetricDescriptor sd) : base(ref sd)
         {
             _iIVSizeInBytes = 16;
+
+            if (sd.InternalSerialization == null) return;
+            _eis = sd.InternalSerialization;
 
             if (sd.KeySize == null) return;
             ESymmetricKeySize eKeySize = sd.KeySize.Value;
@@ -195,7 +200,9 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
                 return null;
 
             String?
-                s = JSONUtils.Serialize(o);
+                s = _eis == EInternalSerialization.JSON
+                    ? JSONUtils.Serialize(o)
+                    : ObjectUtils.Parse<String>(o);
 
             Byte[]? baIn;
             _ParseToBytesArray(ref s, out baIn);
@@ -273,8 +280,10 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
             _SplitBytes(ref baIn, ref iSALTLength, out baSALT, out baIn);
             _ParseToString(ref baIn, out s);
 
-            return JSONUtils.Deserialize<T>(s);
-            
+            return
+                _eis == EInternalSerialization.JSON
+                    ? JSONUtils.Deserialize<T>(s)
+                    : ObjectUtils.Parse<T>(s);
         }
 
         private void _Transform(ref Byte[]? baIn, ref ICryptoTransform ct, out Byte[]? baOut)

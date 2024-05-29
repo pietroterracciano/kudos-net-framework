@@ -21,6 +21,7 @@
     <None Remove="KryptoModule\SymmetricModule\Enums\" />
     <None Remove="KryptoModule\SymmetricModule\Descriptors\" />
     <None Remove="KryptoModule\SymmetricModule\Utils\" />
+    <None Remove="KryptoModule\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="KryptoModule\" />
@@ -32,6 +33,7 @@
     <Folder Include="KryptoModule\SymmetricModule\Enums\" />
     <Folder Include="KryptoModule\SymmetricModule\Descriptors\" />
     <Folder Include="KryptoModule\SymmetricModule\Utils\" />
+    <Folder Include="KryptoModule\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="KryptoModule\SymmetricModule\Enums\ESRBlockSize.cs" />

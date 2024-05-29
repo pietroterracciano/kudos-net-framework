@@ -4,13 +4,14 @@ using System;
 namespace Kudos.Servers.KaronteModule.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public abstract class AKaronteAuthorizatingAttribute<Enum> : Attribute
+    public abstract class AKaronteEnumizedAttribute<EnumType> : Attribute
+        where EnumType : Enum
     {
-        public readonly Enum Value;
+        public readonly EnumType Enum;
 
-        public AKaronteAuthorizatingAttribute(Enum e)
+        public AKaronteEnumizedAttribute(EnumType e)
         {
-            Value = e;
+            Enum = e;
         }
     }
 }

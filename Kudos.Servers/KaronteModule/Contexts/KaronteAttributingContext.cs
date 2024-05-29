@@ -16,7 +16,10 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         public T? GetAttribute<T>()
         {
-            return ObjectUtils.Cast<T>(_att);
+            return
+                HasAttribute
+                    ? ObjectUtils.Cast<T>(_att)
+                    : default(T);
         }
 
         public T? RequestAttribute<T>()

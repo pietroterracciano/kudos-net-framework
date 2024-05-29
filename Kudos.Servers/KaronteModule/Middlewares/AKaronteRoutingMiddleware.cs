@@ -13,11 +13,12 @@ using Kudos.Servers.KaronteModule.Constants;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
-    public abstract class AKaronteRoutingMiddleware : AKaronteMiddleware
+    public abstract class AKaronteRoutingMiddleware
+        : AContexizedKaronteMiddleware<KaronteRoutingContext>
     {
         public AKaronteRoutingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
+        protected override async Task<KaronteRoutingContext> OnContextCreate(KaronteContext kc)
         {
             Endpoint? end = kc.HttpContext.GetEndpoint();
             String? sdn = end?.DisplayName;
@@ -38,20 +39,9 @@ namespace Kudos.Servers.KaronteModule.Middlewares
                 kc.HttpContext.Response.StatusCode = CKaronteHttpStatusCode.MethodNotAllowed;
             }
 
-            kc.RoutingContext = new KaronteRoutingContext(ref kc, ref end, ref ekr);
-            return await OnRoute(kc.RoutingContext);
+            return new KaronteRoutingContext(ref kc, ref end, ref ekr);
         }
 
-        protected override async Task OnBounceReturn(KaronteContext kc)
-        {
-            //if (kc.RoutingContext.Type != EKaronteRoute.Registered)
-            //    return;
-            //else if (kc.ResponsingContext != null)
-            //    kc.ResponsingContext.SetStatusCode(HttpStatusCode.MethodNotAllowed); 
-            //else
-            //    kc.HttpContext.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
-        }
-
-        protected abstract Task<EKaronteBounce> OnRoute(KaronteRoutingContext krc);
+        protected override async Task OnBounceEnd(KaronteContext kc) { }
     }
 }

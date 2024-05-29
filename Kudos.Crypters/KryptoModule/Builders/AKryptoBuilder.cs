@@ -4,6 +4,7 @@ using System.Text;
 using Kudos.Crypters.KryptoModule.Descriptors;
 using Kudos.Utils;
 using Kudos.Reflection.Utils;
+using Kudos.Crypters.KryptoModule.Enums;
 
 namespace Kudos.Crypters.KryptoModule.Builders
 {
@@ -51,6 +52,12 @@ namespace Kudos.Crypters.KryptoModule.Builders
         public BuilderType SetBinaryEncoding(EBinaryEncoding? ebe)
         {
             _dsc.BinaryEncoding = ebe;
+            return this as BuilderType;
+        }
+
+        public BuilderType SetInternalSerialization(EInternalSerialization? eis)
+        {
+            _dsc.InternalSerialization = eis;
             return this as BuilderType;
         }
 

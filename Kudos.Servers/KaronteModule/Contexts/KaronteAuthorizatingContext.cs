@@ -1,7 +1,4 @@
-﻿using Kudos.Constants;
-using Kudos.Servers.KaronteModule.Constants;
-using Kudos.Servers.KaronteModule.Descriptors.Tokens;
-using Kudos.Servers.KaronteModule.Enums;
+﻿using Kudos.Servers.KaronteModule.Descriptors.Authorizatings;
 using Kudos.Utils;
 using System;
 
@@ -9,15 +6,15 @@ namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteAuthorizatingContext : AKaronteChildContext
     {
-        public readonly KaronteAuthorizatingDescriptor? RequestDescriptor, EndpointDescriptor;
-        public readonly Boolean HasRequestDescriptor, HasEndpointDescriptor;
-        public readonly Boolean IsEndpointAuthorized;
+        public readonly KaronteAuthorizationDescriptor? AuthorizationRequestDescriptor, AuthorizationEndpointDescriptor;
+        public readonly Boolean HasAuthorizationRequestDescriptor, HasAuthorizationEndpointDescriptor;
+        public readonly Boolean IsAuthorized;
 
         internal
             KaronteAuthorizatingContext
             (
-                ref KaronteAuthorizatingDescriptor? rd,
-                ref KaronteAuthorizatingDescriptor? ed,
+                ref KaronteAuthorizationDescriptor? ard,
+                ref KaronteAuthorizationDescriptor? aed,
                 ref KaronteContext kc
             )
         :
@@ -26,14 +23,15 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 ref kc
             )
         {
-            HasRequestDescriptor = (RequestDescriptor = rd) != null;
-            HasEndpointDescriptor = (EndpointDescriptor = ed) != null;
-            IsEndpointAuthorized =
-                !HasEndpointDescriptor
+            HasAuthorizationRequestDescriptor = (AuthorizationRequestDescriptor = ard) != null;
+            HasAuthorizationEndpointDescriptor = (AuthorizationEndpointDescriptor = aed) != null;
+            IsAuthorized =
+                !HasAuthorizationEndpointDescriptor
                 ||
                 (
-                    HasRequestDescriptor
-                    && EnumUtils.HasFlag<Enum>(RequestDescriptor.Type, EndpointDescriptor.Type)
+                    HasAuthorizationRequestDescriptor
+                    && EnumUtils.HasFlag<Enum>(AuthorizationRequestDescriptor.Type, AuthorizationEndpointDescriptor.Type)
+                    && AuthorizationRequestDescriptor.HasCode
                 );
         }
     }

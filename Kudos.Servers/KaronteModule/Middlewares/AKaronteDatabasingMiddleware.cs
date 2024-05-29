@@ -16,22 +16,20 @@ using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
-    public abstract class AKaronteDatabasingMiddleware : AKaronteMiddleware
+    public abstract class AKaronteDatabasingMiddleware
+        : AContexizedKaronteMiddleware<KaronteDatabasingContext>
     {
         public AKaronteDatabasingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<EKaronteBounce> OnBounce(KaronteContext kc)
+        protected override async Task<KaronteDatabasingContext> OnContextCreate(KaronteContext kc)
         {
-            kc.DatabasingContext = new KaronteDatabasingContext(ref kc);
-            return await OnReceiveContext(kc.DatabasingContext);
+            return kc.DatabasingContext = new KaronteDatabasingContext(ref kc);
         }
 
-        protected override async Task OnBounceReturn(KaronteContext kc)
+        protected override async Task OnBounceEnd(KaronteContext kc)
         {
             if (!kc.DatabasingContext.HasDatabaseHandler) return;
             await kc.DatabasingContext.DatabaseHandler.CloseConnectionAsync();
         }
-
-        protected abstract Task<EKaronteBounce> OnReceiveContext(KaronteDatabasingContext kdbc);
     }
 }

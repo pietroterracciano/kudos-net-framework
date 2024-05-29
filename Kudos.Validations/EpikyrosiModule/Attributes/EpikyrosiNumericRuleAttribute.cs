@@ -5,7 +5,7 @@ using Kudos.Validations.EpikyrosiModule.Rules;
 
 namespace Kudos.Validations.EpikyrosiModule.Attributes
 {
-    public class EpikyrosiNumericRuleAttribute<T> : AEpikyrosiRuleAttribute
+    public sealed class EpikyrosiNumericRuleAttribute<T> : AEpikyrosiRuleAttribute
 		where T : INumber<T>
 	{
         private Boolean _bIsMinValueSetted;

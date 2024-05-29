@@ -19,15 +19,15 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         public virtual async Task Invoke(HttpContext hc, KaronteContext kc)
         {
-            EKaronteBounce ekb = await OnBounce(kc);
+            EKaronteBounce ekb = await OnBounceStart(kc);
 
             if (ekb == EKaronteBounce.MoveForward)
                 await _rd.Invoke(hc);
 
-            await OnBounceReturn(kc);
+            await OnBounceEnd(kc);
         }
 
-        protected abstract Task<EKaronteBounce> OnBounce(KaronteContext kc);
-        protected abstract Task OnBounceReturn(KaronteContext kc);
+        protected abstract Task<EKaronteBounce> OnBounceStart(KaronteContext kc);
+        protected abstract Task OnBounceEnd(KaronteContext kc);
     }
 }
