@@ -27,33 +27,42 @@ namespace Kudos.Utils
 
         #region public static T? Deserialize<T>()
 
-        public static T? Deserialize<T>(dynamic? dnm, JsonSerializerOptions? jso = null)
+        public static T? Deserialize<T>(Object? o, JsonSerializerOptions? jso = null)
         {
-            return ObjectUtils.Cast<T>(Deserialize(typeof(T), dnm, jso));
+            return ObjectUtils.Cast<T>(Deserialize(typeof(T), o, jso));
         }
-        public static Object? Deserialize(Type? t, dynamic? dnm, JsonSerializerOptions? jso = null)
+        public static Object? Deserialize(Type? t, Object? o, JsonSerializerOptions? jso = null)
         {
-            if (DynamicUtils.IsNull(dnm) || t == null)
+            //if (DynamicUtils.IsNull(o) || t == null)
+            //  return null;
+
+            if (t == null)
                 return null;
-            
-            Object? o;
+
+            dynamic
+                dnm = o as dynamic;
+
+            if (DynamicUtils.IsNull(o))
+                return null;
+
+            Object? o0;
             try
             {
-                o = JsonSerializer.Deserialize(dnm, t, jso);
+                o0 = JsonSerializer.Deserialize(dnm, t, jso);
             }
             catch
             {
-                o = null;
+                o0 = null;
             }
 
-            if (o == null)
+            if (o0 == null)
                 return null;
 
             Type 
-                t0 = o.GetType();
+                t0 = o0.GetType();
 
             if (t0 != CType.JsonElement)
-                return o;
+                return o0;
 
             JsonElement 
                 je = (JsonElement)o;

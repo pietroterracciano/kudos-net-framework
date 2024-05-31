@@ -9,112 +9,137 @@ using Kudos.Utils.Texts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace Kudos.Reflection.Utils
 {
     public static class ReflectionUtils
     {
-        private static readonly long
-            __Multiplier = 10000000000;
+        // mi -> String
+        private static Dictionary<MemberInfo, String>
+            __dmi2hk;
 
-        // t.Module.MetadataToken -> t.MetadataToken
-        private static Dictionary<int, HashSet<int>>
-            __d0;
-        // t.Module.MetadataToken -> t.MetadataToken -> mi.MetadataToken -> mi
-        private static Dictionary<int, Dictionary<int, Dictionary<int, MemberInfo>>>
-            __d1;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> mi.MetadataToken
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, HashSet<int>>>>
-            __d2;
-        // t.Module.MetadataToken -> t.MetadataToken -> BindingFlags -> mi.MetadataToken
-        private static Dictionary<int, Dictionary<int, Dictionary<BindingFlags, HashSet<int>>>>
-            __d3;
-        // t.Module.MetadataToken -> t.MetadataToken -> mi.Name -> mi.MetadataToken
-        private static Dictionary<int, Dictionary<int, Dictionary<string, HashSet<int>>>>
-            __d4;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> mi.Name -> mi.MetadataToken
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, HashSet<int>?>>>>>>
-            __d5;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> mi.Name -> mia
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, MemberInfo[]?>>>>>>
-            __d6;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> pia.Name -> pia
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, PropertyInfo[]?>>>>>>
-            __d7;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> fia.Name -> fia
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, FieldInfo[]?>>>>>>
-            __d8;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> mi.Name -> mia
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, MethodInfo[]?>>>>>>
-            __d9;
-        // t.Module.MetadataToken -> t.MetadataToken -> MemberTypes -> BindingFlags -> cia.Name -> cia
-        private static Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, ConstructorInfo[]?>>>>>>
-            __d10;
-        // t.Module.MetadataToken -> t.MetadataToken -> HashKey:mi.Parameters -> mi.MetadataToken
-        private static Dictionary<int, Dictionary<int, Dictionary<long, HashSet<int>>>>
-            __d11;
-        // t.Module.MetadataToken -> t.MetadataToken -> mi.MetadataToken -> Boolean -> aa
-        private static Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>>
-            __d12;
-        // oc.Value -> oc
-        private static readonly Dictionary<Int16, OpCode?> 
-            __d13;
-        // oc.Name -> oc
-        private static readonly Dictionary<String, OpCode?> 
-            __d14;
-        // Token -> TokenizedObject
-        private static readonly Dictionary<Int32, Object>
-            __d15;
+        private static readonly Object
+            __lck;
+
+        // MemberInfos
+        private static HashSet<MemberInfo>
+            __hsami;
+        // Type -> MemberInfo[]
+        private static Dictionary<Type, MemberInfo[]?>
+            __dt2mia;
+        // Type -> MemberTypes -> MemberInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, MemberInfo[]?>?>
+            __dt2emt2mia;
+        // Type -> BindingFlags -> MemberInfo[]
+        private static Dictionary<Type, Dictionary<BindingFlags, MemberInfo[]?>?>
+            __dt2ebf2mia;
+        // Type -> MemberInfo.Name -> MemberInfo
+        private static Dictionary<Type, Dictionary<String, MemberInfo>?>
+            __dt2min2mi;
+        // Type -> HashKey(ParameterInfo[]) -> MemberInfo
+        private static Dictionary<Type, Dictionary<String, MemberInfo[]?>?>
+            __dt2pihk2mia;
+
+        // Type -> MemberTypes -> BindingFlags -> MemberInfo.Name -> HashKey(ParameterInfo[]) -> MemberInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, MemberInfo[]?>?>?>?>?>
+            __dt2emt2ebf2min2pihk2mia;
+        // Type -> MemberTypes -> BindingFlags -> MemberInfo.Name -> HashKey(ParameterInfo[]) -> PropertyInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, PropertyInfo[]?>?>?>?>?>
+            __dt2emt2ebf2min2pihk2pia;
+        // Type -> MemberTypes -> BindingFlags -> MemberInfo.Name -> HashKey(ParameterInfo[]) -> FieldInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, FieldInfo[]?>?>?>?>?>
+            __dt2emt2ebf2min2pihk2fia;
+        // Type -> MemberTypes -> BindingFlags -> MemberInfo.Name -> HashKey(ParameterInfo[]) -> MethodInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, MethodInfo[]?>?>?>?>?>
+            __dt2emt2ebf2min2pihk2mthia;
+        // Type -> MemberTypes -> BindingFlags -> MemberInfo.Name -> HashKey(ParameterInfo[]) -> ConstructorInfo[]
+        private static Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, ConstructorInfo[]?>?>?>?>?>
+            __dt2emt2ebf2min2pihk2cia;
+
+        // Type -> MemberInfo -> Boolean -> Attribute[]
+        private static Dictionary<Type, Dictionary<MemberInfo, Dictionary<bool, Attribute[]?>?>?>
+            __dt2mi2b2aa;
+
+        // OpCode.Value -> OpCode
+        private static readonly Dictionary<Int16, OpCode?>
+            __docv2oc;
+
+        // OpCode.Name -> OpCode
+        private static readonly Dictionary<String, OpCode?>
+            __docn2oc;
+
         private static OpCode[]? 
             __oca;
-
+        private static readonly Object
+            __lckoc;
         private static Boolean 
             __bIsOpCodesFetched;
 
-        private static readonly object
-            __lck0,
-            __lck1,
-            __lck2;
+        private static StringBuilder
+            __sbmi2hk;
+
+        private static readonly String
+            __sdtfn,
+            __smin;
 
         #region static ReflectionUtils()
 
         static ReflectionUtils()
         {
-            __lck0 = new object();
-            __lck1 = new object();
-            __lck2 = new object();
-            __d0 = new Dictionary<int, HashSet<int>>();
-            __d1 = new Dictionary<int, Dictionary<int, Dictionary<int, MemberInfo>>>();
-            __d2 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, HashSet<int>>>>();
-            __d3 = new Dictionary<int, Dictionary<int, Dictionary<BindingFlags, HashSet<int>>>>();
-            __d4 = new Dictionary<int, Dictionary<int, Dictionary<string, HashSet<int>>>>();
-            __d5 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, HashSet<int>?>>>>>>();
-            __d6 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, MemberInfo[]?>>>>>>();
-            __d7 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, PropertyInfo[]?>>>>>>();
-            __d8 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, FieldInfo[]?>>>>>>();
-            __d9 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, MethodInfo[]?>>>>>>();
-            __d10 = new Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, ConstructorInfo[]?>>>>>>();
-            __d11 = new Dictionary<int, Dictionary<int, Dictionary<long, HashSet<int>>>>();
-            __d12 = new Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>>();
-            __d13 = new Dictionary<Int16, OpCode?>();
-            __d14 = new Dictionary<String, OpCode?>();
-            __d15 = new Dictionary<Int32, Object>();
+            __lck = new object();
+
+            __hsami = new HashSet<MemberInfo>();
+            __dt2mia = new Dictionary<Type, MemberInfo[]?>();
+            __dt2min2mi = new Dictionary<Type, Dictionary<string, MemberInfo>?>();
+            __dt2emt2mia = new Dictionary<Type, Dictionary<MemberTypes, MemberInfo[]?>?>();
+            __dt2ebf2mia = new Dictionary<Type, Dictionary<BindingFlags, MemberInfo[]?>?>();
+            __dt2pihk2mia = new Dictionary<Type, Dictionary<string, MemberInfo[]?>?>();
+
+            __dt2emt2ebf2min2pihk2mia = new Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, MemberInfo[]?>?>?>?>?>();
+            __dt2emt2ebf2min2pihk2pia = new Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, PropertyInfo[]?>?>?>?>?>();
+            __dt2emt2ebf2min2pihk2fia = new Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, FieldInfo[]?>?>?>?>?>();
+            __dt2emt2ebf2min2pihk2mthia = new Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, MethodInfo[]?>?>?>?>?>();
+            __dt2emt2ebf2min2pihk2cia = new Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, ConstructorInfo[]?>?>?>?>?>();
+
+            __dt2mi2b2aa = new Dictionary<Type, Dictionary<MemberInfo, Dictionary<bool, Attribute[]?>?>?>();
+            __dmi2hk = new Dictionary<MemberInfo, string>();
+            __sbmi2hk = new StringBuilder();
+
+            __sdtfn = "dtfn";
+            __smin = "min";
+
+            __lckoc = new Object();
+            __docv2oc = new Dictionary<short, OpCode?>();
+            __docn2oc = new Dictionary<string, OpCode?>();
         }
 
         #endregion
 
         #region public static ...
 
+        #region public static String? GetHashKey(...)
+
+        public static String? GetHashKey(MemberInfo? mi)
+        {
+            String? shk;
+            __GetHashKey(ref mi, out shk);
+            return shk;
+        }
+
+        #endregion
+
         #region public static Attribute? GetCustomAttribute<...>(...)
 
         public static T? GetCustomAttribute<T>(MemberInfo? mi, bool bConsiderInheritance = true)
             where T : Attribute
-        { return GetCustomAttribute(mi, typeof(T), bConsiderInheritance) as T; }
-        public static Attribute? GetCustomAttribute(MemberInfo? mi, Type? t, bool bConsiderInheritance = true)
+        { return GetCustomAttribute(typeof(T), mi, bConsiderInheritance) as T; }
+        public static Attribute? GetCustomAttribute(Type? t, MemberInfo? mi, bool bConsiderInheritance = true)
         {
-            Attribute[]? aa = GetCustomAttributes(mi, t, bConsiderInheritance);
+            Attribute[]? aa = GetCustomAttributes(t, mi, bConsiderInheritance);
             return aa != null && aa.Length == 1 ? aa[0] : null;
         }
 
@@ -124,25 +149,22 @@ namespace Kudos.Reflection.Utils
 
         public static T[]? GetCustomAttributes<T>(MemberInfo? mi, bool bConsiderInheritance = true)
             where T : Attribute
-        { return GetCustomAttributes(mi, typeof(T), bConsiderInheritance) as T[]; }
-        public static Attribute[]? GetCustomAttributes(MemberInfo? mi, Type? t, bool bConsiderInheritance = true)
+        { return GetCustomAttributes(typeof(T), mi, bConsiderInheritance) as T[]; }
+        public static Attribute[]? GetCustomAttributes(Type? t, MemberInfo? mi, bool bConsiderInheritance = true)
         {
-            if (mi == null || t == null)
-                return null;
-
-            lock (__lck1)
+            lock (__dt2mi2b2aa)
             {
                 Attribute[]? aa;
 
-                D12:
-                if (FetchFromDictionaryIfPossible(ref t, ref mi, ref __d12, ref bConsiderInheritance, out aa))
+                FETCH:
+                if (__FetchFromDictionaryIfPossible(ref __dt2mi2b2aa, ref t, ref mi, ref bConsiderInheritance, out aa))
                     return aa;
 
                 try { aa = mi.GetCustomAttributes(t, bConsiderInheritance) as Attribute[]; } catch { }
 
-                AddToDictionaryIfNecessary(ref t, ref mi, ref __d12, ref bConsiderInheritance, ref aa);
+                __AddToDictionaryIfNecessary(ref __dt2mi2b2aa, ref t, ref mi, ref bConsiderInheritance, ref aa);
 
-                goto D12;
+                goto FETCH;
             }
         }
 
@@ -557,7 +579,7 @@ namespace Kudos.Reflection.Utils
 
         public static OpCode[]? GetOpCodes()
         {
-            lock (__lck0)
+            lock (__lckoc)
             {
                 if (__bIsOpCodesFetched)
                     return __oca;
@@ -578,10 +600,10 @@ namespace Kudos.Reflection.Utils
                 {
                     oci = GetFieldValue<OpCode>(fia[i]);
                     if (oci == null) continue;
-                    __d13[oci.Value.Value] = oci;
+                    __docv2oc[oci.Value.Value] = oci.Value;
                     socni = oci.Value.Name;
                     __NormalizeName(ref socni, out socni);
-                    __d14[socni] = oci;
+                    __docn2oc[socni] = oci.Value;
                     __oca[i] = oci.Value;
                 }
 
@@ -597,14 +619,14 @@ namespace Kudos.Reflection.Utils
         {
             __NormalizeName(ref s, out s);
             GetOpCodes();
-            OpCode? oc; __d14.TryGetValue(s, out oc);
+            OpCode? oc; __docn2oc.TryGetValue(s, out oc);
             return oc;
         }
 
         public static OpCode? GetOpCode(Int16 i)
         {
             GetOpCodes();
-            OpCode? oc; __d13.TryGetValue(i, out oc);
+            OpCode? oc; __docv2oc.TryGetValue(i, out oc);
             return oc;
         }
 
@@ -615,12 +637,7 @@ namespace Kudos.Reflection.Utils
         public static T? ResolveTokenizedObject<T>(int iToken) { return ObjectUtils.Cast<T>(ResolveTokenizedObject(iToken)); }
         public static Object? ResolveTokenizedObject(int iToken)
         {
-            lock(__lck2)
-            {
-                Object? o;
-                __d15.TryGetValue(iToken, out o);
-                return o;
-            }
+            throw new InvalidOperationException();
         }
 
         #endregion
@@ -910,10 +927,6 @@ namespace Kudos.Reflection.Utils
 
         internal static void RegisterTokenizedObject(TokenizedObject to)
         {
-            lock(__lck2)
-            {
-                __d15[to.Token] = to;
-            }
         }
 
         #endregion
@@ -925,481 +938,467 @@ namespace Kudos.Reflection.Utils
         private static void __Get<T>
         (
             ref Type? t,
-            ref string? s, /*ref MemberTypes mt,*/
+            ref String? s, /*ref MemberTypes mt,*/
             ref BindingFlags bf,
             ref Type[]? ta,
-            out T[]? uia
+            out T[]? taOut
         )
             where T : MemberInfo
         {
-            lock (__lck0)
+            lock (__lck)
             {
-                if (!Analyze(t))
+                if(!__Analyze(ref t))
                 {
-                    uia = null;
+                    taOut = null;
                     return;
                 }
 
                 Type t0 = typeof(T);
+                if (s == null) s = string.Empty;
+
                 MemberTypes mt;
 
-                Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>> d;
+                Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?> d;
 
                 if (t0 == CType.PropertyInfo)
                 {
                     mt = MemberTypes.Property;
-                    d = __d7 as Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>>;
+                    d = __dt2emt2ebf2min2pihk2pia as Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?>;
                 }
                 else if (t0 == CType.FieldInfo)
                 {
                     mt = MemberTypes.Field;
-                    d = __d8 as Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>>;
+                    d = __dt2emt2ebf2min2pihk2fia as Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?>;
                 }
                 else if (t0 == CType.MethodInfo)
                 {
                     mt = MemberTypes.Method;
-                    d = __d9 as Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>>;
+                    d = __dt2emt2ebf2min2pihk2mthia as Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?>;
                 }
                 else if (t0 == CType.ConstructorInfo)
                 {
                     mt = MemberTypes.Constructor;
-                    d = __d10 as Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>>;
+                    d = __dt2emt2ebf2min2pihk2cia as Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?>;
                 }
                 else
                 {
                     mt = MemberTypes.Constructor | MemberTypes.Property | MemberTypes.Field | MemberTypes.Method;
-                    d = __d6 as Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, T[]?>>>>>>;
+                    d = __dt2emt2ebf2min2pihk2mia as Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<String, Dictionary<String, T[]?>?>?>?>?>;
                 }
 
-                if (s == null) s = string.Empty;
-                long shk; CalculateHashKey(ref ta, out shk);
+                String? stahk; __GetHashKey(ref ta, out stahk);
+                if (stahk == null) stahk = String.Empty;
 
-            D6:
-                if (FetchFromDictionaryIfPossible(ref t, ref d, ref mt, ref bf, ref s, ref shk, out uia))
+                FETCH0:
+                if (__FetchFromDictionaryIfPossible(ref d, ref t, ref mt, ref bf, ref s, ref stahk, out taOut))
                     return;
 
-                HashSet<int>? hs;
+                MemberInfo[]?
+                    mia;
 
-            D5:
-                if (FetchFromDictionaryIfPossible(ref t, ref __d5, ref mt, ref bf, ref s, ref shk, out hs))
+                FETCH1:
+                if (__FetchFromDictionaryIfPossible(ref __dt2emt2ebf2min2pihk2mia, ref t, ref mt, ref bf, ref s, ref stahk, out mia))
                 {
                     List<T>?
-                        l = hs != null ? new List<T>(hs.Count) : null;
+                        l = mia != null ? new List<T>(mia.Length) : null;
 
                     if (l != null)
                     {
-                        MemberInfo? mii;
-                        T? ui;
-                        foreach (int i in hs)
+                        T? tai;
+                        for(int i=0; i < mia.Length; i++)
                         {
-                            FetchFromDictionaryIfPossible(ref t, ref __d1, i, out mii);
-                            ui = mii as T;
-                            if (ui == null) continue;
-                            l.Add(ui);
+                            tai = mia[i] as T;
+                            if (tai == null) continue;
+                            l.Add(tai);
                         }
 
-                        uia = l.ToArray();
+                        taOut = l.ToArray();
                     }
 
-                    AddToDictionaryIfNecessary(ref t, ref d, ref mt, ref bf, ref s, ref shk, ref uia);
-                    goto D6;
+                    __AddToDictionaryIfNecessary(ref d, ref t, ref mt, ref bf, ref s, ref stahk, ref taOut);
+                    goto FETCH0;
                 }
 
-                HashSet<int>?
-                    hs2 = new HashSet<int>();
+                HashSet<MemberInfo>
+                    hsemtmi = new HashSet<MemberInfo>();
 
                 if (mt.HasFlag(MemberTypes.Field))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d2, MemberTypes.Field, out hs);
-                    HashSetUtils.UnionWith(hs2, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2emt2mia, ref t, MemberTypes.Field, out mia);
+                    HashSetUtils.UnionWith(hsemtmi, mia);
                 }
 
                 if (mt.HasFlag(MemberTypes.Constructor))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d2, MemberTypes.Constructor, out hs);
-                    HashSetUtils.UnionWith(hs2, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2emt2mia, ref t, MemberTypes.Constructor, out mia);
+                    HashSetUtils.UnionWith(hsemtmi, mia);
                 }
 
                 if (mt.HasFlag(MemberTypes.Property))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d2, MemberTypes.Property, out hs);
-                    HashSetUtils.UnionWith(hs2, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2emt2mia, ref t, MemberTypes.Property, out mia);
+                    HashSetUtils.UnionWith(hsemtmi, mia);
                 }
 
                 if (mt.HasFlag(MemberTypes.Method))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d2, MemberTypes.Method, out hs);
-                    HashSetUtils.UnionWith(hs2, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2emt2mia, ref t, MemberTypes.Method, out mia);
+                    HashSetUtils.UnionWith(hsemtmi, mia);
                 }
 
-                HashSet<int>
-                    hs30 = new HashSet<int>();
+                HashSet<MemberInfo>
+                    hsebfmi0 = new HashSet<MemberInfo>();
 
                 if (bf.HasFlag(BindingFlags.Public))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d3, BindingFlags.Public, out hs);
-                    HashSetUtils.UnionWith(hs30, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2ebf2mia, ref t, BindingFlags.Public, out mia);
+                    HashSetUtils.UnionWith(hsebfmi0, mia);
                 }
 
                 if (bf.HasFlag(BindingFlags.NonPublic))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d3, BindingFlags.NonPublic, out hs);
-                    HashSetUtils.UnionWith(hs30, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2ebf2mia, ref t, BindingFlags.NonPublic, out mia);
+                    HashSetUtils.UnionWith(hsebfmi0, mia);
                 }
 
-                HashSetUtils.IntersectWith(hs2, hs30);
+                HashSetUtils.IntersectWith(hsemtmi, hsebfmi0);
 
-                HashSet<int>
-                    hs31 = new HashSet<int>();
+                HashSet<MemberInfo>
+                    hsebfmi1 = new HashSet<MemberInfo>();
 
                 if (bf.HasFlag(BindingFlags.Instance))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d3, BindingFlags.Instance, out hs);
-                    HashSetUtils.UnionWith(hs31, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2ebf2mia, ref t, BindingFlags.Instance, out mia);
+                    HashSetUtils.UnionWith(hsebfmi1, mia);
                 }
 
                 if (bf.HasFlag(BindingFlags.Static))
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d3, BindingFlags.Static, out hs);
-                    HashSetUtils.UnionWith(hs31, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2ebf2mia, ref t, BindingFlags.Static, out mia);
+                    HashSetUtils.UnionWith(hsebfmi1, mia);
                 }
 
-                HashSetUtils.IntersectWith(hs2, hs31);
+                HashSetUtils.IntersectWith(hsemtmi, hsebfmi1);
+
+                MemberInfo?
+                    mi;
 
                 if (s.Length > 0)
                 {
-                    FetchFromDictionaryIfPossible(ref t, ref __d4, s, out hs);
-                    HashSetUtils.IntersectWith(hs2, hs);
+                    __FetchFromDictionaryIfPossible(ref __dt2min2mi, ref t, s, out mi);
+                    if(mi != null) HashSetUtils.IntersectWith(hsemtmi, new MemberInfo[] { mi });
                 }
 
-                FetchFromDictionaryIfPossible(ref t, ref __d11, shk, out hs);
-                HashSetUtils.IntersectWith(hs2, hs);
+                __FetchFromDictionaryIfPossible(ref __dt2pihk2mia, ref t, stahk, out mia);
+                HashSetUtils.IntersectWith(hsemtmi, mia);
 
-                if (hs2.Count < 1) hs2 = null;
-                AddToDictionaryIfNecessary(ref t, ref __d5, ref mt, ref bf, ref s, ref shk, ref hs2);
-                goto D5;
+                mia = hsemtmi.Count > 0
+                    ? new MemberInfo[hsemtmi.Count]
+                    : null;
+
+                if (mia != null)
+                {
+                    int i = 0;
+                    foreach (MemberInfo mi0 in hsemtmi)
+                    {
+                        mia[i] = mi0;
+                        i++;
+                    }
+                }
+
+                __AddToDictionaryIfNecessary(ref __dt2emt2ebf2min2pihk2mia, ref t, ref mt, ref bf, ref s, ref stahk, ref mia);
+                goto FETCH1;
             }
         }
 
         #endregion
 
-        #region private static void CalculateHashKey(...)
+        #region private static Boolean __Analyze(...)
 
-        private static void CalculateHashKey
-        (
-           ref ParameterInfo[]? pia,
-           out long i
-        )
-        {
-            Type[]? ta = pia != null ? new Type[pia.Length] : null;
-
-            if (ta != null)
-            {
-                for (int j = 0; j < pia.Length; j++)
-                    ta[j] = pia[j].ParameterType;
-            }
-
-            CalculateHashKey(ref ta, out i);
-        }
-
-        private static void CalculateHashKey
-        (
-            ref Type[]? ta,
-            out long i
-        )
-        {
-            i = 0L;
-
-            if (ta == null)
-                return;
-
-            for (int j = 0; j < ta.Length; j++)
-            {
-                if (ta[j] == null) continue;
-                i += ta[j].Module.MetadataToken * __Multiplier;
-                i += ta[j].MetadataToken * (j + 1);
-            }
-        }
-
-        #endregion
-
-        #region private static Boolean Analyze(...)
-
-        private static bool Analyze(Type? t)
+        private static Boolean __Analyze(ref Type? t)
         {
             if (t == null)
                 return false;
 
-            HashSet<int>? hs;
-            if (!__d0.TryGetValue(t.Module.MetadataToken, out hs) || hs == null)
-                __d0[t.Module.MetadataToken] = hs = new HashSet<int>();
-            else if (hs.Contains(t.MetadataToken))
-                return true;
-
-            hs.Add(t.MetadataToken);
-
-            MemberInfo[]? a;
-            try { a = t.GetMembers(CBindingFlags.All); } catch { a = null; }
-            if (a == null) return true;
-
-            long shk;
-            ParameterInfo[]? pia;
-            BindingFlags bfi;
-            for (int i = 0; i < a.Length; i++)
+            lock(__lck)
             {
-                if (a[i] == null)
-                    continue;
+                if (__hsami.Contains(t)) return true;
+                __hsami.Add(t);
 
-                switch (a[i].MemberType)
+                MemberInfo[]? mia;
+                try { mia = t.GetMembers(CBindingFlags.All); } catch { mia = null; }
+                if (mia == null)
                 {
-                    case MemberTypes.Method:
-                        MethodInfo mi = a[i] as MethodInfo;
-                        if (mi.IsSpecialName && mi.IsHideBySig) continue;
-                        CalculateBindingFlags(mi, out bfi);
-                        pia = mi.GetParameters();
-                        break;
-                    case MemberTypes.Field:
-                        FieldInfo fi = a[i] as FieldInfo;
-                        if (fi.Name.EndsWith(">k__BackingField")) continue;
-                        CalculateBindingFlags(fi, out bfi);
-                        pia = null;
-                        break;
-                    case MemberTypes.Property:
-                        PropertyInfo pi = a[i] as PropertyInfo;
-                        CalculateBindingFlags(pi, out bfi);
-                        pia = null;
-                        break;
-                    case MemberTypes.Constructor:
-                        ConstructorInfo ci = a[i] as ConstructorInfo;
-                        CalculateBindingFlags(ci, out bfi);
-                        pia = ci.GetParameters();
-                        break;
-                    default:
-                        continue;
+                    __dt2mia[t] = null;
+                    return true;
                 }
 
-                AddToDictionaryIfNecessary(ref t, ref __d1, a[i].MetadataToken, ref a[i]);
-                AddToDictionaryIfNecessary(ref t, ref __d2, a[i].MemberType, a[i].MetadataToken);
+                String? shki;
+                ParameterInfo[]? pia;
+                BindingFlags bfi;
 
-                if (bfi.HasFlag(BindingFlags.Public))
-                    AddToDictionaryIfNecessary(ref t, ref __d3, BindingFlags.Public, a[i].MetadataToken);
-                if (bfi.HasFlag(BindingFlags.NonPublic))
-                    AddToDictionaryIfNecessary(ref t, ref __d3, BindingFlags.NonPublic, a[i].MetadataToken);
-                if (bfi.HasFlag(BindingFlags.Instance))
-                    AddToDictionaryIfNecessary(ref t, ref __d3, BindingFlags.Instance, a[i].MetadataToken);
-                if (bfi.HasFlag(BindingFlags.Static))
-                    AddToDictionaryIfNecessary(ref t, ref __d3, BindingFlags.Static, a[i].MetadataToken);
+                List<MemberInfo> lmi = new List<MemberInfo>(mia.Length);
 
-                AddToDictionaryIfNecessary(ref t, ref __d4, a[i].Name, a[i].MetadataToken);
+                Dictionary<String, MemberInfo> dmin2mi = new Dictionary<string, MemberInfo>(mia.Length);
+                Dictionary<BindingFlags, List<MemberInfo>?> debf2lmi = new Dictionary<BindingFlags, List<MemberInfo>?>(mia.Length);
+                Dictionary<MemberTypes, List<MemberInfo>?> demt2lmi = new Dictionary<MemberTypes, List<MemberInfo>?>(mia.Length);
+                Dictionary<String, List<MemberInfo>> dpihk2mia = new Dictionary<string, List<MemberInfo>>(mia.Length);
 
-                CalculateHashKey(ref pia, out shk);
-                AddToDictionaryIfNecessary(ref t, ref __d11, 0, a[i].MetadataToken);
-                AddToDictionaryIfNecessary(ref t, ref __d11, shk, a[i].MetadataToken);
+                __dt2min2mi[t] = new Dictionary<string, MemberInfo>();
+
+                String? spiahk;
+
+                for (int i = 0; i < mia.Length; i++)
+                {
+                    if (mia[i] == null) continue;
+                    lmi.Add(mia[i]);
+
+                    switch (mia[i].MemberType)
+                    {
+                        case MemberTypes.Method:
+                            MethodInfo mi = mia[i] as MethodInfo;
+                            if (mi.IsSpecialName && mi.IsHideBySig) continue;
+                            __CalculateBindingFlags(ref mi, out bfi);
+                            pia = mi.GetParameters();
+                            break;
+                        case MemberTypes.Field:
+                            FieldInfo fi = mia[i] as FieldInfo;
+                            if (fi.Name.EndsWith(">k__BackingField")) continue;
+                            __CalculateBindingFlags(ref fi, out bfi);
+                            pia = null;
+                            break;
+                        case MemberTypes.Property:
+                            PropertyInfo pi = mia[i] as PropertyInfo;
+                            __CalculateBindingFlags(ref pi, out bfi);
+                            pia = null;
+                            break;
+                        case MemberTypes.Constructor:
+                            ConstructorInfo ci = mia[i] as ConstructorInfo;
+                            __CalculateBindingFlags(ref ci, out bfi);
+                            pia = ci.GetParameters();
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    dmin2mi[mia[i].Name] = mia[i];
+
+                    __AddToDictionaryIfNecessary(ref demt2lmi, mia[i].MemberType, ref mia[i]);
+
+                    if (bfi.HasFlag(BindingFlags.Public))
+                        __AddToDictionaryIfNecessary(ref debf2lmi, BindingFlags.Public, ref mia[i]);
+                    if (bfi.HasFlag(BindingFlags.NonPublic))
+                        __AddToDictionaryIfNecessary(ref debf2lmi, BindingFlags.NonPublic, ref mia[i]);
+                    if (bfi.HasFlag(BindingFlags.Instance))
+                        __AddToDictionaryIfNecessary(ref debf2lmi, BindingFlags.Instance, ref mia[i]);
+                    if (bfi.HasFlag(BindingFlags.Static))
+                        __AddToDictionaryIfNecessary(ref debf2lmi, BindingFlags.Static, ref mia[i]);
+
+                    __GetHashKey(ref pia, out spiahk);
+                    __AddToDictionaryIfNecessary(ref dpihk2mia, String.Empty, ref mia[i]);
+                    if(spiahk != null) __AddToDictionaryIfNecessary(ref dpihk2mia, spiahk, ref mia[i]);
+                }
+
+                __dt2mia[t] = lmi.ToArray();
+
+                if (dmin2mi.Count > 0)
+                {
+                    Dictionary<String, MemberInfo>.Enumerator
+                        enm = dmin2mi.GetEnumerator();
+
+                    __dt2min2mi[t] = new Dictionary<string, MemberInfo>(dmin2mi.Count);
+
+                    while (enm.MoveNext())
+                        __dt2min2mi[t][enm.Current.Key] = enm.Current.Value;
+                }
+
+                if (demt2lmi.Count > 0)
+                {
+                    Dictionary<MemberTypes, List<MemberInfo>?>.Enumerator
+                        enm = demt2lmi.GetEnumerator();
+
+                    __dt2emt2mia[t] = new Dictionary<MemberTypes, MemberInfo[]?>(demt2lmi.Count);
+
+                    while (enm.MoveNext())
+                        __dt2emt2mia[t][enm.Current.Key] = enm.Current.Value.ToArray();
+                }
+
+                if (debf2lmi.Count > 0)
+                {
+                    Dictionary<BindingFlags, List<MemberInfo>?>.Enumerator
+                        enm = debf2lmi.GetEnumerator();
+
+                    __dt2ebf2mia[t] = new Dictionary<BindingFlags, MemberInfo[]?>(debf2lmi.Count);
+
+                    while (enm.MoveNext())
+                        __dt2ebf2mia[t][enm.Current.Key] = enm.Current.Value.ToArray();
+                }
+
+                if (dpihk2mia.Count > 0)
+                {
+                    Dictionary<String, List<MemberInfo>?>.Enumerator
+                        enm = dpihk2mia.GetEnumerator();
+
+                    __dt2pihk2mia[t] = new Dictionary<String, MemberInfo[]?>(dpihk2mia.Count);
+
+                    while (enm.MoveNext())
+                        __dt2pihk2mia[t][enm.Current.Key] = enm.Current.Value.ToArray();
+                }
+
+                return true;
             }
-
-            return true;
         }
 
         #endregion
 
         #region private static void FetchFromDictionaryIfPossible<...>(...)
 
-        private static Boolean FetchFromDictionaryIfPossible<V>
+        private static Boolean __FetchFromDictionaryIfPossible<V>
         (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>>> d,
-            ref MemberTypes k0,
-            ref BindingFlags k1,
-            ref string k2,
-            ref long k3,
+            ref Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<String, V?>?>?>?>?> d,
+            ref Type? k0,
+            ref MemberTypes k1,
+            ref BindingFlags k2,
+            ref string k3,
+            ref string k4,
             out V? v
         )
         {
-            Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V>>>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null) { v = default; return false; }
+            Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, V?>?>?>?>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null) { v = default; return false; }
 
-            Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V>>>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null) { v = default; return false; }
+            Dictionary<BindingFlags, Dictionary<string, Dictionary<String, V?>?>?>? d1;
+            if (!d0.TryGetValue(k1, out d1) || d1 == null) { v = default; return false; }
 
-            Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V>>>? d2;
-            if (!d1.TryGetValue(k0, out d2) || d2 == null) { v = default; return false; }
+            Dictionary<string, Dictionary<string, V?>?>? d2;
+            if (!d1.TryGetValue(k2, out d2) || d2 == null) { v = default; return false; }
 
-            Dictionary<string, Dictionary<long, V>>? d3;
-            if (!d2.TryGetValue(k1, out d3) || d3 == null) { v = default; return false; }
+            Dictionary<String, V?>? d3;
+            if (!d2.TryGetValue(k3, out d3) || d3 == null) { v = default; return false; }
 
-            Dictionary<long, V>? d4;
-            if (!d3.TryGetValue(k2, out d4) || d4 == null) { v = default; return false; }
-
-            return d4.TryGetValue(k3, out v);
+            return d3.TryGetValue(k4, out v);
         }
 
-        private static void FetchFromDictionaryIfPossible<K>
+        private static bool __FetchFromDictionaryIfPossible<K1>
         (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<K, HashSet<int>>>> d,
-            K k,
-            out HashSet<int>? hs
-        )
-        {
-            Dictionary<int, Dictionary<K, HashSet<int>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null) { hs = null; return; }
-            Dictionary<K, HashSet<int>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null) { hs = null; return; }
-            d1.TryGetValue(k, out hs);
-        }
-
-        private static void FetchFromDictionaryIfPossible
-        (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<int, MemberInfo>>> d,
-            int k,
+            ref Dictionary<Type, Dictionary<K1, MemberInfo>?> d,
+            ref Type k0,
+            K1 k1,
             out MemberInfo? v
         )
         {
-            Dictionary<int, Dictionary<int, MemberInfo>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null) { v = null; return; }
-            Dictionary<int, MemberInfo>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null) { v = null; return; }
-            d1.TryGetValue(k, out v);
+            Dictionary<K1, MemberInfo>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null) { v = default; return false; }
+            return d0.TryGetValue(k1, out v);
         }
 
-        private static bool FetchFromDictionaryIfPossible
+        private static bool __FetchFromDictionaryIfPossible<K1>
         (
-            ref Type t,
-            ref MemberInfo m,
-            ref Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>> d,
-            ref bool k,
+            ref Dictionary<Type, Dictionary<K1, MemberInfo[]?>?> d,
+            ref Type k0,
+            K1 k1,
+            out MemberInfo[]? v
+        )
+        {
+            Dictionary<K1, MemberInfo[]?>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null) { v = default; return false; }
+            return d0.TryGetValue(k1, out v);
+        }
+
+        private static bool __FetchFromDictionaryIfPossible
+        (
+            ref Dictionary<Type, Dictionary<MemberInfo, Dictionary<Boolean, Attribute[]?>?>?> d,
+            ref Type k0,
+            ref MemberInfo k1,
+            ref bool k2,
             out Attribute[]? v
         )
         {
-            Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null) { v = default; return false; }
+            Dictionary<MemberInfo, Dictionary<bool, Attribute[]?>?>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null) { v = default; return false; }
 
-            Dictionary<int, Dictionary<bool, Attribute[]>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null) { v = default; return false; }
+            Dictionary<bool, Attribute[]?>? d1;
+            if (!d0.TryGetValue(k1, out d1) || d1 == null) { v = default; return false; }
 
-            Dictionary<bool, Attribute[]>? d2;
-            if (!d1.TryGetValue(m.MetadataToken, out d2) || d2 == null) { v = default; return false; }
-
-            return d2.TryGetValue(k, out v);
+            return d1.TryGetValue(k2, out v);
         }
 
         #endregion
 
-        #region private static void AddToDictionaryIfNecessary<...>(...)
+        #region private static void __AddToDictionaryIfNecessary<...>(...)
 
-        private static void AddToDictionaryIfNecessary<V>
+        private static void __AddToDictionaryIfNecessary<V>
         (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>>> d,
-            ref MemberTypes k0,
-            ref BindingFlags k1,
-            ref string k2,
-            ref long k3,
+            ref Dictionary<Type, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<String, V?>?>?>?>?>? d,
+            ref Type? k0,
+            ref MemberTypes k1,
+            ref BindingFlags k2,
+            ref string k3,
+            ref string k4,
             ref V? v
         )
         {
-            Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null)
-                d[t.Module.MetadataToken] = d0 = new Dictionary<int, Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>>();
+            Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<String, V?>?>?>?>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null)
+                d[k0] = d0 = new Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<string, V?>?>?>?>();
 
-            Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null)
-                d0[t.MetadataToken] = d1 = new Dictionary<MemberTypes, Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>>();
+            Dictionary<BindingFlags, Dictionary<string, Dictionary<String, V?>?>?>? d1;
+            if (!d0.TryGetValue(k1, out d1) || d1 == null)
+                d0[k1] = d1 = new Dictionary<BindingFlags, Dictionary<string, Dictionary<string, V?>?>?>();
 
-            Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>? d2;
-            if (!d1.TryGetValue(k0, out d2) || d2 == null)
-                d1[k0] = d2 = new Dictionary<BindingFlags, Dictionary<string, Dictionary<long, V?>>>();
+            Dictionary<string, Dictionary<String, V?>?>? d2;
+            if (!d1.TryGetValue(k2, out d2) || d2 == null)
+                d1[k2] = d2 = new Dictionary<string, Dictionary<string, V?>?>();
 
-            Dictionary<string, Dictionary<long, V?>>? d3;
-            if (!d2.TryGetValue(k1, out d3) || d3 == null)
-                d2[k1] = d3 = new Dictionary<string, Dictionary<long, V?>>();
-
-            Dictionary<long, V?>? d4;
-            if (!d3.TryGetValue(k2, out d4) || d4 == null)
-                d3[k2] = d4 = new Dictionary<long, V?>();
+            Dictionary<String, V?>? d3;
+            if (!d2.TryGetValue(k3, out d3) || d3 == null)
+                d2[k3] = d3 = new Dictionary<string, V?>();
 
             V? v0;
-            if (!d4.TryGetValue(k3, out v0))
-                d4[k3] = v;
+            if (!d3.TryGetValue(k4, out v0))
+                d3[k4] = v;
         }
 
-        private static void AddToDictionaryIfNecessary
+        private static void __AddToDictionaryIfNecessary<T>
         (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<int, MemberInfo>>> d,
-            int k,
+            ref Dictionary<T, List<MemberInfo>?> d,
+            T k,
             ref MemberInfo v
         )
         {
-            Dictionary<int, Dictionary<int, MemberInfo>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null)
-                d[t.Module.MetadataToken] = d0 = new Dictionary<int, Dictionary<int, MemberInfo>>();
-
-            Dictionary<int, MemberInfo>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null)
-                d0[t.MetadataToken] = d1 = new Dictionary<int, MemberInfo>();
-
-            MemberInfo? v0;
-            if (!d1.TryGetValue(k, out v0))
-                d1[k] = v;
+            List<MemberInfo>? l;
+            if (!d.TryGetValue(k, out l) || l == null) d[k] = l = new List<MemberInfo>();
+            l.Add(v);
         }
 
-        private static void AddToDictionaryIfNecessary<K>
+        private static void __AddToDictionaryIfNecessary
         (
-            ref Type t,
-            ref Dictionary<int, Dictionary<int, Dictionary<K, HashSet<int>>>> d,
-            K k,
-            int v
-        )
-            where K : notnull
-        {
-            Dictionary<int, Dictionary<K, HashSet<int>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null)
-                d[t.Module.MetadataToken] = d0 = new Dictionary<int, Dictionary<K, HashSet<int>>>();
-
-            Dictionary<K, HashSet<int>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null)
-                d0[t.MetadataToken] = d1 = new Dictionary<K, HashSet<int>>();
-
-            HashSet<int>? hs;
-            if (!d1.TryGetValue(k, out hs) || hs == null)
-                d1[k] = hs = new HashSet<int>();
-
-            hs.Add(v);
-        }
-
-        private static void AddToDictionaryIfNecessary
-        (
-           ref Type t,
-           ref MemberInfo m,
-           ref Dictionary<int, Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>> d,
-           ref bool k,
-           ref Attribute[]? v
+            ref Dictionary<Type, Dictionary<MemberInfo, Dictionary<Boolean, Attribute[]?>?>?> d,
+            ref Type k0,
+            ref MemberInfo k1,
+            ref bool k2,
+            ref Attribute[]? v
         )
         {
-            Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>? d0;
-            if (!d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null)
-                d[t.Module.MetadataToken] = d0 = new Dictionary<int, Dictionary<int, Dictionary<bool, Attribute[]?>>>();
+            Dictionary<MemberInfo, Dictionary<bool, Attribute[]?>?>? d0;
+            if (!d.TryGetValue(k0, out d0) || d0 == null)
+                d[k0] = d0 = new Dictionary<MemberInfo, Dictionary<bool, Attribute[]?>?>();
 
-            Dictionary<int, Dictionary<bool, Attribute[]?>>? d1;
-            if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null)
-                d0[t.MetadataToken] = d1 = new Dictionary<int, Dictionary<bool, Attribute[]?>>();
-
-            Dictionary<bool, Attribute[]?>? d2;
-            if (!d1.TryGetValue(m.MetadataToken, out d2) || d2 == null)
-                d1[m.MetadataToken] = d2 = new Dictionary<bool, Attribute[]?>();
+            Dictionary<bool, Attribute[]?>? d1;
+            if (!d0.TryGetValue(k1, out d1) || d1 == null)
+                d0[k1] = d1 = new Dictionary<bool, Attribute[]?>();
 
             Attribute[]? v0;
-            if (!d2.TryGetValue(k, out v0))
-                d2[k] = v;
+            if (!d1.TryGetValue(k2, out v0))
+                d1[k2] = v;
         }
 
         #endregion
 
-        #region private static void CalculateBindingFlags(...)
+        #region private static void __CalculateBindingFlags(...)
 
-        private static void CalculateBindingFlags(MethodInfo mi, out BindingFlags bf)
+        private static void __CalculateBindingFlags(MethodInfo mi, out BindingFlags bf) { __CalculateBindingFlags(ref mi, out bf); }
+        private static void __CalculateBindingFlags(ref MethodInfo mi, out BindingFlags bf)
         {
             bf =
                 BindingFlags.Default;
@@ -1418,7 +1417,7 @@ namespace Kudos.Reflection.Utils
                     : BindingFlags.Instance;
         }
 
-        private static void CalculateBindingFlags(FieldInfo fi, out BindingFlags bf)
+        private static void __CalculateBindingFlags(ref FieldInfo fi, out BindingFlags bf)
         {
             bf =
                 BindingFlags.Default;
@@ -1437,7 +1436,7 @@ namespace Kudos.Reflection.Utils
                     : BindingFlags.Instance;
         }
 
-        private static void CalculateBindingFlags(ConstructorInfo ci, out BindingFlags bf)
+        private static void __CalculateBindingFlags(ref ConstructorInfo ci, out BindingFlags bf)
         {
             bf =
                 BindingFlags.Default;
@@ -1456,14 +1455,14 @@ namespace Kudos.Reflection.Utils
                     : BindingFlags.Instance;
         }
 
-        private static void CalculateBindingFlags(PropertyInfo pi, out BindingFlags bf)
+        private static void __CalculateBindingFlags(ref PropertyInfo pi, out BindingFlags bf)
         {
             BindingFlags bfSet;
-            if (pi.SetMethod != null) CalculateBindingFlags(pi.SetMethod, out bfSet);
+            if (pi.SetMethod != null) __CalculateBindingFlags(pi.SetMethod, out bfSet);
             else bfSet = BindingFlags.Default;
 
             BindingFlags bfGet;
-            if (pi.GetMethod != null) CalculateBindingFlags(pi.GetMethod, out bfGet);
+            if (pi.GetMethod != null) __CalculateBindingFlags(pi.GetMethod, out bfGet);
             else bfGet = BindingFlags.Default;
 
             bf = BindingFlags.Default;
@@ -1616,6 +1615,96 @@ namespace Kudos.Reflection.Utils
                     return;
                 }
             }
+        }
+
+        #endregion
+
+        #region private static void __GetTypes(...)
+
+        private static void __GetTypes
+        (
+           ref ParameterInfo[]? pia,
+           out Type[]? ta
+        )
+        {
+            if(pia == null)
+            {
+                ta = null;
+                return;
+            }
+
+            ta = new Type[pia.Length];
+
+            for (int j = 0; j < pia.Length; j++)
+                ta[j] = pia[j].ParameterType;
+        }
+
+        #endregion
+
+        #region private static void __GetHashKey(...)
+
+        private static void __GetHashKey(ref Type? t, out String? shk)
+        {
+            MemberInfo? mi = t as MemberInfo;
+            __GetHashKey(ref mi, out shk);
+        }
+        private static void __GetHashKey(ref MemberInfo? mi, out String? shk)
+        {
+            if (mi == null) { shk = null; return; }
+
+            lock (__sbmi2hk)
+            {
+                if (__dmi2hk.TryGetValue(mi, out shk))
+                    return;
+
+                __sbmi2hk
+                    .Clear();
+
+                if (mi.DeclaringType != null)
+                    __sbmi2hk.Append(__sdtfn).Append(CCharacter.DoubleDot).Append(mi.DeclaringType.FullName).Append(CCharacter.Pipe);
+
+                __sbmi2hk.Append(__smin).Append(CCharacter.DoubleDot).Append(mi.Name);
+
+                shk = __dmi2hk[mi] = __sbmi2hk.ToString();
+            }
+        }
+
+        private static void __GetHashKey
+        (
+           ref ParameterInfo[]? pia,
+           out String? s
+        )
+        {
+            Type[]? ta;
+            __GetTypes(ref pia, out ta);
+            __GetHashKey(ref ta, out s);
+        }
+
+        private static void __GetHashKey
+        (
+            ref Type[]? ta,
+            out String? s
+        )
+        {
+            if(ta == null)
+            {
+                s = null;
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            String? si;
+            for (int i=0; i<ta.Length; i++)
+            {
+                __GetHashKey(ref ta[i], out si);
+                if (si != null) sb.Append(si).Append(CCharacter.Pipe);
+            }
+
+            if (sb.Length > 1)
+                sb.Remove(sb.Length - 1, 1);
+
+            s = sb.ToString();
         }
 
         #endregion

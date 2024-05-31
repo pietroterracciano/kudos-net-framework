@@ -22,13 +22,13 @@ namespace Kudos.Validations.EpikyrosiModule
 	{
         #region ... static ...
 
-        // Type.Module.MetadataToken -> Type.MetadataToken -> PoolName -> EpikyrosiBuilt
-        private static readonly Dictionary<int, Dictionary<int, Dictionary<String, EpikyrosiBuilt?>>>
+        // Type -> PoolName -> EpikyrosiBuilt
+        private static readonly Dictionary<Type, Dictionary<String, EpikyrosiBuilt?>>
             __d;
 
         static Epikyrosi()
         {
-            __d = new Dictionary<int, Dictionary<int, Dictionary<string, EpikyrosiBuilt?>>>();
+            __d = new Dictionary<Type, Dictionary<string, EpikyrosiBuilt?>>();
         }
 
         #endregion
@@ -83,13 +83,9 @@ namespace Kudos.Validations.EpikyrosiModule
 
             lock(__d)
             {
-                Dictionary<int, Dictionary<String, EpikyrosiBuilt?>>? d0;
-                if (!__d.TryGetValue(t.Module.MetadataToken, out d0) || d0 == null)
-                    __d[t.Module.MetadataToken] = d0 = new Dictionary<int, Dictionary<String, EpikyrosiBuilt?>>();
-
-                Dictionary<String, EpikyrosiBuilt?>? d1;
-                if (!d0.TryGetValue(t.MetadataToken, out d1) || d1 == null)
-                    d0[t.MetadataToken] = d1 = new Dictionary<string, EpikyrosiBuilt?>();
+                Dictionary<String, EpikyrosiBuilt?>? d0;
+                if (!__d.TryGetValue(t, out d0) || d0 == null)
+                    __d[t] = d0 = new Dictionary<string, EpikyrosiBuilt?>();
 
                 #region Normalizzo sPoolName
 
@@ -99,9 +95,9 @@ namespace Kudos.Validations.EpikyrosiModule
 
                 EpikyrosiBuilt? eb;
 
-                d1:
+                d0:
 
-                if (d1.TryGetValue(sPoolName, out eb))
+                if (d0.TryGetValue(sPoolName, out eb))
                     return
                         eb != null
                             ? eb.Validate(o, bStopOnFirstNotValid)
@@ -117,15 +113,15 @@ namespace Kudos.Validations.EpikyrosiModule
 
                 if (mia == null)
                 {
-                    d1[sPoolName] = null;
-                    goto d1;
+                    d0[sPoolName] = null;
+                    goto d0;
                 }
 
-                Dictionary<String, Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>> d2;
+                Dictionary<String, Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>> d1;
 
-                #region Genero il Dictionary d2 di supporto che servirà per creare gli EpiroskyBuilt (se possibile)
+                #region Genero il Dictionary d1 di supporto che servirà per creare gli EpiroskyBuilt (se possibile)
 
-                d2 = new Dictionary<String, Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>>();
+                d1 = new Dictionary<String, Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>>();
 
                 AEpikyrosiRuleAttribute[]? eraa;
                 EpikyrosiEntity eei;
@@ -153,8 +149,8 @@ namespace Kudos.Validations.EpikyrosiModule
                         {
                             Normalize(ref pnaj[k], out pnk);
 
-                            if (!d2.TryGetValue(pnk, out dj) || dj == null)
-                                d2[pnk] = dj = new Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>();
+                            if (!d1.TryGetValue(pnk, out dj) || dj == null)
+                                d1[pnk] = dj = new Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>();
 
                             if (!dj.TryGetValue(eei, out lj) || lj == null)
                                 dj[eei] = lj = new List<AEpikyrosiRule>();
@@ -167,10 +163,10 @@ namespace Kudos.Validations.EpikyrosiModule
 
                 #endregion
 
-                #region Genero gli EpikyrosiBuilt a partire dal Dictionary d2 di supporto creato in precedenza
+                #region Genero gli EpikyrosiBuilt a partire dal Dictionary d1 di supporto creato in precedenza
 
                 Dictionary<String, Dictionary<EpikyrosiEntity, List<AEpikyrosiRule>>>.Enumerator
-                    enmi = d2.GetEnumerator();
+                    enmi = d1.GetEnumerator();
 
                 EpikyrosiBuilder ebi;
 
@@ -195,15 +191,15 @@ namespace Kudos.Validations.EpikyrosiModule
                         }
                     }
 
-                    d1[enmi.Current.Key] = ebi.Build();
+                    d0[enmi.Current.Key] = ebi.Build();
                 }
 
-                if (!d1.TryGetValue(sPoolName, out eb))
-                    d1[sPoolName] = null;
+                if (!d0.TryGetValue(sPoolName, out eb))
+                    d0[sPoolName] = null;
 
                 #endregion
 
-                goto d1;
+                goto d0;
             }
         }
 

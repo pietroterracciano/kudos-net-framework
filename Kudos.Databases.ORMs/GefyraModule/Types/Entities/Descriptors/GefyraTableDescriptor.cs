@@ -34,8 +34,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
         private static readonly StringBuilder
             __sb;
-        // Type.Module.MetadataToken -> Type.MetadataToken -> IGefyraTableDescriptor
-        private static readonly Dictionary<int, Dictionary<int, GefyraTableDescriptor>>
+        // Type -> IGefyraTableDescriptor
+        private static readonly Dictionary<Type, GefyraTableDescriptor>
             __d;
         // TableDescriptorHashKey -> IGefyraTableDescriptor
         private static readonly Metas
@@ -51,7 +51,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
             __ssnPrefix = "sn";
             __snPrefix = "n";
 
-            __d = new Dictionary<int, Dictionary<int, GefyraTableDescriptor>>();
+            __d = new Dictionary<Type, GefyraTableDescriptor>();
             __sb = new StringBuilder();
             __m = new Metas(StringComparison.OrdinalIgnoreCase);
 
@@ -80,10 +80,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
             lock (__d)
             {
-                Dictionary<int, GefyraTableDescriptor>? d;
-                if (!__d.TryGetValue(t.Module.MetadataToken, out d) || d == null)
-                    __d[t.Module.MetadataToken] = d = new Dictionary<int, GefyraTableDescriptor>();
-                else if (d.TryGetValue(t.MetadataToken, out gtd))
+                if (__d.TryGetValue(t, out gtd) && gtd != null)
                     return;
 
                 GefyraTableAttribute?
@@ -115,7 +112,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
                 #endregion
 
                 Request(ref t, ref ssn, ref sn, out gtd);
-                d[t.MetadataToken] = gtd;
+                __d[t] = gtd;
             }
 
             //#region Aggiungo alla Cache anche il TableDescriptor base 
@@ -268,8 +265,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
         #endregion
 
-        // Type.Module.MetadataToken -> Type.MetadataToken -> IGefyraColumnDescriptor
-        private readonly Dictionary<int, Dictionary<int, GefyraColumnDescriptor>>
+        // MemberInfo -> IGefyraColumnDescriptor
+        private readonly Dictionary<MemberInfo, GefyraColumnDescriptor>
             _d;
         // ColumnDescriptorHashKey -> IGefyraColumnDescriptor
         private readonly Metas
@@ -280,7 +277,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
         private GefyraTableDescriptor(ref String shk, ref Type dt, ref String? ssn, ref String sn) : base(ref shk, ref sn)
         {
             _this = this;
-            _d = new Dictionary<int, Dictionary<int, GefyraColumnDescriptor>>();
+            _d = new Dictionary<MemberInfo, GefyraColumnDescriptor>();
             _m = new Metas(StringComparison.OrdinalIgnoreCase);
 
             HasDeclaringType = (DeclaringType = dt) != null;
@@ -347,10 +344,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
             lock (_d)
             {
-                Dictionary<int, GefyraColumnDescriptor>? d;
-                if (!_d.TryGetValue(mi.Module.MetadataToken, out d) || d == null)
-                    _d[mi.Module.MetadataToken] = d = new Dictionary<int, GefyraColumnDescriptor>();
-                else if (d.TryGetValue(mi.MetadataToken, out gcd))
+                if (_d.TryGetValue(mi, out gcd) && gcd != null)
                     return;
 
                 GefyraColumnAttribute?
@@ -391,7 +385,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
                 #region Aggiungo il ColumnDescriptor al dictionary d di cache
 
-                d[mi.MetadataToken] = gcd;
+                _d[mi] = gcd;
 
                 #endregion
             }

@@ -21,16 +21,13 @@ namespace Kudos.Validations.EpikyrosiModule.Entities
         internal static readonly EpikyrosiEntity
             Invalid;
 
-        private static readonly StringBuilder
-            __sb;
-        // Type.Module.MetadataToken -> Type.MetadataToken -> EpikyrosiEntity
-        private static readonly Dictionary<int, Dictionary<int, EpikyrosiEntity>>
+        // Type -> EpikyrosiEntity
+        private static readonly Dictionary<MemberInfo, EpikyrosiEntity>
             __d;
 
         static EpikyrosiEntity()
         {
-            __d = new Dictionary<int, Dictionary<int, EpikyrosiEntity>>();
-            __sb = new StringBuilder();
+            __d = new Dictionary<MemberInfo, EpikyrosiEntity>();
         }
 
         #region internal static void Get<...>(...)
@@ -61,14 +58,11 @@ namespace Kudos.Validations.EpikyrosiModule.Entities
 
             lock (__d)
             {
-                Dictionary<int, EpikyrosiEntity>? d;
-                if (!__d.TryGetValue(mi.Module.MetadataToken, out d) || d == null)
-                    __d[mi.Module.MetadataToken] = d = new Dictionary<int, EpikyrosiEntity>();
-                else if (d.TryGetValue(mi.MetadataToken, out ee))
+                if (__d.TryGetValue(mi, out ee) && ee != null)
                     return;
 
                 ee = new EpikyrosiEntity(ref mi);
-                d[mi.MetadataToken] = ee;
+                __d[mi] = ee;
             }
         }
 

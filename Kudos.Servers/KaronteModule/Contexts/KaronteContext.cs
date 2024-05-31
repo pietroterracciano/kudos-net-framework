@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Kudos.Utils;
 using Kudos.Reflection.Utils;
+using System.Threading.Tasks;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
@@ -122,6 +123,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             }
         }
 
+        public Task<ControllerType> RequestControllerAsync<ControllerType>() { return Task.Run(() => RequestController<ControllerType>()); }
         public ControllerType RequestController<ControllerType>()
         {
             Type

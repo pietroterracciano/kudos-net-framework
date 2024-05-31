@@ -39,7 +39,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
                 kc.HttpContext.Response.StatusCode = CKaronteHttpStatusCode.MethodNotAllowed;
             }
 
-            return new KaronteRoutingContext(ref kc, ref end, ref ekr);
+            return kc.RoutingContext = new KaronteRoutingContext(ref kc, ref end, ref ekr);
         }
 
         protected override async Task OnBounceEnd(KaronteContext kc) { }
