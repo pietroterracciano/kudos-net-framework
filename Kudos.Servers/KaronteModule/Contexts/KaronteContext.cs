@@ -20,6 +20,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         public KaronteResponsingContext? ResponsingContext { get; internal set; }
         public KaronteRoutingContext? RoutingContext { get; internal set; }
         public KaronteDatabasingContext? DatabasingContext { get; internal set; }
+        public KaronteCapabilitingContext? CapabilitingContext { get; internal set; }
         public KaronteAuthorizatingContext? AuthorizatingContext { get; internal set; }
         public KaronteAuthenticatingContext? AuthenticatingContext { get; internal set; }
         public KaronteJSONingContext? JSONingContext { get; internal set; }

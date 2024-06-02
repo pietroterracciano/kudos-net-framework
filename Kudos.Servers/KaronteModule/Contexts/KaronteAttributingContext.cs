@@ -15,6 +15,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         }
 
         public T? GetAttribute<T>()
+            where T : Attribute
         {
             return
                 HasAttribute
@@ -23,6 +24,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         }
 
         public T? RequestAttribute<T>()
+            where T : Attribute
         {
             T? t = GetAttribute<T>();
             if (t == null) throw new InvalidOperationException();

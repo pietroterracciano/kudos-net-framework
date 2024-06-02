@@ -26,5 +26,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
             kc.RequestObject<KaronteHeadingContext>(CKaronteKey.Heading, out khc);
             return khc;
         }
+
+        protected override async Task OnBounceEnd(KaronteContext kc) { }
     }
 }

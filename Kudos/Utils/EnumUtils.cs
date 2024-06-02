@@ -119,7 +119,7 @@ namespace Kudos.Utils
 
         //#endregion
 
-        #region public static Boolean IsDefined(...)
+        #region public static Boolean IsValid(...)
 
         public static Boolean IsValid<T>(Object? e) where T : Enum { return e != null && IsValid(typeof(T), e); }
         public static Boolean IsValid(Enum? e, Object? o) { return e != null && IsValid(e.GetType(), o); }
@@ -140,9 +140,7 @@ namespace Kudos.Utils
 
         public static String? GetKey(Enum? e)
         {
-            String? s = StringUtils.Parse(e);
-            Int32? i = Int32Utils.Parse(s);
-            return i == null ? s : null;
+            return StringUtils.Parse(e);
         }
 
         #endregion
@@ -211,6 +209,16 @@ namespace Kudos.Utils
 
         #region private ...
 
+        #region private static void __IsValid(...)
+
+        private static void __IsValid(ref Enum? e, out Boolean b)
+        {
+            String? s = GetKey(e);
+            b = Int32Utils.Parse(s) == null;
+        }
+
+        #endregion
+
         #region private static void ToObject(...)
 
         private static void __ToObject(ref Type? t, ref Object? oIn, out Enum? e)
@@ -219,8 +227,9 @@ namespace Kudos.Utils
             try
             {
                 e = Enum.ToObject(t, oIn) as Enum;
-                String? s = GetKey(e);
-                if (s == null) e = null;
+                Boolean b;
+                __IsValid(ref e, out b);
+                if (!b) e = null;
             }
             catch
             {
@@ -241,8 +250,9 @@ namespace Kudos.Utils
                 Object? o;
                 Enum.TryParse(t, s, bIgnoreCase, out o);
                 e = o as Enum;
-                String? s0 = GetKey(e);
-                if (s0 == null) e = null;
+                Boolean b;
+                __IsValid(ref e, out b);
+                if (!b) e = null;
             }
             catch
             {

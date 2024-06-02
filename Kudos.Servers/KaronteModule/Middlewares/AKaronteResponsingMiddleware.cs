@@ -35,12 +35,9 @@ namespace Kudos.Servers.KaronteModule.Middlewares
             NonActionResultType?
                 nar = ObjectUtils.Cast<NonActionResultType>(kc.ResponsingContext.NonActionResult);
 
-            HttpStatusCode?
-                httpsc =
+            Int32?
+                ihttpsc =
                     OnNonActionResultTransformationToHttpResponseStatusCode(nar);
-
-            Int32? 
-                ihttpsc = EnumUtils.GetValue(httpsc);
 
             if (ihttpsc != null)
                 kc.HttpContext.Response.StatusCode = ihttpsc.Value;
@@ -70,7 +67,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         //protected abstract NonActionResultType? OnNonActionResultCreation();
 
-        protected abstract HttpStatusCode? OnNonActionResultTransformationToHttpResponseStatusCode(NonActionResultType? nar);
+        protected abstract Int32? OnNonActionResultTransformationToHttpResponseStatusCode(NonActionResultType? nar);
 
         protected abstract Object? OnNonActionResultTransformationToActionResult(NonActionResultType? nar);
     }

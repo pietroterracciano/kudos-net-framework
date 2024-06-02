@@ -14,12 +14,10 @@ using static Google.Protobuf.Reflection.FeatureSet.Types;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {
-    public abstract class AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType, EnumType>
+    public abstract class AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType>
         : AContexizedKaronteMiddleware<KaronteAuthenticatingContext>
     where
-        AttributeType : AKaronteEnumizedAttribute<EnumType>
-    where
-        EnumType : Enum
+        AttributeType : Attribute
     {
         public AKaronteAuthenticatingMiddleware(ref RequestDelegate rd) : base(ref rd) {}
 
@@ -27,24 +25,8 @@ namespace Kudos.Servers.KaronteModule.Middlewares
         {
             KaronteAttributingContext kac;
             kc.RequestObject<KaronteAttributingContext>(CKaronteKey.Attributing, out kac);
-
-            AttributeType?
-                at = kac.GetAttribute<AttributeType>();
-
-            KaronteAuthenticationDescriptor?
-                kad = at != null
-                    ? new KaronteAuthenticationDescriptor(at.Enum)
-                    : null;
-
-            Object?
-                ad = kad != null
-                    ? await OnAuthenticationDataFetch(kc, kad)
-                    : null;
-
-            return kc.AuthenticatingContext = new KaronteAuthenticatingContext(ref kad, ref ad, ref kc);
+            return kc.AuthenticatingContext = new KaronteAuthenticatingContext(ref kac, ref kc);
         }
-
-        protected abstract Task<AuthenticationDataType?> OnAuthenticationDataFetch(KaronteContext kc, KaronteAuthenticationDescriptor kad);
 
         protected override async Task OnBounceEnd(KaronteContext kc) { }
     }

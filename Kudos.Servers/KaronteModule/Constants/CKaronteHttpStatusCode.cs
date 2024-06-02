@@ -12,6 +12,12 @@ namespace Kudos.Servers.KaronteModule.Constants
             InternalServerError = EnumUtils.GetValue(HttpStatusCode.InternalServerError).Value,
             ServiceUnavailable = EnumUtils.GetValue(HttpStatusCode.ServiceUnavailable).Value,
             BadRequest = EnumUtils.GetValue(HttpStatusCode.BadRequest).Value,
-            MethodNotAllowed = EnumUtils.GetValue(HttpStatusCode.MethodNotAllowed).Value;
+            MethodNotAllowed = EnumUtils.GetValue(HttpStatusCode.MethodNotAllowed).Value,
+            NotImplemented = EnumUtils.GetValue(HttpStatusCode.NotImplemented).Value,
+            Unauthorized = EnumUtils.GetValue(HttpStatusCode.Unauthorized).Value,
+            UnprocessableContent = EnumUtils.GetValue(HttpStatusCode.UnprocessableContent).Value,
+            UnprocessableEntity = EnumUtils.GetValue(HttpStatusCode.UnprocessableEntity).Value,
+
+            Expired = 600;
     }
 }

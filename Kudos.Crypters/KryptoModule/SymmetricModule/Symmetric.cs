@@ -13,6 +13,7 @@ using Kudos.Crypters.KryptoModule.SymmetricModule.Utils;
 using Kudos.Utils.Numerics;
 using Kudos.Enums;
 using Kudos.Crypters.KryptoModule.Enums;
+using System.Text.Json;
 
 namespace Kudos.Crypters.KryptoModule.SymmetricModule
 {
@@ -112,14 +113,12 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
         private readonly Int32 _iKeySizeInBytes;
         private Int32 _iIVSizeInBytes;//, BlockSizeInBytes;
         private readonly SymmetricAlgorithm? _sa;
-        private readonly EInternalSerialization? _eis;
+        //private readonly JsonSerializerOptions? _jsonso;
 
         internal Symmetric(ref SymmetricDescriptor sd) : base(ref sd)
         {
             _iIVSizeInBytes = 16;
-
-            if (sd.InternalSerialization == null) return;
-            _eis = sd.InternalSerialization;
+            //jsonso = sd.JsonSerializerOptions;
 
             if (sd.KeySize == null) return;
             ESymmetricKeySize eKeySize = sd.KeySize.Value;
@@ -194,14 +193,14 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
             }
         }
 
-        public String? Encrypt(Object? o)
+        public String? Encrypt(Object? o, JsonSerializerOptions? jsonso = null)
         {
             if (_sa == null)
                 return null;
 
             String?
-                s = _eis == EInternalSerialization.JSON
-                    ? JSONUtils.Serialize(o)
+                s = jsonso != null
+                    ? JSONUtils.Serialize(o, jsonso)
                     : ObjectUtils.Parse<String>(o);
 
             Byte[]? baIn;
@@ -240,7 +239,7 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
             return s;
         }
 
-        public T? Decrypt<T>(String? s)
+        public T? Decrypt<T>(String? s, JsonSerializerOptions? jsonso = null)
         {
             if (_sa == null)
                 return default(T);
@@ -281,8 +280,8 @@ namespace Kudos.Crypters.KryptoModule.SymmetricModule
             _ParseToString(ref baIn, out s);
 
             return
-                _eis == EInternalSerialization.JSON
-                    ? JSONUtils.Deserialize<T>(s)
+                jsonso != null
+                    ? JSONUtils.Deserialize<T>(s, jsonso)
                     : ObjectUtils.Parse<T>(s);
         }
 

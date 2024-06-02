@@ -48,24 +48,28 @@ namespace Kudos.Servers.KaronteModule.Controllers
             //KaronteContext.RoutingContext = new KaronteRoutingContext(ref kc, ref end, ref ekr);
         }
 
+        //[KaronteNonAction]
         [NonAction]
         public override string? ToString()
         {
             return base.ToString();
         }
 
+        //[KaronteNonAction]
         [NonAction]
         public override bool Equals(object? obj)
         {
             return base.Equals(obj);
         }
 
+        //[KaronteNonAction]
         [NonAction]
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 
+        //[KaronteNonAction]
         [NonAction]
         public new Type GetType()
         {

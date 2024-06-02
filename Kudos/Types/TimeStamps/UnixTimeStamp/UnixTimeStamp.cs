@@ -19,7 +19,7 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
             __dSecondsMultiplier = 1000.0d;
         }
 
-        private ulong _i;
+        private long _i;
 
         public ETimeStampKind Kind
         {
@@ -31,11 +31,14 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
         public UnixTimeStamp(DateTime dt)
         {
             if (dt.Kind == DateTimeKind.Unspecified) dt = dt.ToUniversalTime();
-            _i = UInt64Utils.NNParse((dt - DateTimeUtils.GetOrigin(dt.Kind)).TotalMilliseconds);
+            _i = Int64Utils.NNParse((dt - DateTimeUtils.GetOrigin(dt.Kind)).TotalMilliseconds);
             Kind = TimeStampKindUtils.Parse(dt.Kind);
         }
 
-        public UnixTimeStamp(ulong i, ETimeStampKind eKind = ETimeStampKind.Universal)
+        public UnixTimeStamp(uint i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
+        public UnixTimeStamp(int i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
+        public UnixTimeStamp(ulong i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
+        public UnixTimeStamp(long i, ETimeStampKind eKind = ETimeStampKind.Universal)
         {
             _i = i;
             Kind = eKind;
@@ -43,14 +46,14 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
 
         #region To()
 
-        public ulong ToMilliSeconds()
+        public long ToMilliSeconds()
         {
             return _i;
         }
 
-        public uint ToSeconds()
+        public int ToSeconds()
         {
-            return UInt32Utils.NNParse(Math.Round(_i / __dSecondsMultiplier));
+            return Int32Utils.NNParse(Math.Round(_i / __dSecondsMultiplier));
         }
 
         public DateTime ToDateTime()
@@ -77,7 +80,7 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
 
         public UnixTimeStamp AddMilliSeconds(int i)
         {
-            return new UnixTimeStamp(_i + UInt64Utils.NNParse(i), Kind);
+            return new UnixTimeStamp(_i + Int64Utils.NNParse(i), Kind);
         }
 
         public UnixTimeStamp AddSeconds(int i)
@@ -149,14 +152,24 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
             return o.ToString();
         }
 
-        public static implicit operator uint(UnixTimeStamp o)
+        public static implicit operator int(UnixTimeStamp o)
         {
             return o.ToSeconds();
         }
 
-        public static implicit operator ulong(UnixTimeStamp o)
+        public static implicit operator uint(UnixTimeStamp o)
+        {
+            return UInt32Utils.NNParse(o.ToSeconds());
+        }
+
+        public static implicit operator long(UnixTimeStamp o)
         {
             return o.ToMilliSeconds();
+        }
+
+        public static implicit operator ulong(UnixTimeStamp o)
+        {
+            return UInt64Utils.NNParse(o.ToMilliSeconds());
         }
 
         public static implicit operator DateTime(UnixTimeStamp o)

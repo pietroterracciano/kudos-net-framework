@@ -34,17 +34,18 @@ namespace Kudos.Servers.KaronteModule
 {
     public static class Karonte
     {
-        private static Type[]? __aRegisteredServices;
-        private static readonly List<Type> __lRegisteredServices;
-        private static readonly HashSet<String> __hsRegistedApplications;
-        private static readonly List<Type> __lRegisteredControllers;
-
         static Karonte()
         {
             __lRegisteredServices = new List<Type>();
-            __lRegisteredControllers = new List<Type>();
             __hsRegistedApplications = new HashSet<string>();
         }
+
+        #region private static ...
+
+        private static Type[]? __aRegisteredServices;
+        private static readonly List<Type> __lRegisteredServices;
+        private static readonly HashSet<String> __hsRegistedApplications;
+        private static Boolean _bIsKaronteRoutingServiceRegistered;
 
         private static void __RegisterService<T>() { __RegisterService(typeof(T)); }
         private static void __RegisterService(Type? t) { if (t == null || __lRegisteredServices.Contains(t)) return; __lRegisteredServices.Add(t); }
@@ -54,11 +55,35 @@ namespace Kudos.Servers.KaronteModule
         private static void __RegisterApplication(String? s) { if (s == null) return; __hsRegistedApplications.Add(s); }
         private static Boolean __IsApplicationRegistered(String? s) { return s != null && __hsRegistedApplications.Contains(s); }
 
-        internal static void RegisterController(ref Type? t)
+        private static void __MapKaronteController
+        (
+            ref IEndpointRouteBuilder erb,
+            ref Type? t
+        )
         {
-            if (t == null) return;
-            __lRegisteredControllers.Add(t);
+            KaronteControllerRouteDescriptor? kcrd;
+            KaronteControllerRouteDescriptor.Request(ref t, out kcrd);
+
+            if (kcrd == null || kcrd.MethodsRouteDescriptor == null)
+                return;
+
+            int k = 0;
+            for(int i=0; i< kcrd.MethodsRouteDescriptor.Length; i++)
+            {
+                erb.MapControllerRoute
+                (
+                    kcrd.MethodsRouteDescriptor[i].FullHashKey,
+                    kcrd.MethodsRouteDescriptor[i].ResolvedFullPattern,
+                    new { controller = kcrd.ResolvedMemberName, action = kcrd.MethodsRouteDescriptor[i].ResolvedMemberName }
+                );
+
+                k++;
+            }
         }
+
+        #endregion
+
+        #region public static ...
 
         #region public static IServiceCollection AddKaronteCore(...)
 
@@ -75,9 +100,6 @@ namespace Kudos.Servers.KaronteModule
                         return new KaronteContext();
                     }
                 );
-            sc
-                .AddRouting()
-                .AddControllers();
 
             Assembly?
                 ass = Assembly.GetEntryAssembly();
@@ -114,6 +136,42 @@ namespace Kudos.Servers.KaronteModule
                         break;
                 }
             }
+
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteRoutingCore(...)
+
+        public static IServiceCollection AddKaronteRoutingCore(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            sc
+                .AddRoutingCore()
+                .AddControllers();
+
+            _bIsKaronteRoutingServiceRegistered = true;
+
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteRouting(...)
+
+        public static IServiceCollection AddKaronteRouting(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            sc
+                .AddRouting()
+                .AddControllers();
+
+            _bIsKaronteRoutingServiceRegistered = true;
 
             return sc;
         }
@@ -300,7 +358,7 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteRouting<RoutingMiddlewareType>(this IApplicationBuilder ab)
             where RoutingMiddlewareType : AKaronteRoutingMiddleware
         {
-            if (!__IsServiceRegistered<KaronteContext>())
+            if (!_bIsKaronteRoutingServiceRegistered)
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Routing))
                 return ab;
@@ -342,6 +400,13 @@ namespace Kudos.Servers.KaronteModule
         #endregion
 
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
+
+        public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteAuthorizatingMiddleware<KaronteAuthorizationAttribute, EKaronteAuthorizationType>
+        {
+            return
+                ab.UseKaronteAuthorizating<MiddlewareType, KaronteAuthorizationAttribute, EKaronteAuthorizationType>();
+        }
 
         public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType, AttributeType, EnumType>(this IApplicationBuilder ab)
             where MiddlewareType : AKaronteAuthorizatingMiddleware<AttributeType, EnumType>
@@ -516,13 +581,19 @@ namespace Kudos.Servers.KaronteModule
 
         #region public static IApplicationBuilder UseKaronteAuthenticating(...)
 
-        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, AttributeType, EnumType>(this IApplicationBuilder ab)
+        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType>(this IApplicationBuilder ab)
             where
-                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType, EnumType>
+                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, KaronteAuthenticationAttribute>
+        {
+            return
+                ab.UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, KaronteAuthenticationAttribute>();
+        }
+
+        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, AttributeType>(this IApplicationBuilder ab)
             where
-                AttributeType : AKaronteEnumizedAttribute<EnumType>
+                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType>
             where
-                EnumType : Enum
+                AttributeType : Attribute
         {
             if (!__IsServiceRegistered<KaronteContext>())
                 throw new InvalidOperationException();
@@ -539,10 +610,34 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IApplicationBuilder UseKaronteCapabiliting(...)
+
+        public static IApplicationBuilder UseKaronteCapabiliting<MiddlewareType>(this IApplicationBuilder ab)
+            where
+                MiddlewareType : AKaronteCapabilitingMiddleware
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+            else if (__IsApplicationRegistered(CKaronteKey.Capabiliting))
+                return ab;
+
+            __RegisterApplication(CKaronteKey.Capabiliting);
+
+            return
+                ab
+                    .UseKaronteAttributing<KaronteCapabilityAttribute>()
+                    .UseMiddleware<MiddlewareType>();
+        }
+
+        #endregion
+
         #region public static IEndpointRouteBuilder MapKaronteControllers(...)
 
         public static IEndpointRouteBuilder MapKaronteControllers(this IEndpointRouteBuilder erb)
         {
+            if (!__IsApplicationRegistered(CKaronteKey.Routing))
+                throw new InvalidOperationException();
+
             Assembly?
                 ass = Assembly.GetEntryAssembly();
 
@@ -567,6 +662,9 @@ namespace Kudos.Servers.KaronteModule
         public static IEndpointRouteBuilder MapKaronteController<T>(this IEndpointRouteBuilder erb)
             where T : AKaronteController
         {
+            if (!__IsApplicationRegistered(CKaronteKey.Routing))
+                throw new InvalidOperationException();
+
             Type t = typeof(T);
             __MapKaronteController(ref erb, ref t);
             return erb;
@@ -574,157 +672,6 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
-        private static void __MapKaronteController
-        (
-            ref IEndpointRouteBuilder erb,
-            ref Type? t
-        )
-        {
-            KaronteControllerAttribute?
-                kca = ReflectionUtils.GetCustomAttribute<KaronteControllerAttribute>(t, true);
-
-            if (kca == null)
-                return;
-
-            KaronteRouteDescriptor[]? krds0;
-            if (!__MapKaronteController(t, out krds0))
-                return;
-
-            KaronteRouteDescriptor[]? krds1;
-            if (!__MapKaronteController(ReflectionUtils.GetMethods(t), out krds1))
-                return;
-
-            int k = 0;
-            String s0i, s1i, s0j, s1j;
-            for (int i = 0; i < krds1.Length; i++)
-            {
-                s0i = krds1[i].ResolvePattern(ref kca);
-                s1i = krds1[i].ResolveMemberName();
-
-                for (int j = 0; j < krds0.Length; j++)
-                {
-                    s0j = krds0[j].ResolvePattern(ref kca);
-                    s1j = krds0[j].ResolveMemberName();
-
-                    erb.MapControllerRoute
-                    (
-                        "C:" + t.FullName + "|R:" + k,
-                        s0j + s0i,
-                        new { controller = s1j, action = s1i }
-                    );
-
-                    k++;
-                }
-            }
-        }
-
-        private static Boolean __MapKaronteController
-        (
-            MemberInfo[] ? mis,
-            out KaronteRouteDescriptor[]? krds
-        )
-        {
-            if(mis == null)
-            {
-                krds = null;
-                return false;
-            }
-
-            List<KaronteRouteDescriptor>
-                l = new List<KaronteRouteDescriptor>(mis.Length);
-
-            KaronteRouteDescriptor[]? krdsi;
-            for (int i = 0; i < mis.Length; i++)
-            {
-                if (!__MapKaronteController(mis[i], out krdsi)) continue;
-                l.AddRange(krdsi);
-            }
-
-            krds = l.ToArray();
-
-            return krds.Length > 0;
-        }
-
-        private static Boolean __MapKaronteController
-        (
-            MemberInfo mi,
-            out KaronteRouteDescriptor[]? krds
-        )
-        {
-            NonActionAttribute?
-                naa = ReflectionUtils.GetCustomAttribute<NonActionAttribute>(mi, true);
-
-            if (naa != null)
-            {
-                krds = null;
-                return false;
-            }
-
-            return __MapKaronteController(ref mi, ReflectionUtils.GetCustomAttributes<RouteAttribute>(mi, true), out krds);
-        }
-
-        private static Boolean __MapKaronteController
-        (
-            ref MemberInfo mi,
-            RouteAttribute[]? ras,
-            out KaronteRouteDescriptor[]? krds
-        )
-        {
-            List<KaronteRouteDescriptor>
-                l;
-
-            if (ras != null)
-            {
-                l = new List<KaronteRouteDescriptor>(ras.Length);
-
-                KaronteRouteDescriptor? krdi;
-                for (int i = 0; i < ras.Length; i++)
-                {
-                    if (!__MapKaronteController(ref mi, ref ras[i], out krdi)) continue;
-                    l.Add(krdi);
-                }
-            }
-            else
-                l = new List<KaronteRouteDescriptor>();
-
-            if (l.Count < 1)
-                switch(mi.MemberType)
-                {
-                    case MemberTypes.TypeInfo:
-                        l.Add(new KaronteRouteDescriptor(mi, CKaronteRouteKey.Controller_Version+ "/"+ CKaronteRouteKey.Controller));
-                        break;
-                    case MemberTypes.Method:
-                        l.Add(new KaronteRouteDescriptor(mi, CKaronteRouteKey.Action));
-                        break;
-                }
-
-            krds = l.ToArray();
-
-            return krds.Length > 0;
-        }
-
-        private static Boolean __MapKaronteController
-        (
-            ref MemberInfo mi,
-            ref RouteAttribute? ra,
-            out KaronteRouteDescriptor? krd
-        )
-        {
-            String? s;
-            Boolean b = __Configure(ref ra, out s);
-            krd = b ? new KaronteRouteDescriptor(mi, s) : null;
-            return b;
-        }
-
-        private static Boolean __Configure
-        (
-            ref RouteAttribute? ra,
-            out String? s
-        )
-        {
-            Boolean b = ra != null && !String.IsNullOrWhiteSpace(ra.Template);
-            s = b ? ra.Template : null;
-            return b;
-        }
+        #endregion
     }
 }

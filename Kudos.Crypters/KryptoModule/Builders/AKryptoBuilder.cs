@@ -5,6 +5,7 @@ using Kudos.Crypters.KryptoModule.Descriptors;
 using Kudos.Utils;
 using Kudos.Reflection.Utils;
 using Kudos.Crypters.KryptoModule.Enums;
+using System.Text.Json;
 
 namespace Kudos.Crypters.KryptoModule.Builders
 {
@@ -55,11 +56,11 @@ namespace Kudos.Crypters.KryptoModule.Builders
             return this as BuilderType;
         }
 
-        public BuilderType SetInternalSerialization(EInternalSerialization? eis)
-        {
-            _dsc.InternalSerialization = eis;
-            return this as BuilderType;
-        }
+        //public BuilderType SetJSONSerializerOptions(JsonSerializerOptions? jsonso)
+        //{
+        //    _dsc.JsonSerializerOptions = jsonso;
+        //    return this as BuilderType;
+        //}
 
         public SALTBuilder<BuilderType, BuiltType, DescriptorType> RequestSALT()
         {

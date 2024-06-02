@@ -30,6 +30,8 @@
     <Compile Remove="KaronteModule\Middlewares\KaronteAuthorizatingMiddleware.cs" />
     <Compile Remove="KaronteModule\Attributes\KaronteAuthorizatingAttribute.cs" />
     <Compile Remove="KaronteModule\Attributes\KaronteRouteAttribute.cs" />
+    <Compile Remove="KaronteModule\Attributes\KaronteNonAction.cs" />
+    <Compile Remove="KaronteModule\Attributes\KaronteNonActionAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>

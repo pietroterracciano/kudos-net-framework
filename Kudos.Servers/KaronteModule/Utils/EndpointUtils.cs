@@ -1,27 +1,34 @@
-﻿using Kudos.Servers.KaronteModule.Contexts;
+﻿using Kudos.Reflection.Utils;
+using Kudos.Servers.KaronteModule.Attributes;
+using Kudos.Servers.KaronteModule.Constants;
+using Kudos.Servers.KaronteModule.Contexts;
+using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Utils;
 using Kudos.Utils.Collections;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Org.BouncyCastle.Asn1.Crmf;
+using Org.BouncyCastle.Asn1.X500;
 using System;
+using System.Reflection;
 
 namespace Kudos.Servers.KaronteModule.Utils
 {
     public static class EndpointUtils
     {
-        public static Boolean IsFallbackRoute(Endpoint? end)
+        public static EKaronteRouteStatus GetRouteStatus(Endpoint? end)
         {
-            if (end == null) return false;
-            String? sdn = end.DisplayName;
-            return sdn != null && sdn.StartsWith("Fallback", StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static Boolean IsRootRoute(Endpoint? end)
-        {
-            if (end == null) return false;
-            String? sdn = end.DisplayName;
-            return sdn != null && sdn.Equals("/", StringComparison.OrdinalIgnoreCase);
+            if (end == null || end.DisplayName == null)
+                return EKaronteRouteStatus.NotRegistered;
+            else if (end.Metadata == null || end.Metadata.Count < 1)
+                return EKaronteRouteStatus.NotSupported;
+            else if (end.DisplayName.StartsWith("Fallback", StringComparison.OrdinalIgnoreCase))
+                return EKaronteRouteStatus.OnFallback;
+            else if (end.DisplayName.Equals("/", StringComparison.OrdinalIgnoreCase))
+                return EKaronteRouteStatus.OnRoot;
+            else
+                return EKaronteRouteStatus.Registered;
         }
 
         public static ObjectType? GetLastMetadata<ObjectType>(Endpoint? end)
