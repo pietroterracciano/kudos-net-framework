@@ -9,8 +9,10 @@ namespace Kudos.Validations.EpikyrosiModule.Enums
         MaxValue,
         MinLength,
         MaxLength,
-        Collision,
+        ExpectedCollisionValue,
+        ExpectedValue,
         CanBeNull,
+        CanBeUndefined,
         CanBeInvalid,
         CanBeWhitespace,
         CanBeEmpty

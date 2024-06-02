@@ -65,5 +65,11 @@ namespace Kudos.Servers.KaronteModule.Controllers
         {
             return base.GetHashCode();
         }
+
+        [NonAction]
+        public new Type GetType()
+        {
+            return base.GetType();
+        }
     }
 }

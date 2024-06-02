@@ -22,16 +22,18 @@ namespace Kudos.Converters
             JsonSerializerOptions jsonso
         )
         {
+            Object? o;
+
             if (_ejcwo == EEJCWorksOn.Name)
             {
-                String? s; try { s = utf8jsonr.GetString(); } catch { s = null; }
-                return EnumUtils.Parse<T>(s);
+                try { o = utf8jsonr.GetString(); } catch { o = null; }
             }
             else
             {
-                Int32 i; utf8jsonr.TryGetInt32(out i);
-                return EnumUtils.Parse<T>(i);
+                Int32 i; utf8jsonr.TryGetInt32(out i); o = i;
             }
+
+            return EnumUtils.Parse<T>(o);
         }
 
         public override void Write(

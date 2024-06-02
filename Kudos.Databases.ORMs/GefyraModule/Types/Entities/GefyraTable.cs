@@ -163,7 +163,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities
         #region public ... RequestColumn...(...)
 
         public IGefyraColumn RequestColumn(string? sName) { GefyraColumn gc; RequestColumn(ref sName, out gc); return gc; }
-        public Task<IGefyraColumn> RequestColumnAsync(string? sName) { return Task.Run(() => RequestColumn(sName)); }
+        //public Task<IGefyraColumn> RequestColumnAsync(string? sName) { return Task.Run(() => RequestColumn(sName)); }
 
         #endregion
 

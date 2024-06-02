@@ -15,6 +15,7 @@
     <None Remove="Descriptors\" />
     <Compile Remove="Utils\DatabaseColumnTypeUtils.cs" />
     <Compile Remove="Utils\DatabaseDataTypeUtils.cs" />
+    <None Remove="Exceptions\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,5 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Descriptors\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 </Project>

@@ -123,7 +123,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             }
         }
 
-        public Task<ControllerType> RequestControllerAsync<ControllerType>() { return Task.Run(() => RequestController<ControllerType>()); }
+        //public Task<ControllerType> RequestControllerAsync<ControllerType>() { return Task.Run(() => RequestController<ControllerType>()); }
         public ControllerType RequestController<ControllerType>()
         {
             Type
@@ -170,7 +170,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 Type[]? 
                     rss = RegisteredServices;
 
-                HttpContext 
+                HttpContext
                     httpc = this.HttpContext;
 
                 if (httpc == null)
@@ -178,7 +178,6 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
                 List<Object?>
                     lo = new List<Object?>();
-
 
                 lo.Add(this);
                 lo.Add(httpc);

@@ -1,6 +1,7 @@
 ﻿using Kudos.Interfaces;
 using Kudos.Reflection.Utils;
 using System;
+using System.Text.Json.Serialization;
 
 namespace Kudos.Types
 {
@@ -18,6 +19,7 @@ namespace Kudos.Types
             __i = 0;
         }
 
+        [JsonIgnore]
         public Int32 Token { get; private set; }
         
         public TokenizedObject()

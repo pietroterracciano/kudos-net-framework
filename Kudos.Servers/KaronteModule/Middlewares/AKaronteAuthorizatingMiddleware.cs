@@ -74,16 +74,15 @@ namespace Kudos.Servers.KaronteModule.Middlewares
                 return false;
             }
 
-            EnumType?
-                et = EnumUtils.Parse<EnumType>(sa[0]);
+            EnumType e = EnumUtils.Parse<EnumType>(sa[0]);
 
-            if (!EnumUtils.IsValid<EnumType>(et))
+            if (!EnumUtils.IsValid<EnumType>(e))
             {
                 kad = null;
                 return false;
             }
 
-            kad = new KaronteAuthorizationDescriptor(sa[1], et);
+            kad = new KaronteAuthorizationDescriptor(sa[1], e);
             return true;
         }
     }

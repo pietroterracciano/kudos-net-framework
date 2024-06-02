@@ -17,11 +17,12 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
         Enum
     {
         public Boolean?
+            //CanBeUndefined,
             CanBeInvalid;
 
-        private Boolean _bIsCollisionSetted;
-        private T? _eCollision;
-        public T? Collision { get { return _eCollision; } set { _eCollision = value; _bIsCollisionSetted = true; } }
+        private Boolean _bIsExpectedCollisionValueSetted;
+        private T? _eExpectedCollisionValue;
+        public T? ExpectedCollisionValue { get { return _eExpectedCollisionValue; } set { _eExpectedCollisionValue = value; _bIsExpectedCollisionValueSetted = true; } }
 
         public EpikyrosiEnumRule()
             : base(typeof(T)) { }
@@ -32,6 +33,17 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
 
             if (v0 != null)
             {
+                //if
+                //(
+                //    CanBeUndefined != null
+                //    && !CanBeUndefined.Value
+                //    && !EnumUtils.IsDefined<T>(v0)
+                //)
+                //{
+                //    envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.CanBeUndefined, CanBeUndefined.Value);
+                //    return;
+                //}
+                //else
                 if
                 (
                     CanBeInvalid != null
@@ -44,12 +56,12 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
                 }
                 else if
                 (
-                    _bIsCollisionSetted
-                    && Collision != null
-                    && !EnumUtils.HasFlag(Collision, v0)
+                    _bIsExpectedCollisionValueSetted
+                    && ExpectedCollisionValue != null
+                    && !EnumUtils.HasFlag(ExpectedCollisionValue, v0)
                 )
                 {
-                    envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.Collision, EnumUtils.GetKey(Collision));
+                    envr = new EpikyrosiNotValidResult(ref mi, EEpikyrosiNotValidOn.ExpectedCollisionValue, EnumUtils.GetKey(ExpectedCollisionValue));
                     return;
                 }
             }

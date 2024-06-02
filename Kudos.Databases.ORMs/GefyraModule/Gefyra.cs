@@ -42,8 +42,8 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         public static IGefyraTable RequestTable<T>() { GefyraTable gt; GefyraTable.Request<T>(out gt); return gt; }
         public static IGefyraTable RequestTable(Type? t) { GefyraTable gt; GefyraTable.Request(ref t, out gt); return gt; }
-        public static Task<IGefyraTable> RequestTableAsync<T>() { return Task.Run(RequestTable<T>); }
-        public static Task<IGefyraTable> RequestTableAsync(Type? t) { return Task.Run(() => RequestTable(t)); }
+        //public static Task<IGefyraTable> RequestTableAsync<T>() { return Task.Run(RequestTable<T>); }
+        //public static Task<IGefyraTable> RequestTableAsync(Type? t) { return Task.Run(() => RequestTable(t)); }
 
         //public static GefyraTable RequestTable(String? sName) { GefyraTable gt; GefyraTable.Request(ref sName, out gt); return gt; }
         //public static GefyraTable RequestTable(String? sSchemaName, String? sName) { GefyraTable gt; GefyraTable.Request(ref sSchemaName, ref sName, out gt); return gt; }\
@@ -54,7 +54,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Parse
 
-        public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
+        //public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
         public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
         {
             if (dt == null)
@@ -73,7 +73,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             return l.ToArray();
         }
 
-        public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
+        //public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
         public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
         {
             if (dr == null)
@@ -131,8 +131,8 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Fit
 
-        public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => {  Fit<T>(dbh, ref t0); }); }
-        public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
+        //public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => {  Fit<T>(dbh, ref t0); }); }
+        //public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
         public static void Fit<T>(IDatabaseHandler? dbh, ref T? t) { T? t0; __Fit(ref dbh, ref t, out t0, true); }
         public static T? Fit<T>(IDatabaseHandler? dbh, T? t) { T? t0; __Fit(ref dbh, ref t, out t0, false); return t0; }
         private static void __Fit<T>(ref IDatabaseHandler? dbh, ref T? t, out T? t0, Boolean bInPlace)
@@ -179,7 +179,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
         }
 
-        public static Task<Object?> FitAsync(DatabaseColumnDescriptor dbcd, Object? o) { return Task.Run(() => Fit(dbcd, o)); }
+        //public static Task<Object?> FitAsync(DatabaseColumnDescriptor dbcd, Object? o) { return Task.Run(() => Fit(dbcd, o)); }
         public static Object? Fit(DatabaseColumnDescriptor? dbcd, Object? o) { Object? oOut; __Fit(ref dbcd, ref o, out oOut); return oOut; }
         private static void __Fit(ref DatabaseColumnDescriptor? dbcd, ref Object? oIn, out Object? oOut)
         {

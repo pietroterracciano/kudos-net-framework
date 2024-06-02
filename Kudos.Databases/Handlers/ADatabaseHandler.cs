@@ -186,6 +186,7 @@ namespace Kudos.Databases.Controllers
 
         #region public Boolean ChangeSchema()
 
+        public Task<DatabaseResult> ChangeSchemaAsync(String? s) { return Task.Run(() => ChangeSchema(s)); }
         public DatabaseResult ChangeSchema(String? s)
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
@@ -209,16 +210,6 @@ namespace Kudos.Databases.Controllers
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        public Task<DatabaseResult> ChangeSchemaAsync(String sSchemaName)
-        {
-            return Task.Run(
-                delegate ()
-                {
-                    return ChangeSchema(sSchemaName);
-                }
-            );
-        }
-
         #endregion
 
         #region Transaction
@@ -228,6 +219,7 @@ namespace Kudos.Databases.Controllers
             return _oCommand?.Transaction != null;
         }
 
+        public Task<DatabaseResult> BeginTransactionAsync() { return Task.Run(BeginTransaction); }
         public DatabaseResult BeginTransaction()
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
@@ -252,6 +244,7 @@ namespace Kudos.Databases.Controllers
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
+        public Task<DatabaseResult> CommitTransactionAsync() { return Task.Run(CommitTransaction); }
         public DatabaseResult CommitTransaction()
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
@@ -276,6 +269,7 @@ namespace Kudos.Databases.Controllers
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
+        public Task<DatabaseResult> RollbackTransactionAsync() { return Task.Run(RollbackTransaction); }
         public DatabaseResult RollbackTransaction()
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();

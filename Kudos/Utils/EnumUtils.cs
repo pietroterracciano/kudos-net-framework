@@ -4,6 +4,8 @@ using Kudos.Utils.Collections;
 using Kudos.Utils.Numerics;
 using Kudos.Utils.Texts;
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Kudos.Utils
 {
@@ -24,66 +26,104 @@ namespace Kudos.Utils
         #endregion
 
         #region public static String[]? GetKeys<...>(...)
-        
+
         public static String[]? GetKeys<T>() where T : Enum { return GetKeys(typeof(T)); }
-        public static String[]? GetKeys(Enum? e) { return e != null ? GetKeys(e.GetType()) : null; }
+        public static String[]? GetKeys(Enum? e)
+        {
+            Enum[]? ea = GetFlags(e);
+            String[]? sa; __GetKeys(ref ea, out sa);
+            return sa;
+        }
         public static String[]? GetKeys(Type? t)
         {
-            if (t != null && t.IsEnum)
-                try { return Enum.GetNames(t); } catch { }
-
-            return null;
+            Enum[]? ea = GetFlags(t);
+            String[]? sa; __GetKeys(ref ea, out sa);
+            return sa;
         }
 
         #endregion
 
         #region public static Int32[]? GetValues<...>(...)
 
-        public static Int32?[]? GetValues<T>() where T : Enum { return GetValues(typeof(T)); }
-        public static Int32?[]? GetValues(Enum? e) { return e != null ? GetValues(e.GetType()) : null; }
-        public static Int32?[]? GetValues(Type? t)
+        public static Int32[]? GetValues<T>() where T : Enum { return GetValues(typeof(T)); }
+        public static Int32[]? GetValues(Enum? e)
         {
-            if (t == null || !t.IsEnum)
-                return null;
-
-            Array? a0;
-            try { a0 = Enum.GetValues(t); } catch { a0 = null; }
-
-            if (a0 == null)
-                return null;
-
-            int?[]? a1 = new int?[a0.Length];
-            for (int i = 0; i < a1.Length; i++)
-                a1[i] = Int32Utils.Parse(a0.GetValue(i));
-
-            return a1;
+            Enum[]? ea = GetFlags(e);
+            int[]? ia; __GetValues(ref ea, out ia);
+            return ia;
+        }
+        public static Int32[]? GetValues(Type? t)
+        {
+            Enum[]? ea = GetFlags(t);
+            int[]? ia; __GetValues(ref ea, out ia);
+            return ia;
         }
 
         #endregion
 
-        #region public static Boolean IsValid(...)
+        #region public static ... GetFlags<...>(...)
 
-        public static Boolean IsValid<T>(Enum? e) where T: Enum
+        public static T[]? GetFlags<T>() where T : Enum { return ObjectUtils.Cast<T[]?>(GetFlags(typeof(T))); }
+        public static T[]? GetFlags<T>(T? t) where T : Enum { return ObjectUtils.Cast<T[]?>(GetFlags(t as Enum)); }
+        public static Enum[]? GetFlags(Enum? e) 
         {
             if (e == null)
-                return false;
+                return null;
 
-            Int32?[]?
-                a = GetValues<T>();
+            Enum[]? a = GetFlags(e.GetType());
 
-            if (a != null)
+            if (a == null)
+                return null;
+
+            List<Enum> l = new List<Enum>(a.Length);
+
+            for(int i=0; i<a.Length; i++)
             {
-                Int32 ie = GetNNValue(e);
-
-                for (int i = 0; i < a.Length; i++)
-                {
-                    if (!ie.Equals(a[i])) continue;
-                    return true;
-                }
+                if (!e.HasFlag(a[i])) continue;
+                l.Add(a[i]);
             }
 
-            return false;
+            return l.Count > 0 ? l.ToArray() : null;
         }
+        public static Enum[]? GetFlags(Type? t)
+        {
+            if (t == null || !t.IsEnum) return null;
+            Array? a;
+            try { a = Enum.GetValues(t); } catch { a = null; }
+            if (a == null) return null;
+            List<Enum> l = new List<Enum>(a.Length);
+            Enum? ei;
+            for(int i=0; i<a.Length; i++)
+            {
+                ei = a.GetValue(i) as Enum;
+                if (ei == null) continue;
+                l.Add(ei);
+            }
+
+            return l.Count > 0 ? l.ToArray() : null;
+        }
+
+        #endregion
+
+        //#region public static Boolean IsDefined(...)
+
+        //public static Boolean IsDefined<T>(Object? e) where T: Enum { return e != null && IsDefined(typeof(T), e); }
+        //public static Boolean IsDefined(Enum? e, Object? o) { return e != null && IsDefined(e.GetType(), o); }
+        //public static Boolean IsDefined(Type? t, Object? o)
+        //{
+        //    if (t != null && t.IsEnum && o != null)
+        //        try { return Enum.IsDefined(t, o); } catch { }
+
+        //    return false;
+        //}
+
+        //#endregion
+
+        #region public static Boolean IsDefined(...)
+
+        public static Boolean IsValid<T>(Object? e) where T : Enum { return e != null && IsValid(typeof(T), e); }
+        public static Boolean IsValid(Enum? e, Object? o) { return e != null && IsValid(e.GetType(), o); }
+        public static Boolean IsValid(Type? t, Object? o) { return Parse(t, o) != null; }
 
         #endregion
 
@@ -100,10 +140,9 @@ namespace Kudos.Utils
 
         public static String? GetKey(Enum? e)
         {
-            if (e != null)
-                try { return Enum.GetName(e.GetType(), e); } catch { }
-
-            return null;
+            String? s = StringUtils.Parse(e);
+            Int32? i = Int32Utils.Parse(s);
+            return i == null ? s : null;
         }
 
         #endregion
@@ -126,78 +165,132 @@ namespace Kudos.Utils
 
         #endregion
 
-        #region public static T? Parse<T>(...)
+        #region public static ... Parse<...>(...)
 
-        public static T? Parse<T>(object o) where T : Enum { return ObjectUtils.Cast<T>(Parse(typeof(T), o)); }
-        public static T? Parse<T>(string? s, bool bIgnoreCase = true) where T : Enum { return ObjectUtils.Cast<T>(Parse(typeof(T), s, bIgnoreCase)); }
-
-        #endregion
-
-        #region public static T NNParse<T>(...)
-
-        public static T NNParse<T>(object o) where T : Enum { return __NNParse<T>(Parse<T>(o)); }
-        public static T NNParse<T>(string? s, bool bIgnoreCase = true) where T : Enum { return __NNParse<T>(Parse<T>(s, bIgnoreCase)); }
-        private static T __NNParse<T>(T? o) where T : Enum { return o != null ? o : default(T); }
-
-        #endregion
-
-        #region public static Object? Parse(...)
-
-        public static Object? Parse(Type? t, Object? o)
+        public static T Parse<T>(string? s, bool bIgnoreCase = true) where T : Enum { return ObjectUtils.Cast<T>(Parse(typeof(T), s, bIgnoreCase)); }
+        public static T Parse<T>(object? o) where T : Enum { return ObjectUtils.Cast<T>(Parse(typeof(T), o)); }
+        public static Enum? Parse(Type? t, string? s, bool bIgnoreCase = true)
         {
-            if (o != null)
+            Enum? e;
+            __TryParse(ref t, ref s, ref bIgnoreCase, out e);
+            return e;
+        }
+        public static Enum? Parse(Type? t, Object? o)
+        {
+            if (o == null)
+                return null;
+
+            Type ot = o.GetType();
+
+            if (ot == CType.String)
+                return Parse(t, o as String, true);
+
+            Enum? e;
+            __ToObject(ref t, ref o, out e);
+            return e;
+        }
+
+        #endregion
+
+        //#region public static T NNParse<T>(...)
+
+        //public static T NNParse<T>(object? o) where T : Enum
+        //{
+        //    return __NNParse<T>(t);
+        //}
+        //public static T NNParse<T>(string? s, bool bIgnoreCase = true) where T : Enum
+        //{
+        //    return __NNParse<T>(Parse<T>(s, bIgnoreCase));
+        //}
+        //private static T __NNParse<T>(T? o) where T : Enum
+        //{
+        //    return o != null ? o : default(T);
+        //}
+
+        //#endregion
+
+        #region private ...
+
+        #region private static void ToObject(...)
+
+        private static void __ToObject(ref Type? t, ref Object? oIn, out Enum? e)
+        {
+            if (t == null || !t.IsEnum || oIn == null) { e = null; return; }
+            try
             {
-                Type ot = o.GetType();
-                if (ot == CType.String) return __TryParse(t, (String)o, true);
-                return __ToObject(t, o);
+                e = Enum.ToObject(t, oIn) as Enum;
+                String? s = GetKey(e);
+                if (s == null) e = null;
             }
-
-            return null;
-        }
-        public static Object? Parse(Type? t, string? s, bool bIgnoreCase = true)
-        {
-            return __TryParse(t, s, bIgnoreCase);
-        }
-
-        #endregion
-
-        #region public static Object NNParse(...)
-
-        public static Object NNParse(Type? t, Object? o) { return __NNParse(t, Parse(t, o)); }
-        public static Object NNParse(Type? t, string? s, bool bIgnoreCase = true) { return __NNParse(t, Parse(t, s, bIgnoreCase)); }
-        private static Object __NNParse(Type? t, Object? o) 
-        {
-            if (o != null) return o;
-            int?[]? a = GetValues(t);
-            Object? a0 = ArrayUtils.IsValidIndex(a, 0) ? a.GetValue(0) : null;
-            return a0 != null ? a0 : EEnum.None;
-        }
-
-        #endregion
-
-        #region private static Object? ToObject(...)
-
-        private static Object? __ToObject(Type? t, Object? o)
-        {
-            if(t != null && t.IsEnum && o != null)
-                try { return Enum.ToObject(t, o); } catch { }
-
-            return null;
+            catch
+            {
+                e = null;
+            }
         }
 
         #endregion
 
         #region private static Object? __TryParse(...)
 
-        private static Object? __TryParse(Type? t, String? s, Boolean bIgnoreCase = true)
+        private static void __TryParse(ref Type? t, ref String? s, ref Boolean bIgnoreCase, out Enum? e)
         {
-            if (t == null || !t.IsEnum || s == null)
-                return null;
+            if (t == null || !t.IsEnum || s == null) { e = null; return; }
 
-            Object? o;
-            try { Enum.TryParse(t, s, bIgnoreCase, out o); } catch { o = null; }
-            return o;
+            try
+            {
+                Object? o;
+                Enum.TryParse(t, s, bIgnoreCase, out o);
+                e = o as Enum;
+                String? s0 = GetKey(e);
+                if (s0 == null) e = null;
+            }
+            catch
+            {
+                e = null;
+            }
         }
+
+        #endregion
+
+        #region private static __GetKeys(...)
+
+        private static void __GetKeys(ref Enum[]? ea, out String[]? sa)
+        {
+            if (ea == null) { sa = null; return; }
+
+            List<String> l = new List<String>(ea.Length);
+            String? s;
+            for (int i = 0; i < ea.Length; i++)
+            {
+                s = StringUtils.Parse(ea[i]);
+                if (s == null) continue;
+                l.Add(s);
+            }
+
+            sa = l.Count > 0 ? l.ToArray() : null;
+        }
+
+        #endregion
+
+        #region private static __GetValues(...)
+
+        private static void __GetValues(ref Enum[]? ea, out Int32[]? ia)
+        {
+            if (ea == null) { ia = null; return; }
+
+            List<Int32> l = new List<int>(ea.Length);
+            Int32? j;
+            for (int i = 0; i < ea.Length; i++)
+            {
+                j = Int32Utils.Parse(ea[i]);
+                if (j == null) continue;
+                l.Add(j.Value);
+            }
+
+            ia = l.Count > 0 ? l.ToArray() : null;
+        }
+
+        #endregion
 
         #endregion
     }

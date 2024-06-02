@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System;
 using Kudos.Constants;
 using Kudos.Servers.KaronteModule.Constants;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace Kudos.Servers.KaronteModule.Middlewares
 {

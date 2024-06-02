@@ -11,6 +11,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities.Actions
 
     {
         public IGefyraColumn RequestColumn(String? sName);
-        public Task<IGefyraColumn> RequestColumnAsync(String? sName);
+        //public Task<IGefyraColumn> RequestColumnAsync(String? sName);
     }
 }

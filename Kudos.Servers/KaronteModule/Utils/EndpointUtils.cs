@@ -1,6 +1,7 @@
 ﻿using Kudos.Servers.KaronteModule.Contexts;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Utils;
+using Kudos.Utils.Collections;
 using Microsoft.AspNetCore.Http;
 using Org.BouncyCastle.Asn1.Crmf;
 using System;
@@ -40,5 +41,13 @@ namespace Kudos.Servers.KaronteModule.Utils
 
             return o;
         }
+
+        //public static Object? GetLastMetadata(Endpoint? end)
+        //{
+        //    return
+        //        end != null && end.Metadata.Count > 0
+        //            ? end.Metadata[end.Metadata.Count - 1]
+        //            : null;
+        //}
     }
 }

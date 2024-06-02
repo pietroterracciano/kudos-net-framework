@@ -15,12 +15,18 @@ namespace Kudos.Databases.Results
     {
         public static readonly DatabaseErrorResult
             Empty,
-            InternalFailure;
+            InternalFailure,
+            ImpossibleToBeginTransaction,
+            TransactionIsAlreadyBegun,
+            NotInTransaction;
 
         static DatabaseErrorResult()
         {
             Empty = new DatabaseErrorResult(0, String.Empty);
             InternalFailure = new DatabaseErrorResult(CDatabaseErrorCode.InternalFailure, "Internal failure");
+            ImpossibleToBeginTransaction = new DatabaseErrorResult(CDatabaseErrorCode.ImpossibleToBeginTransaction, "ImpossibleToBeginTransaction");
+            TransactionIsAlreadyBegun = new DatabaseErrorResult(CDatabaseErrorCode.TransactionIsAlreadyBegun, "TransactionAlreadyBegun");
+            NotInTransaction = new DatabaseErrorResult(CDatabaseErrorCode.NotInTransaction, "NotInTransaction");
         }
 
         public readonly int ID;

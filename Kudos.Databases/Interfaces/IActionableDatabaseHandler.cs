@@ -17,10 +17,14 @@ namespace Kudos.Databases.Interfaces
         Boolean IsConnectionOpened();
         Boolean IsConnectionBroken();
         Boolean IsConnectionClosed();
+        Task<DatabaseResult> ChangeSchemaAsync(String? s);
         DatabaseResult ChangeSchema(String? s);
         Boolean IsIntoTransaction();
+        Task<DatabaseResult> BeginTransactionAsync();
         DatabaseResult BeginTransaction();
+        Task<DatabaseResult> CommitTransactionAsync();
         DatabaseResult CommitTransaction();
+        Task<DatabaseResult> RollbackTransactionAsync();
         DatabaseResult RollbackTransaction();
         DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object?>[]? aParameters);
         Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object>[]? aParameters);
