@@ -443,6 +443,7 @@ namespace Kudos.Servers.KaronteModule
                         KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
                         kc.RegisteredServices = __aRegisteredServices;
                         kc.HttpContext = httpc;
+
                         httpc.Response.StatusCode = CKaronteHttpStatusCode.MethodNotAllowed;
 
                         if (bIsKaronteJSONingServiceRegistered)

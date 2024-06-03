@@ -10,7 +10,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 {
     public sealed class KaronteAuthorizatingContext : AKaronteChildContext
     {
-        private Boolean _bIsHeaderAnalyzed, _bIsEndpointAnalyzed;
+        private Boolean _bIsRequestAnalyzed, _bIsEndpointAnalyzed;
         private EKaronteAuthorizationType? _ekatr, _ekatep;
         private String? _srat;
 
@@ -18,7 +18,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         public EKaronteAuthorizationType? GetRequestAuthorizationType()
         {
-            _AnalyzeHeader(); return _ekatr;
+            _AnalyzeRequest(); return _ekatr;
         }
 
         public Boolean HasRequestAuthorizationType()
@@ -28,7 +28,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
         public String? GetRequestAuthorizationToken()
         {
-            _AnalyzeHeader(); return _srat;
+            _AnalyzeRequest(); return _srat;
         }
 
         public Boolean HasRequestAuthorizationToken()
@@ -82,13 +82,13 @@ namespace Kudos.Servers.KaronteModule.Contexts
 
             if (kaa == null) return;
 
-            _ekatr = kaa.AuthorizationType;
+            _ekatep = kaa.AuthorizationType;
         }
 
-        private void _AnalyzeHeader()
+        private void _AnalyzeRequest()
         {
-            if (_bIsHeaderAnalyzed) return;
-            _bIsHeaderAnalyzed = true;
+            if (_bIsRequestAnalyzed) return;
+            _bIsRequestAnalyzed = true;
 
             String?
                 s = KaronteContext.HeadingContext

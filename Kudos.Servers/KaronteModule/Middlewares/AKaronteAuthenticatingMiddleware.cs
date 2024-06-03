@@ -14,11 +14,8 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         protected override async Task<KaronteAuthenticatingContext?> OnContextFetch(KaronteContext kc)
         {
-            kc.AuthenticatingContext.AuthenticationData = await OnAuthenticationDataFetch(kc);
             return kc.AuthenticatingContext;
         }
-
-        protected abstract Task<Object?> OnAuthenticationDataFetch(KaronteContext kc);
 
         protected override async Task OnBounceEnd(KaronteContext kc) { }
     }
