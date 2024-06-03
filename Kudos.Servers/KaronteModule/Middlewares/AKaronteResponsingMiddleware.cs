@@ -20,7 +20,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     {
         public AKaronteResponsingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<KaronteResponsingContext> OnContextCreate(KaronteContext kc)
+        protected override async Task<KaronteResponsingContext> OnContextFetch(KaronteContext kc)
         {
             return kc.ResponsingContext = new KaronteResponsingContext(ref kc);
         }

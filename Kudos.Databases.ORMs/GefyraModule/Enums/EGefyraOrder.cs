@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Kudos.Databases.ORMs.GefyraModule.Enums
 {
-    [Flags]
     public enum EGefyraOrder
     {
         Asc,

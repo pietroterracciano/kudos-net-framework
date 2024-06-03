@@ -4,7 +4,7 @@ using Kudos.Servers.KaronteModule.Services;
 using Kudos.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kudos.Servers.KaronteModule.Options
+namespace Kudos.Servers.KaronteModule.Services
 {
 	public class
         KaronteJSONingService

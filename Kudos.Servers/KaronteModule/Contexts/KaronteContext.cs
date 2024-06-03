@@ -23,6 +23,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         public KaronteCapabilitingContext? CapabilitingContext { get; internal set; }
         public KaronteAuthorizatingContext? AuthorizatingContext { get; internal set; }
         public KaronteAuthenticatingContext? AuthenticatingContext { get; internal set; }
+        public KaronteHeadingContext? HeadingContext { get; internal set; }
         public KaronteJSONingContext? JSONingContext { get; internal set; }
         public KaronteCryptingContext? CryptingContext { get; internal set; }
 
@@ -51,21 +52,21 @@ namespace Kudos.Servers.KaronteModule.Contexts
             );
         }
 
-        internal void RegisterObject<T>(String? s, ref T? o)
-        {
-            _mObjects.Set(s, o);
-        }
+        //internal void RegisterObject<T>(String? s, ref T? o)
+        //{
+        //    _mObjects.Set(s, o);
+        //}
 
-        internal void GetObject<T>(String? s, out T? o)
-        {
-            o = _mObjects.Get<T>(s);
-        }
+        //internal void GetObject<T>(String? s, out T? o)
+        //{
+        //    o = _mObjects.Get<T>(s);
+        //}
 
-        internal void RequestObject<T>(String? s, out T o)
-        {
-            GetObject<T>(s, out o);
-            if (o == null) throw new InvalidOperationException();
-        }
+        //internal void RequestObject<T>(String? s, out T o)
+        //{
+        //    GetObject<T>(s, out o);
+        //    if (o == null) throw new InvalidOperationException();
+        //}
 
         public ServiceType RequestService<ServiceType>()
         {

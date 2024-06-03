@@ -10,11 +10,8 @@ using Kudos.Servers.KaronteModule.Controllers;
 using Kudos.Servers.KaronteModule.Descriptors.Routes;
 using Kudos.Servers.KaronteModule.Enums;
 using Kudos.Servers.KaronteModule.Middlewares;
-using Kudos.Servers.KaronteModule.Options;
 using Kudos.Servers.KaronteModule.Services;
 using Kudos.Servers.KaronteModule.Utils;
-using Kudos.Types;
-using Kudos.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,24 +33,33 @@ namespace Kudos.Servers.KaronteModule
     {
         static Karonte()
         {
+            __hsRegisteredServices = new HashSet<string>();
             __lRegisteredServices = new List<Type>();
             __hsRegistedApplications = new HashSet<string>();
+            __lRegisteredEndpoints = new List<Type>();
         }
 
         #region private static ...
 
         private static Type[]? __aRegisteredServices;
-        private static readonly List<Type> __lRegisteredServices;
-        private static readonly HashSet<String> __hsRegistedApplications;
-        private static Boolean _bIsKaronteRoutingServiceRegistered;
+        private static readonly List<Type> __lRegisteredServices, __lRegisteredEndpoints;
+        private static readonly HashSet<String> __hsRegisteredServices, __hsRegistedApplications;
 
         private static void __RegisterService<T>() { __RegisterService(typeof(T)); }
         private static void __RegisterService(Type? t) { if (t == null || __lRegisteredServices.Contains(t)) return; __lRegisteredServices.Add(t); }
         private static Boolean __IsServiceRegistered<T>() { return __IsServiceRegistered(typeof(T)); }
         private static Boolean __IsServiceRegistered(Type? t) { return t != null && __lRegisteredServices.Contains(t); }
 
+        private static void __RegisterService(String? s) { if (s == null) return; __hsRegisteredServices.Add(s); }
+        private static Boolean __IsServiceRegistered(String? s) { return s != null && __hsRegisteredServices.Contains(s); }
+
         private static void __RegisterApplication(String? s) { if (s == null) return; __hsRegistedApplications.Add(s); }
         private static Boolean __IsApplicationRegistered(String? s) { return s != null && __hsRegistedApplications.Contains(s); }
+
+        private static void __RegisterEndpoint<T>() { __RegisterEndpoint(typeof(T)); }
+        private static void __RegisterEndpoint(Type? t) { if (t == null || __lRegisteredEndpoints.Contains(t)) return; __lRegisteredEndpoints.Add(t); }
+        private static Boolean __IsEndpointRegistered<T>() { return __IsEndpointRegistered(typeof(T)); }
+        private static Boolean __IsEndpointRegistered(Type? t) { return t != null && __lRegisteredEndpoints.Contains(t); }
 
         private static void __MapKaronteController
         (
@@ -66,6 +72,10 @@ namespace Kudos.Servers.KaronteModule
 
             if (kcrd == null || kcrd.MethodsRouteDescriptor == null)
                 return;
+            else if (__IsEndpointRegistered(t))
+                return;
+
+            __RegisterEndpoint(t);
 
             int k = 0;
             for(int i=0; i< kcrd.MethodsRouteDescriptor.Length; i++)
@@ -148,12 +158,14 @@ namespace Kudos.Servers.KaronteModule
         {
             if (!__IsServiceRegistered<KaronteContext>())
                 throw new InvalidOperationException();
+            else if (__IsServiceRegistered(CKaronteKey.Routing))
+                return sc;
+
+            __RegisterService(CKaronteKey.Routing);
 
             sc
                 .AddRoutingCore()
                 .AddControllers();
-
-            _bIsKaronteRoutingServiceRegistered = true;
 
             return sc;
         }
@@ -166,12 +178,14 @@ namespace Kudos.Servers.KaronteModule
         {
             if (!__IsServiceRegistered<KaronteContext>())
                 throw new InvalidOperationException();
+            else if (__IsServiceRegistered(CKaronteKey.Routing))
+                return sc;
+
+            __RegisterService(CKaronteKey.Routing);
 
             sc
                 .AddRouting()
                 .AddControllers();
-
-            _bIsKaronteRoutingServiceRegistered = true;
 
             return sc;
         }
@@ -325,6 +339,78 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IServiceCollection AddKaronteHeading(..)
+
+        public static IServiceCollection AddKaronteHeading(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Heading);
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteCapabiliting(..)
+
+        public static IServiceCollection AddKaronteCapabiliting(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Capabiliting);
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteAuthorizating(..)
+
+        public static IServiceCollection AddKaronteAuthorizating(this IServiceCollection sc)
+        {
+            sc
+                .AddKaronteHeading()
+                .AddKaronteRoutingCore();
+
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Authorizating);
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteAuthenticating(..)
+
+        public static IServiceCollection AddKaronteAuthenticating(this IServiceCollection sc)
+        {
+            sc
+                .AddKaronteRoutingCore();
+
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Authenticating);
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteResponsing(..)
+
+        public static IServiceCollection AddKaronteResponsing(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Responsing);
+            return sc;
+        }
+
+        #endregion
+
         #region public static IApplicationBuilder UseKaronteCore(...)
 
         public static IApplicationBuilder UseKaronteCore(this IApplicationBuilder ab)
@@ -338,6 +424,17 @@ namespace Kudos.Servers.KaronteModule
 
             __aRegisteredServices = __lRegisteredServices.ToArray();
 
+            Boolean
+                bIsKaronteJSONingServiceRegistered = __IsServiceRegistered<KaronteJSONingService>(),
+                bIsKaronteDatabasingServiceRegistered = __IsServiceRegistered<KaronteDatabasingService>(),
+                bIsKaronteCryptingServiceRegistered = __IsServiceRegistered<KaronteCryptingService>(),
+                bIsKaronteResponsingServiceRegistered = __IsServiceRegistered(CKaronteKey.Responsing),
+                bIsKaronteCapabilitingServiceRegistered = __IsServiceRegistered(CKaronteKey.Capabiliting),
+                bIsKaronteRoutingServiceRegistered = __IsServiceRegistered(CKaronteKey.Routing),
+                bIsKaronteAuthorizatingServiceRegistered = __IsServiceRegistered(CKaronteKey.Authorizating),
+                bIsKaronteAuthenticatingServiceRegistered = __IsServiceRegistered(CKaronteKey.Authenticating),
+                bIsKaronteHeadingServiceRegistered = __IsServiceRegistered(CKaronteKey.Heading);
+
             return 
                 ab.Use
                 (
@@ -346,6 +443,50 @@ namespace Kudos.Servers.KaronteModule
                         KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
                         kc.RegisteredServices = __aRegisteredServices;
                         kc.HttpContext = httpc;
+                        httpc.Response.StatusCode = CKaronteHttpStatusCode.MethodNotAllowed;
+
+                        if (bIsKaronteJSONingServiceRegistered)
+                        {
+                            KaronteJSONingService kjsons = 
+                                httpc.RequestServices.GetRequiredService<KaronteJSONingService>();
+
+                            kc.JSONingContext = new KaronteJSONingContext(ref kjsons, ref kc);
+                        }
+
+                        if (bIsKaronteDatabasingServiceRegistered)
+                        {
+                            KaronteDatabasingService kdbs =
+                                httpc.RequestServices.GetRequiredService<KaronteDatabasingService>();
+
+                            kc.DatabasingContext = new KaronteDatabasingContext(ref kdbs, ref kc);
+                        }
+
+                        if (bIsKaronteCryptingServiceRegistered)
+                        {
+                            KaronteCryptingService kcs =
+                                httpc.RequestServices.GetRequiredService<KaronteCryptingService>();
+
+                            kc.CryptingContext = new KaronteCryptingContext(ref kcs, ref kc);
+                        }
+
+                        if(bIsKaronteCapabilitingServiceRegistered)
+                            kc.CapabilitingContext = new KaronteCapabilitingContext(ref kc);
+
+                        if(bIsKaronteRoutingServiceRegistered)
+                            kc.RoutingContext = new KaronteRoutingContext(ref kc);
+
+                        if (bIsKaronteAuthorizatingServiceRegistered)
+                            kc.AuthorizatingContext = new KaronteAuthorizatingContext(ref kc);
+
+                        if (bIsKaronteAuthenticatingServiceRegistered)
+                            kc.AuthenticatingContext = new KaronteAuthenticatingContext(ref kc);
+
+                        if (bIsKaronteHeadingServiceRegistered)
+                            kc.HeadingContext = new KaronteHeadingContext(ref kc);
+
+                        if (bIsKaronteResponsingServiceRegistered)
+                            kc.ResponsingContext = new KaronteResponsingContext(ref kc);
+
                         await rd.Invoke(httpc);
                     }
                 );
@@ -353,12 +494,39 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IApplicationBuilder UseKaronteMiddleware...)
+
+        public static IApplicationBuilder UseKaronteMiddleware<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteMiddleware
+        {
+            if (!__IsApplicationRegistered(CKaronteKey.Core))
+                throw new InvalidOperationException();
+
+            return
+                ab
+                    .UseMiddleware<MiddlewareType>();
+        }
+
+        #endregion
+
         #region public static IApplicationBuilder UseKaronteRouting(...)
 
-        public static IApplicationBuilder UseKaronteRouting<RoutingMiddlewareType>(this IApplicationBuilder ab)
-            where RoutingMiddlewareType : AKaronteRoutingMiddleware
+        public static IApplicationBuilder UseKaronteRouting<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteRoutingMiddleware
         {
-            if (!_bIsKaronteRoutingServiceRegistered)
+            return
+                ab
+                    .UseKaronteRouting()
+                    .UseKaronteMiddleware<MiddlewareType>();
+        }
+
+        public static IApplicationBuilder UseKaronteRouting(this IApplicationBuilder ab)
+        {
+            if
+            (
+                !__IsApplicationRegistered(CKaronteKey.Core)
+                || !__IsServiceRegistered(CKaronteKey.Routing)
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Routing))
                 return ab;
@@ -367,34 +535,7 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseRouting()
-                    .UseMiddleware<RoutingMiddlewareType>();
-        }
-
-        #endregion
-
-        #region public static IApplicationBuilder UseKaronteCrypting(...)
-
-        public static IApplicationBuilder UseKaronteCrypting(this IApplicationBuilder ab)
-        {
-            if (!__IsServiceRegistered<KaronteCryptingService>())
-                throw new InvalidOperationException();
-            else if (__IsApplicationRegistered(CKaronteKey.Crypting))
-                return ab;
-
-            __RegisterApplication(CKaronteKey.Crypting);
-
-            return
-                ab
-                    .Use
-                    (
-                        async (httpc, rd) =>
-                        {
-                            KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
-                            kc.CryptingContext = new KaronteCryptingContext(ref kc);
-                            await rd.Invoke();
-                        }
-                    );
+                    .UseRouting();
         }
 
         #endregion
@@ -402,18 +543,13 @@ namespace Kudos.Servers.KaronteModule
         #region public static IApplicationBuilder UseKaronteAuthorizating(...)
 
         public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType>(this IApplicationBuilder ab)
-            where MiddlewareType : AKaronteAuthorizatingMiddleware<KaronteAuthorizationAttribute, EKaronteAuthorizationType>
+           where MiddlewareType : AKaronteAuthorizatingMiddleware
         {
-            return
-                ab.UseKaronteAuthorizating<MiddlewareType, KaronteAuthorizationAttribute, EKaronteAuthorizationType>();
-        }
-
-        public static IApplicationBuilder UseKaronteAuthorizating<MiddlewareType, AttributeType, EnumType>(this IApplicationBuilder ab)
-            where MiddlewareType : AKaronteAuthorizatingMiddleware<AttributeType, EnumType>
-            where AttributeType : AKaronteEnumizedAttribute<EnumType>
-            where EnumType : Enum
-        {
-            if (!__IsServiceRegistered<KaronteContext>())
+            if
+            (
+                !__IsApplicationRegistered(CKaronteKey.Core)
+                || !__IsServiceRegistered(CKaronteKey.Authorizating)
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Authorizating))
                 return ab;
@@ -422,9 +558,7 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseKaronteHeading(CKaronteHttpHeader.Authorization)
-                    .UseKaronteAttributing<AttributeType>()
-                    .UseMiddleware<MiddlewareType>();
+                   .UseMiddleware<MiddlewareType>();
         }
 
         #endregion
@@ -434,7 +568,11 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteDatabasing<MiddlewareType>(this IApplicationBuilder ab)
             where MiddlewareType : AKaronteDatabasingMiddleware
         {
-            if (!__IsServiceRegistered<KaronteDatabasingService>())
+            if
+            (
+               !__IsApplicationRegistered(CKaronteKey.Core)
+               || !__IsServiceRegistered<KaronteDatabasingService>()
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Databasing))
                 return ab;
@@ -443,121 +581,7 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseMiddleware<MiddlewareType>();
-        }
-
-        #endregion
-
-        #region public static IApplicationBuilder UseKaronteHeading(...)
-
-        public static IApplicationBuilder UseKaronteHeading<MiddlewareType>(this IApplicationBuilder ab, String? s)
-            where MiddlewareType : AKaronteHeadingMiddleware
-        {
-            return
-                ab
-                    .UseKaronteHeading(s)
-                    .UseMiddleware<MiddlewareType>();
-        }
-
-        internal static IApplicationBuilder UseKaronteHeading(this IApplicationBuilder ab, String? s)
-        {
-            if (!__IsServiceRegistered<KaronteContext>())
-                throw new InvalidOperationException();
-
-            __RegisterApplication(CKaronteKey.Heading);
-
-            return
-                ab
-                    .Use
-                    (
-                        async (httpc, rq) =>
-                        {
-                            KaronteContext
-                                kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
-
-                            StringValues sv;
-
-                            if (s != null)
-                                httpc.Request.Headers.TryGetValue(s, out sv);
-                            else
-                                sv = new StringValues();
-
-                            KaronteHeadingContext khc = new KaronteHeadingContext(ref s, ref sv, ref kc);
-
-                            kc.RegisterObject(CKaronteKey.Heading, ref khc);
-
-                            await rq.Invoke();
-                        }
-                    );
-        }
-
-        #endregion
-
-        #region public static IApplicationBuilder UseKaronteAttributing(...)
-
-        public static IApplicationBuilder UseKaronteAttributing<MiddlewareType, AttributeType>(this IApplicationBuilder ab)
-            where MiddlewareType : AKaronteAttributingMiddleware<AttributeType>
-            where AttributeType : Attribute
-        {
-            return
-                ab
-                    .UseKaronteAttributing<AttributeType>()
-                    .UseMiddleware<MiddlewareType>();
-        }
-
-        internal static IApplicationBuilder UseKaronteAttributing<AttributeType>(this IApplicationBuilder ab)
-            where AttributeType : Attribute
-        {
-            if (!__IsServiceRegistered<KaronteContext>())
-                throw new InvalidOperationException();
-
-            __RegisterApplication(CKaronteKey.Attributing);
-
-            return
-                ab
-                    .Use
-                    (
-                        async (httpc, rq) =>
-                        {
-                            KaronteContext
-                                kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
-
-                            Attribute?
-                                att = EndpointUtils.GetLastMetadata<AttributeType>(httpc.GetEndpoint());
-
-                            KaronteAttributingContext hac = new KaronteAttributingContext(ref att, ref kc);
-
-                            kc.RegisterObject(CKaronteKey.Attributing, ref hac);
-
-                            await rq.Invoke();
-                        }
-                    );
-        }
-
-        #endregion
-
-        #region public static IApplicationBuilder UseKaronteJSONing(...)
-
-        public static IApplicationBuilder UseKaronteJSONing(this IApplicationBuilder ab)
-        {
-            if (!__IsServiceRegistered<KaronteJSONingService>())
-                throw new InvalidOperationException();
-            else if (__IsApplicationRegistered(CKaronteKey.JSONing))
-                return ab;
-
-            __RegisterApplication(CKaronteKey.JSONing);
-
-            return
-                ab
-                    .Use
-                    (
-                        async (httpc, rd) =>
-                        {
-                            KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
-                            kc.JSONingContext = new KaronteJSONingContext(ref kc);
-                            await rd.Invoke();
-                        }
-                    );
+                   .UseMiddleware<MiddlewareType>();
         }
 
         #endregion
@@ -567,35 +591,33 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteResponsing<ResponsingMiddlewareType, NonActionResultType>(this IApplicationBuilder ab)
             where ResponsingMiddlewareType : AKaronteResponsingMiddleware<NonActionResultType>
         {
-            if (!__IsServiceRegistered<KaronteContext>())
+            if
+            (
+               !__IsApplicationRegistered(CKaronteKey.Core)
+               || !__IsServiceRegistered(CKaronteKey.Responsing)
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Responsing))
                 return ab;
 
             __RegisterApplication(CKaronteKey.Responsing);
 
-            return ab.UseMiddleware<ResponsingMiddlewareType>();
+            return
+                ab.UseMiddleware<ResponsingMiddlewareType>();
         }
 
         #endregion
 
         #region public static IApplicationBuilder UseKaronteAuthenticating(...)
 
-        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType>(this IApplicationBuilder ab)
-            where
-                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, KaronteAuthenticationAttribute>
+        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteAuthenticatingMiddleware
         {
-            return
-                ab.UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, KaronteAuthenticationAttribute>();
-        }
-
-        public static IApplicationBuilder UseKaronteAuthenticating<MiddlewareType, AuthenticationDataType, AttributeType>(this IApplicationBuilder ab)
-            where
-                MiddlewareType : AKaronteAuthenticatingMiddleware<AuthenticationDataType, AttributeType>
-            where
-                AttributeType : Attribute
-        {
-            if (!__IsServiceRegistered<KaronteContext>())
+            if
+            (
+               !__IsApplicationRegistered(CKaronteKey.Core)
+               || !__IsServiceRegistered(CKaronteKey.Authenticating)
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Authenticating))
                 return ab;
@@ -604,7 +626,6 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseKaronteAttributing<AttributeType>()
                     .UseMiddleware<MiddlewareType>();
         }
 
@@ -616,7 +637,11 @@ namespace Kudos.Servers.KaronteModule
             where
                 MiddlewareType : AKaronteCapabilitingMiddleware
         {
-            if (!__IsServiceRegistered<KaronteContext>())
+            if
+            (
+               !__IsApplicationRegistered(CKaronteKey.Core)
+               || !__IsServiceRegistered(CKaronteKey.Capabiliting)
+            )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Capabiliting))
                 return ab;
@@ -625,7 +650,6 @@ namespace Kudos.Servers.KaronteModule
 
             return
                 ab
-                    .UseKaronteAttributing<KaronteCapabilityAttribute>()
                     .UseMiddleware<MiddlewareType>();
         }
 
@@ -635,9 +659,6 @@ namespace Kudos.Servers.KaronteModule
 
         public static IEndpointRouteBuilder MapKaronteControllers(this IEndpointRouteBuilder erb)
         {
-            if (!__IsApplicationRegistered(CKaronteKey.Routing))
-                throw new InvalidOperationException();
-
             Assembly?
                 ass = Assembly.GetEntryAssembly();
 
@@ -662,7 +683,11 @@ namespace Kudos.Servers.KaronteModule
         public static IEndpointRouteBuilder MapKaronteController<T>(this IEndpointRouteBuilder erb)
             where T : AKaronteController
         {
-            if (!__IsApplicationRegistered(CKaronteKey.Routing))
+            if
+            (
+               !__IsApplicationRegistered(CKaronteKey.Core)
+               || !__IsServiceRegistered(CKaronteKey.Routing)
+            )
                 throw new InvalidOperationException();
 
             Type t = typeof(T);

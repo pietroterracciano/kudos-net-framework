@@ -6,7 +6,7 @@ namespace Kudos.Servers.KaronteModule.Constants
         public static readonly String
 			Authorization = nameof(Authorization),
 			ContentType = "Content-Type",
-			Accept = "Accept",
+			Accept = nameof(Accept),
 			AcceptContent = "Accept-Content";
 	}
 }

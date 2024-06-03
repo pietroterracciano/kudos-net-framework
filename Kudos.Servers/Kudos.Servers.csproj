@@ -25,10 +25,8 @@
     <None Remove="KaronteModule\Utils\" />
     <None Remove="KaronteModule\Services\" />
     <Compile Remove="KaronteModule\Services\KaronteHeadingService.cs" />
-    <None Remove="KaronteModule\Descriptors\Authorizatings\" />
     <None Remove="KaronteModule\Descriptors\Authenticatings\" />
     <Compile Remove="KaronteModule\Middlewares\KaronteAuthorizatingMiddleware.cs" />
-    <Compile Remove="KaronteModule\Attributes\KaronteAuthorizatingAttribute.cs" />
     <Compile Remove="KaronteModule\Attributes\KaronteRouteAttribute.cs" />
     <Compile Remove="KaronteModule\Attributes\KaronteNonAction.cs" />
     <Compile Remove="KaronteModule\Attributes\KaronteNonActionAttribute.cs" />
@@ -43,7 +41,6 @@
   <ItemGroup>
     <Folder Include="KaronteModule\Utils\" />
     <Folder Include="KaronteModule\Services\" />
-    <Folder Include="KaronteModule\Descriptors\Authorizatings\" />
     <Folder Include="KaronteModule\Descriptors\Authenticatings\" />
   </ItemGroup>
   <ItemGroup>

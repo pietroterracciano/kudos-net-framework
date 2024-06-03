@@ -3,8 +3,7 @@ using System;
 
 namespace Kudos.Servers.KaronteModule.Enums
 {
-    [Flags]
-    public enum EKaronteRouteStatus
+    public enum EKaronteEndpointStatus
     {
         NotRegistered,
         OnFallback,

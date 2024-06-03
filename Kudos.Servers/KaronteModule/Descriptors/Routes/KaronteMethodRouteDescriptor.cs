@@ -141,28 +141,28 @@ namespace Kudos.Servers.KaronteModule.Descriptors.Routes
             }
         }
 
-        internal static void Request(ref Endpoint? end, out KaronteMethodRouteDescriptor? kmrd)
-        {
-            String? shkorfp;
+        //internal static void Request(ref Endpoint? end, out KaronteMethodRouteDescriptor? kmrd)
+        //{
+        //    String? shkorfp;
 
-            IRouteDiagnosticsMetadata? rdmd = EndpointUtils.GetLastMetadata<IRouteDiagnosticsMetadata>(end);
-            shkorfp = rdmd != null ? shkorfp = rdmd.Route : null;
+        //    IRouteDiagnosticsMetadata? rdmd = EndpointUtils.GetLastMetadata<IRouteDiagnosticsMetadata>(end);
+        //    shkorfp = rdmd != null ? shkorfp = rdmd.Route : null;
            
-            lock (__m)
-            {
-                kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
-            }
+        //    lock (__m)
+        //    {
+        //        kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
+        //    }
 
-            if (kmrd != null) return;
+        //    if (kmrd != null) return;
 
-            RouteNameMetadata? rnmd = EndpointUtils.GetLastMetadata<RouteNameMetadata>(end);
-            shkorfp = rnmd != null ? rnmd.RouteName : null;
+        //    RouteNameMetadata? rnmd = EndpointUtils.GetLastMetadata<RouteNameMetadata>(end);
+        //    shkorfp = rnmd != null ? rnmd.RouteName : null;
 
-            lock (__m)
-            {
-                kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
-            }
-        }
+        //    lock (__m)
+        //    {
+        //        kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
+        //    }
+        //}
 
         #endregion
 

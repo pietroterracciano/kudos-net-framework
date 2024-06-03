@@ -21,9 +21,9 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     {
         public AKaronteDatabasingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<KaronteDatabasingContext> OnContextCreate(KaronteContext kc)
+        protected override async Task<KaronteDatabasingContext> OnContextFetch(KaronteContext kc)
         {
-            return kc.DatabasingContext = new KaronteDatabasingContext(ref kc);
+            return kc.DatabasingContext;
         }
 
         protected override async Task OnBounceEnd(KaronteContext kc)

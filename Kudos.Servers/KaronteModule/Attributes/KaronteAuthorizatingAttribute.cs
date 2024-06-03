@@ -3,9 +3,14 @@ using Kudos.Servers.KaronteModule.Enums;
 
 namespace Kudos.Servers.KaronteModule.Attributes
 {
-    public sealed class KaronteAuthorizatingAttribute : AKaronteAuthorizatingAttribute<EKaronteAuthorizationType>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public sealed class KaronteAuthorizatingAttribute : Attribute
     {
-        public KaronteAuthorizatingAttribute(EKaronteAuthorizationType e) : base(e) { }
+        public readonly EKaronteAuthorizationType AuthorizationType;
+
+        public KaronteAuthorizatingAttribute(EKaronteAuthorizationType e)
+        {
+            AuthorizationType = e;
+        }
     }
 }
-

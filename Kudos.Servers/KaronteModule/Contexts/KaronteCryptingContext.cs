@@ -10,9 +10,18 @@ namespace Kudos.Servers.KaronteModule.Contexts
 	{
 		private readonly KaronteCryptingService _kcs;
 
-		internal KaronteCryptingContext(ref KaronteContext kc) : base(ref kc)
+		internal KaronteCryptingContext
+            (
+                ref KaronteCryptingService kcs,
+                ref KaronteContext kc
+            )
+        :
+            base
+            (
+                ref kc
+            )
 		{
-            _kcs = kc.RequestService<KaronteCryptingService>();
+            _kcs = kcs;
         }
 
 		public Symmetric? GetSymmetric(String? sn) { return _kcs.Symmetrics.Get<Symmetric>(sn); }

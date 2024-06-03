@@ -2,7 +2,6 @@
 
 namespace Kudos.Databases.ORMs.GefyraModule.Enums
 {
-    [Flags]
 	public enum EGefyraJoin
 	{
 		Left,

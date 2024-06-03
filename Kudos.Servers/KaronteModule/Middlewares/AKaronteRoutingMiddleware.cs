@@ -20,10 +20,9 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     {
         public AKaronteRoutingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
-        protected override async Task<KaronteRoutingContext> OnContextCreate(KaronteContext kc)
+        protected override async Task<KaronteRoutingContext> OnContextFetch(KaronteContext kc)
         {
-            Endpoint? end = kc.HttpContext.GetEndpoint();
-            return kc.RoutingContext = new KaronteRoutingContext(ref kc, ref end);
+            return kc.RoutingContext;
         }
 
         protected override async Task OnBounceEnd(KaronteContext kc) { }

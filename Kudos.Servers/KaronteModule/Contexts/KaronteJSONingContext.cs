@@ -1,8 +1,7 @@
 ﻿using Kudos.Utils;
 using System;
-using Kudos.Servers.KaronteModule.Options;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Kudos.Servers.KaronteModule.Services;
 
 namespace Kudos.Servers.KaronteModule.Contexts
 {
@@ -12,9 +11,19 @@ namespace Kudos.Servers.KaronteModule.Contexts
         //private readonly KaronteJSONingService _kjsons;
         public readonly JsonSerializerOptions SerializerOptions;
 
-        internal KaronteJSONingContext(ref KaronteContext kc) : base(ref kc)
+        internal
+            KaronteJSONingContext
+            (
+                ref KaronteJSONingService kjsons,
+                ref KaronteContext kc
+            )
+        :
+            base
+            (
+                ref kc
+            )
         {
-            SerializerOptions = KaronteContext.RequestService<KaronteJSONingService>().JsonSerializerOptions;
+            SerializerOptions = kjsons.JsonSerializerOptions;
         }
 
         //public Task<String?> SerializeAsync(object? o) { return Task.Run(() => Serialize(o)); }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Kudos.Databases.Enums
 {
-    [Flags]
     public enum EDatabaseDataType
     {
         TinyInteger,
