@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Kudos.Constants;
+using Kudos.Reflection.Utils;
 
 namespace Kudos.Utils.Numerics
 {

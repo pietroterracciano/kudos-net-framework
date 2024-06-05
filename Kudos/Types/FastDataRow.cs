@@ -42,7 +42,6 @@ namespace Kudos.Types
             }
         }
 
-
         public FastDataRow(DataRow? dr)
         {
             if(dr == null)
@@ -53,6 +52,8 @@ namespace Kudos.Types
                 _b = false;
                 return;
             }
+
+            _dr = dr;
 
             _b = true;
             _d0 = new Dictionary<int, object?>(dr.Table.Columns.Count);

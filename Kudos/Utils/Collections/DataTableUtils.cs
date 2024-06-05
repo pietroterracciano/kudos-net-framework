@@ -11,6 +11,18 @@ namespace Kudos.Utils.Collections
 
         #endregion
 
+        #region public static Boolean? HasColumn(...)
+
+        public static Boolean HasColumn(DataTable? dt, String? s)
+        {
+            return
+                s != null
+                && dt != null
+                && dt.Columns.Contains(s);
+        }
+
+        #endregion
+
         #region public static DataRow? GetRow(...)
 
         public static DataRow? GetFirstRow(DataTable? dt) { return GetRow(dt, 0); }

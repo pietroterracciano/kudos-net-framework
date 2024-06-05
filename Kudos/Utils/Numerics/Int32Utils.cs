@@ -29,6 +29,7 @@ namespace Kudos.Utils.Numerics
 
         #endregion
 
+        public static Int32? Parse(String? s) { Int32 i; return Int32.TryParse(s, out i) ? i : null; }
         public static Int32? Parse(Object? o) { return ObjectUtils.Parse<Int32?>(o); }
         public static Int32 NNParse(Object? o) { return ObjectUtils.Parse<Int32>(o); }
     }

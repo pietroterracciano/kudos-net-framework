@@ -62,18 +62,18 @@ namespace Kudos.Validations.EpikyrosiModule
 
         #region Validate
 
-        //public static Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid = false)
-        //{
-        //    return Task.Run(() => Validate(o, bStopOnFirstNotValid));
-        //}
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid = false)
+        {
+            return Task.Run(() => Validate(o, bStopOnFirstNotValid));
+        }
         public static EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid = false)
         {
             return Validate(o, null, bStopOnFirstNotValid);
         }
-        //public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid = false)
-        //{
-        //    return Task.Run(() => Validate(o, sPoolName, bStopOnFirstNotValid));
-        //}
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid = false)
+        {
+            return Task.Run(() => Validate(o, sPoolName, bStopOnFirstNotValid));
+        }
         public static EpikyrosiResult Validate(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid = false)
         {
             if (o == null)

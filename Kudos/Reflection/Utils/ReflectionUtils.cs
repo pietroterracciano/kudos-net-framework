@@ -224,6 +224,32 @@ namespace Kudos.Reflection.Utils
 
         #endregion
 
+        #region public static Type? GetInterface<...>(...)
+
+        public static Type? GetInterface<T>(string? s) { return GetInterface(typeof(T), s); }
+        public static Type? GetInterface(Type? t, string? s)
+        {
+            if (t != null && s != null)
+                try { return t.GetInterface(s); } catch { }
+
+            return null;
+        }
+
+        #endregion
+
+        #region public static Type? GetInterfaces<...>(...)
+
+        public static Type[]? GetInterfaces<T>() { return GetInterfaces(typeof(T)); }
+        public static Type[]? GetInterfaces(Type? t)
+        {
+            if (t != null)
+                try { return t.GetInterfaces(); } catch { }
+
+            return null;
+        }
+
+        #endregion
+
         #region public static MethodInfo? GetMethod<...>(...)
 
         public static MethodInfo? GetMethod<T>(string? s, params Type[]? ta) { return GetMethod(typeof(T), s, ta); }
@@ -401,7 +427,7 @@ namespace Kudos.Reflection.Utils
 
         public static bool SetPropertyValue(object? o, PropertyInfo? pi, object? oValue, bool bForceValueCompatibility = true)
         {
-            if (o != null && pi != null)
+            if (o != null && pi != null && pi.SetMethod != null)
                 try { pi.SetValue(o, bForceValueCompatibility ? ObjectUtils.Parse(pi.PropertyType, oValue) : oValue); return true; } catch { }
 
             return false;
@@ -444,7 +470,7 @@ namespace Kudos.Reflection.Utils
         public static T? GetPropertyValue<T>(object? o, PropertyInfo? pi) { return ObjectUtils.Cast<T>(GetPropertyValue(o, pi)); }
         public static object? GetPropertyValue(object? o, PropertyInfo? pi)
         {
-            if (o != null && pi != null)
+            if (o != null && pi != null && pi.GetMethod != null)
                 try { return pi.GetValue(o); } catch { }
 
             return null;
@@ -508,18 +534,18 @@ namespace Kudos.Reflection.Utils
         public static object? CreateInstance(Type? t, BindingFlags bf, Object?[]? oa) { return CreateInstance(t, bf, null, oa); }
         public static object? CreateInstance(Type? t, BindingFlags bf, Type[]? ta, Object?[]? oa)
         {
-            Object? o = InvokeConstructor<Object>( GetConstructor(t, bf, ta), oa );
-            if (o != null)
-                return o;
-
+            ConstructorInfo? ci = GetConstructor(t, bf, ta);
             Object?[]? oa0;
-            ConstructorInfo? ci;
-            __FindCompatibleConstructor(ref t, ref oa, out ci, out oa0);
-            if (ci != null)
-            {
-                o = InvokeConstructor<Object>(ci, oa0);
-                if (o != null) return o;
-            }
+            __FindCompatibleConstructorParameters(ref ci, ref oa, out oa0);
+            Object? o = InvokeConstructor<Object>(ci, oa0);
+            if (o != null) return o;
+
+            //__FindCompatibleConstructor(ref t, ref bf, ref oa, out ci, out oa0);
+            //if (ci != null)
+            //{
+            //    o = InvokeConstructor<Object>(ci, oa0);
+            //    if (o != null) return o;
+            //}
 
             try
             {
@@ -537,10 +563,15 @@ namespace Kudos.Reflection.Utils
 
         public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object?[]? a)
         {
-            if (ci != null)
-                try { return ObjectUtils.Cast<T>(ci.Invoke(a)); } catch { }
+            return ObjectUtils.Cast<T>(InvokeConstructor(ci, a));
+        }
 
-            return default(T);
+        public static Object? InvokeConstructor(ConstructorInfo? ci, params object?[]? a)
+        {
+            if (ci != null)
+                try { return ci.Invoke(a); } catch { }
+
+            return null;
         }
 
         #endregion
@@ -877,6 +908,21 @@ namespace Kudos.Reflection.Utils
             }
 
             return li.ToArray();
+        }
+
+        #endregion
+
+        #region public static Type? MakeGenericType(...)
+
+        public static Type? MakeGenericType(Type? t, Type? tg, params Type[]? tga)
+        {
+            if (t == null) return null;
+            Type?[] ta = ArrayUtils.UnShift(tg, tga);
+            if (ta == null) return null;
+            List<Type> l = new List<Type>(ta.Length);
+            for (int i = 0; i < ta.Length; i++) { if (ta[i] == null) continue; l.Add(ta[i]); }
+            try { return t.MakeGenericType(l.ToArray()); } catch { }
+            return null;
         }
 
         #endregion
@@ -1535,10 +1581,10 @@ namespace Kudos.Reflection.Utils
 
         #region private static void __FindCompatibleConstructor<...>(...)
 
-        private static void __FindCompatibleConstructor(ref Type? t, ref Object?[]? oa, out ConstructorInfo? ci, out Object?[]? oaOut)
+        private static void __FindCompatibleConstructor(ref Type? t, ref BindingFlags bf, ref Object?[]? oa, out ConstructorInfo? ci, out Object?[]? oaOut)
         {
             ConstructorInfo[]?
-                cia = ReflectionUtils.GetConstructors(t);
+                cia = ReflectionUtils.GetConstructors(t, bf);
 
             if (cia != null)
                 for (int i = 0; i < cia.Length; i++)

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Numerics;
 using System.Reflection;
 using Kudos.Constants;
@@ -57,39 +58,72 @@ namespace Kudos.Databases.ORMs.GefyraModule
         //public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
         public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
         {
-            if (dt == null)
+            return Parse(typeof(T), dt, gb) as T[];
+        }
+        public static Object[]? Parse(Type? t, DataTable? dt, GefyraBuilt? gb = null)
+        {
+            if (dt == null || dt.Rows.Count < 1)
                 return null;
 
-            List<T> l = new List<T>(dt.Rows.Count);
+            Object[]?
+               oa0 = ArrayUtils.CreateInstance(t, dt.Rows.Count);
 
-            T? ti;
-            for(int i=0; i<dt.Rows.Count; i++)
+            if (oa0 == null)
+                return null;
+
+            Int32
+                iNonNullableObjects = 0;
+
+            Object? oi;
+            for (int i = 0; i < dt.Rows.Count; i++)
             {
-                ti = Parse<T>(dt.Rows[i], gb);
-                if (ti == null) continue;
-                l.Add(ti);
+                oi = Parse(t, dt.Rows[i], gb);
+                if (oi == null) continue;
+                oa0[i] = oi; iNonNullableObjects++;
             }
 
-            return l.ToArray();
+            if (iNonNullableObjects < 1)
+                return null;
+            else if (dt.Rows.Count - iNonNullableObjects == 0)
+                return oa0;
+
+            Object[]?
+                oa1 = ArrayUtils.CreateInstance(t, iNonNullableObjects);
+
+            if (oa1 == null)
+                return null;
+
+            for (int i = 0; i < oa0.Length; i++)
+            {
+                if (oa0[i] == null) continue;
+                oa1[i] = oa0[i];
+            }
+
+            return oa1;
         }
 
         //public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
         public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
         {
+            return ObjectUtils.Cast<T>(Parse(typeof(T), dr, gb));
+        }
+        public static Object? Parse(Type? t, DataRow? dr, GefyraBuilt? gb = null)
+        {
             if (dr == null)
-                return default(T);
+                return null;
 
             IGefyraTable
-                gt = Gefyra.RequestTable<T>();
+                gt = Gefyra.RequestTable(t);
 
             if (gt == GefyraTable.Invalid)
-                return default(T);
+                return null;
 
-            T? t =
-                ReflectionUtils.InvokeConstructor<T>(ReflectionUtils.GetConstructor<T>(CBindingFlags.Instance));
+            Object?
+                o =
+                    ReflectionUtils.InvokeConstructor(ReflectionUtils.GetConstructor(t, CBindingFlags.Instance));
 
-            if (t == null)
-                return default(T);
+            if (o == null)
+                return null;
 
             Metas? m;
 
@@ -108,7 +142,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
             IGefyraColumn? gci;
 
-            for(int i=0; i<dr.Table.Columns.Count; i++)
+            for (int i = 0; i < dr.Table.Columns.Count; i++)
             {
                 gci =
                     m != null
@@ -121,10 +155,10 @@ namespace Kudos.Databases.ORMs.GefyraModule
                 if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember)
                     continue;
 
-                ReflectionUtils.SetMemberValue(t, gci.DeclaringMember, DataRowUtils.GetValue(dr, i), true);
+                ReflectionUtils.SetMemberValue(o, gci.DeclaringMember, DataRowUtils.GetValue(dr, i), true);
             }
 
-            return t;
+            return o;
         }
 
         #endregion

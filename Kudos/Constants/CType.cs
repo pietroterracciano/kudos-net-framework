@@ -54,6 +54,9 @@ namespace Kudos.Constants
             OpCodes = typeof(OpCodes),
             Type = typeof(Type),
             JsonElement = typeof(JsonElement),
-            UnixTimeStamp = typeof(UnixTimeStamp);
+            UnixTimeStamp = typeof(UnixTimeStamp),
+            Array = typeof(Array),
+            IList = typeof(System.Collections.IList),
+            List = typeof(List<>);
     }
 }

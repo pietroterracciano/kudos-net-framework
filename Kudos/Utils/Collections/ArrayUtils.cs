@@ -2,8 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Kudos.Constants;
+using Kudos.Reflection.Utils;
 
 namespace Kudos.Utils.Collections
 {
@@ -17,8 +20,8 @@ namespace Kudos.Utils.Collections
 
         #region CreateInstance<...>(...)
 
-        public static T[]? CreateInstance<T>(int i) { return ObjectUtils.Cast<T[]>(CreateInstance(typeof(T), i)); }
-        public static Array? CreateInstance(Type? t, int i) { if (t != null && i > -1) try { return Array.CreateInstance(t, i); } catch { } return null; }
+        public static T[]? CreateInstance<T>(int i) { return CreateInstance(typeof(T), i) as T[]; }
+        public static Object[]? CreateInstance(Type? t, int i) { if (t != null && i > -1) try { return Array.CreateInstance(t, i) as Object[]; } catch { } return null; }
 
         #endregion
 
@@ -53,13 +56,13 @@ namespace Kudos.Utils.Collections
 
         #endregion
 
-        #region public static T?[]? UnShift(...)
+        #region public static T?[] UnShift(...)
 
-        public static T?[]? UnShift<T>(T? o, T?[]? a)
+        public static T?[] UnShift<T>(T? o, T?[]? a)
         {
             int i = a != null ? a.Length : 0;
 
-            T[] a1 = new T[1 + i];
+            T?[] a1 = new T[1 + i];
             a1[0] = o;
 
             if (i > 0)
@@ -130,6 +133,22 @@ namespace Kudos.Utils.Collections
 
             Array.Copy(tai, 0, tao0, 0, tao0.Length);
             Array.Copy(tai, i, tao1, 0, tao1.Length);
+        }
+
+        #endregion
+
+        #region public static Type? GetArgumentType(...)
+
+        public new static Type? GetArgumentType(ICollection? o)
+        {
+            return o != null
+                ? GetArgumentType(o.GetType())
+                : null;
+        }
+
+        public new static Type? GetArgumentType(Type? t)
+        {
+            return ReflectionUtils.GetMemberValueType(ReflectionUtils.GetMethod(t, "Get"));
         }
 
         #endregion

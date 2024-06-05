@@ -72,6 +72,52 @@ namespace Kudos.Utils
 
         #endregion
 
+        #region public static Boolean IsNumeric(...)
+
+        public static Boolean IsNumeric(Object? o)
+        {
+            return
+                IsNumeric(o as Type)
+                ||
+                (
+                    o != null
+                    && IsNumeric(o.GetType())
+                );
+        }
+
+        public static Boolean IsNumeric(Type? t)
+        {
+            return
+                t != null
+                &&
+                (
+                    t == CType.UInt16
+                    || t == CType.NullableUInt16
+                    || t == CType.UInt32
+                    || t == CType.NullableUInt32
+                    || t == CType.UInt64
+                    || t == CType.NullableUInt64
+                    || t == CType.UInt128
+                    || t == CType.NullableUInt128
+                    || t == CType.Int16
+                    || t == CType.NullableInt16
+                    || t == CType.Int32
+                    || t == CType.NullableInt32
+                    || t == CType.Int64
+                    || t == CType.NullableInt64
+                    || t == CType.Int128
+                    || t == CType.NullableInt128
+                    || t == CType.Single
+                    || t == CType.NullableSingle
+                    || t == CType.Double
+                    || t == CType.NullableDouble
+                    || t == CType.Decimal
+                    || t == CType.NullableDecimal
+                );
+        }
+
+        #endregion
+
         #region public static Boolean IsInstance<...>(...)
 
         public static Boolean IsInstance<T>(Object? o) { return IsInstance(o, typeof(T)); }
