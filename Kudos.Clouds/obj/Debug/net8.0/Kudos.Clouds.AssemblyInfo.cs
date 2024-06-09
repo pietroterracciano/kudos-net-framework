@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Kudos.Clouds")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+33d6079f5177778fd13330307d5f2019f0ef2e5f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+29c809ae7d3be552fff33c9164dae0433ca61d2d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Kudos.Clouds")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Kudos.Clouds")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
