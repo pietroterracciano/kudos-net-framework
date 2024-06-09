@@ -21,6 +21,7 @@ namespace Kudos.Servers.KaronteModule.Constants
             UnprocessableEntity = EnumUtils.GetKey(HttpStatusCode.UnprocessableEntity),
             ImATeapot = "I'm a teapot",
             Expired = nameof(Expired),
+            Wrong = nameof(Wrong),
             NotNecessary = nameof(NotNecessary);
     }
 }

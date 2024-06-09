@@ -19,6 +19,7 @@ namespace Kudos.Servers.KaronteModule.Constants
             UnprocessableEntity = EnumUtils.GetValue(HttpStatusCode.UnprocessableEntity).Value,
             ImATeapot = 418,
             Expired = 600,
+            Wrong = 601,
             NotNecessary = 250;
     }
 }
