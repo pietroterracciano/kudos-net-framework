@@ -42,6 +42,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         IGefyraOffsetClausoleBuilder,
 
         IGefyraUpdateClausoleBuilder,
+            IGefyraUpdateClausole,
+            IGefyraSetClausole,
+            IGefyraSetClausoleBuilder,
+            IGefyraSetActionClausoleBuilder,
+            IGefyraPostClausole<IGefyraSetActionClausoleBuilder>,
+            IGefyraPostClausoleBuilder<IGefyraSetActionClausoleBuilder>,
+
         IGefyraDeleteClausoleBuilder
     {
         private static readonly String
@@ -70,66 +77,66 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             _sb1 = new StringBuilder();
         }
 
-        #region private void Append(...)
+        #region private void _Append(...)
 
-        private void Append(ref EGefyraCompare e)
+        private void _Append(ref EGefyraCompare e)
         {
             String? s;
             GefyraCompareUtils.GetString(ref e, out s);
-            Append(s);
+            _Append(s);
         }
 
-        private void Append(ref EGefyraOrder e)
+        private void _Append(ref EGefyraOrder e)
         {
             String? s;
             GefyraOrderUtils.GetString(ref e, out s);
-            Append(s);
+            _Append(s);
         }
 
-        private void Append(ref EGefyraJoin e)
+        private void _Append(ref EGefyraJoin e)
         {
             String? s;
             GefyraJoinUtils.GetString(ref e, out s);
-            Append(s);
+            _Append(s);
         }
 
-        private void Append(ref IGefyraTable? gt)
+        private void _Append(ref IGefyraTable? gt)
         {
-            if (gt == null) Append(GefyraTable.Invalid.GetSQL());
+            if (gt == null) _Append(GefyraTable.Invalid.GetSQL());
             else if (gt == GefyraTable.Ignored) return;
-            Append(gt.GetSQL());
+            _Append(gt.GetSQL());
         }
 
-        private void Append(ref IGefyraColumn?[]? gca)
+        private void _Append(ref IGefyraColumn?[]? gca)
         {
             if (gca == null) return;
             for (int i = 0; i < gca.Length; i++)
             {
-                Append(ref gca[i]);
+                _Append(ref gca[i]);
                 if (i > gca.Length - 2) continue;
-                Append(CCharacter.Comma);
-                Append(CCharacter.Space);
+                _Append(CCharacter.Comma);
+                _Append(CCharacter.Space);
             }
         }
 
-        private void Append(ref IGefyraColumn? gc)
+        private void _Append(ref IGefyraColumn? gc)
         {
-            if (gc == null) Append(GefyraColumn.Invalid.GetSQL());
+            if (gc == null) _Append(GefyraColumn.Invalid.GetSQL());
             else if (gc == GefyraColumn.Ignored) return;
-            Append(gc.GetSQL()); _lgcConsumed.Add(gc);
+            _Append(gc.GetSQL()); _lgcConsumed.Add(gc);
         }
 
-        private void Append(ref Int32 i)
+        private void _Append(ref Int32 i)
         {
             _sb0.Append(i);
         }
 
-        private void Append(String s)
+        private void _Append(String s)
         {
             _sb0.Append(s);
         }
 
-        private void Append(Char c)
+        private void _Append(Char c)
         {
             _sb0.Append(c);
         }
@@ -152,8 +159,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraInsertClausoleBuilder Insert()
         {
-            Append(CGefyraClausole.Insert);
-            Append(CCharacter.Space);
+            _Append(CGefyraClausole.Insert);
+            _Append(CCharacter.Space);
             return this;
         }
 
@@ -163,17 +170,17 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraIntoClausoleBuilder Into(IGefyraTable? gt, IGefyraColumn? gc, params IGefyraColumn?[]? gca)
         {
-            Append(CGefyraClausole.Into); Append(CCharacter.Space); Append(ref gt); Append(CCharacter.Space);
-            Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Into); _Append(CCharacter.Space); _Append(ref gt); _Append(CCharacter.Space);
+            _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
 
             IGefyraColumn?[]? gca0 = ArrayUtils.UnShift(gc, gca);
 
-            Append(ref gca0); Append(CCharacter.Space);
+            _Append(ref gca0); _Append(CCharacter.Space);
 
-            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             //IGefyraColumn?[]? gca0 = ArrayUtils.UnShift(gc, gca);
-            //Append(ref gca0);
-            //Append(CCharacter.Space);
+            //_Append(ref gca0);
+            //_Append(CCharacter.Space);
 
             return this;
         }
@@ -184,7 +191,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraValuesClausoleBuilder Values(Object? o, params Object?[]? oa)
         {
-            Append(CGefyraClausole.Values); Append(CCharacter.Space); Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Values); _Append(CCharacter.Space); _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
 
             Object?[]? oa0 = ArrayUtils.UnShift(o, oa);
 
@@ -195,15 +202,15 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                 {
                     gci = ListUtils.Get(_lgcConsumed, i);
                     if (gci == null) continue;
-                    AppendParameter(ref gci, ref oa0[i]);
+                    _AppendParameter(ref gci, ref oa0[i]);
                     if (i < oa0.Length - 1)
-                        Append(CCharacter.Comma);
-                    Append(CCharacter.Space);
+                        _Append(CCharacter.Comma);
+                    _Append(CCharacter.Space);
                 }
             }
 
 
-            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
 
             return this;
         }
@@ -214,13 +221,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraSelectClausoleBuilder Select(params IGefyraColumn?[]? gca)
         {
-            Append(CGefyraClausole.Select);
-            Append(CCharacter.Space);
+            _Append(CGefyraClausole.Select);
+            _Append(CCharacter.Space);
             if (gca == null || gca.Length < 1)
-                Append(CCharacter.Asterisk);
+                _Append(CCharacter.Asterisk);
             else
             {
-                Append(ref gca);
+                _Append(ref gca);
 
                 if (gca != null)
                     for (int i = 0; i < gca.Length; i++)
@@ -229,7 +236,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                         _lgcOnOutput.Add(gca[i]);
                     }
             }
-            Append(CCharacter.Space);
+            _Append(CCharacter.Space);
             return this;
         }
 
@@ -239,7 +246,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraFromClausoleBuilder From(IGefyraTable? gt)
         {
-            Append(CGefyraClausole.From); Append(CCharacter.Space); Append(ref gt); Append(CCharacter.Space);
+            _Append(CGefyraClausole.From); _Append(CCharacter.Space); _Append(ref gt); _Append(CCharacter.Space);
             return this;
         }
 
@@ -249,16 +256,16 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraJoinClausoleBuilder Join(EGefyraJoin e, IGefyraTable? gt)
         {
-            Append(ref e); Append(CCharacter.Space); Append(CGefyraClausole.Join); Append(CCharacter.Space); Append(ref gt); Append(CCharacter.Space);
+            _Append(ref e); _Append(CCharacter.Space); _Append(CGefyraClausole.Join); _Append(CCharacter.Space); _Append(ref gt); _Append(CCharacter.Space);
             return this;
         }
 
         public IGefyraJoinClausoleBuilder Join(EGefyraJoin e, Action<IGefyraSelectClausole>? actgsc)
         {
-            Append(ref e); Append(CCharacter.Space); Append(CGefyraClausole.Join); Append(CCharacter.Space);
-            Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+            _Append(ref e); _Append(CCharacter.Space); _Append(CGefyraClausole.Join); _Append(CCharacter.Space);
+            _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
             if (actgsc != null) actgsc.Invoke(this);
-            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             return this;
         }
 
@@ -268,7 +275,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraOnClausoleBuilder On(Action<IGefyraOnActionClausoleBuilder>? act)
         {
-            Append(CGefyraClausole.On); Append(CCharacter.Space);
+            _Append(CGefyraClausole.On); _Append(CCharacter.Space);
             if (act != null) act.Invoke(this);
             return this;
         }
@@ -300,17 +307,23 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #endregion
 
-        #region IGefyraJunctionClausole
+        #region IGefyraAndClausole
 
-        IGefyraOnActionClausoleBuilder IGefyraJunctionClausole<IGefyraOnActionClausoleBuilder>.And()
+        public IGefyraOnActionClausoleBuilder And()
         {
             return _And();
         }
 
-        IGefyraOnActionClausoleBuilder IGefyraJunctionClausole<IGefyraOnActionClausoleBuilder>.Or()
+        #endregion
+
+        #region IGefyraOrClausole
+
+        public IGefyraOnActionClausoleBuilder Or()
         {
             return _Or();
         }
+
+        #endregion
 
         #endregion
 
@@ -323,13 +336,11 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #endregion
 
-        #endregion
-
         #region IGefyraWhereClausole
 
         public IGefyraWhereClausoleBuilder Where(Action<IGefyraWhereActionClausoleBuilder>? act)
         {
-            Append(CGefyraClausole.Where); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Where); _Append(CCharacter.Space);
             if (act != null) act.Invoke(this);
             return this;
         }
@@ -387,22 +398,30 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraJunctionClausole
 
-        IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder> IGefyraJunctionClausole<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>.And()
+        IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder> IGefyraAndClausole<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>.And()
         {
             return _And();
         }
 
-        IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder> IGefyraJunctionClausole<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>.Or()
+        IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder> IGefyraOrClausole<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>.Or()
         {
             return _Or();
         }
 
-        public IGefyraWhereActionClausoleBuilder And()
+        #endregion
+
+        #region IGefyraAndClausole
+
+        IGefyraWhereActionClausoleBuilder IGefyraAndClausole<IGefyraWhereActionClausoleBuilder>.And()
         {
             return _And();
         }
 
-        public IGefyraWhereActionClausoleBuilder Or()
+        #endregion
+
+        #region IGefyraOrClausole
+
+        IGefyraWhereActionClausoleBuilder IGefyraOrClausole<IGefyraWhereActionClausoleBuilder>.Or()
         {
             return _Or();
         }
@@ -415,8 +434,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraOrderByClausoleBuilder OrderBy(IGefyraColumn? gc, EGefyraOrder e)
         {
-            Append(CGefyraClausole.Order); Append(CCharacter.Space); Append(CGefyraClausole.By); Append(CCharacter.Space);
-            Append(ref gc); Append(CCharacter.Space); Append(ref e); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Order); _Append(CCharacter.Space); _Append(CGefyraClausole.By); _Append(CCharacter.Space);
+            _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
             return this;
         }
 
@@ -426,7 +445,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraLimitClausoleBuilder Limit(int i)
         {
-            Append(CGefyraClausole.Limit); Append(CCharacter.Space); Append(ref i); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Limit); _Append(CCharacter.Space); _Append(ref i); _Append(CCharacter.Space);
             return this;
         }
 
@@ -436,9 +455,53 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public IGefyraOffsetClausoleBuilder Offset(int i)
         {
-            Append(CGefyraClausole.Offset); Append(CCharacter.Space); Append(ref i); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Offset); _Append(CCharacter.Space); _Append(ref i); _Append(CCharacter.Space);
             return this;
         }
+
+        #endregion
+
+        #region IGefyraUpdateClausole
+
+        public IGefyraUpdateClausoleBuilder Update(IGefyraTable? gt)
+        {
+            _Append(CGefyraClausole.Update); _Append(CCharacter.Space); _Append(ref gt); _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraSetClausole
+
+        public IGefyraSetClausoleBuilder Set(Action<IGefyraSetActionClausoleBuilder>? act)
+        {
+            _Append(CGefyraClausole.Set); _Append(CCharacter.Space);
+            if (act != null) act.Invoke(this);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraSetActionClausoleBuilder
+
+        #region IGefyraPostClausole
+
+        public IGefyraPostClausoleBuilder<IGefyraSetActionClausoleBuilder> Post(IGefyraColumn? gc, Object? o)
+        {
+            return _Post(ref gc, ref o);
+        }
+
+        #endregion
+
+        #region IGefyraAndClausole
+
+        IGefyraSetActionClausoleBuilder IGefyraAndClausole<IGefyraSetActionClausoleBuilder>.And()
+        {
+            _Append(CCharacter.Comma); _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
 
         #endregion
 
@@ -455,24 +518,34 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref object? o)
         {
-            Append(ref gc); Append(CCharacter.Space); Append(ref e); Append(CCharacter.Space);
+            _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
 
             IGefyraColumn? gc0 = o as IGefyraColumn;
-            if (gc0 != null) Append(ref gc0);
-            else AppendParameter(ref gc, ref o);
+            if (gc0 != null) _Append(ref gc0);
+            else _AppendParameter(ref gc, ref o);
 
-            Append(CCharacter.Space);
+            _Append(CCharacter.Space);
             return this;
         }
 
         private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref Action<IGefyraSelectClausole>? act)
         {
-            Append(ref gc); Append(CCharacter.Space); Append(ref e); Append(CCharacter.Space);
-            Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+            _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
+            _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
             if (act != null) act.Invoke(this);
-            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             return this;
 
+        }
+
+        #endregion
+
+        #region IGefyraPostClausole
+
+        private GefyraBuilder _Post(ref IGefyraColumn? gc, ref object? o)
+        {
+            EGefyraCompare egc = EGefyraCompare.Equal;
+            return _Compare(ref gc, ref egc, ref o);
         }
 
         #endregion
@@ -481,7 +554,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private GefyraBuilder _OpenBlock()
         {
-            Append(CCharacter.LeftRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
             return this;
         }
 
@@ -491,7 +564,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private GefyraBuilder _CloseBlock()
         {
-            Append(CCharacter.RightRoundBracket); Append(CCharacter.Space);
+            _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             return this;
         }
 
@@ -501,13 +574,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private GefyraBuilder _And()
         {
-            Append(CGefyraClausole.And); Append(CCharacter.Space);
+            _Append(CGefyraClausole.And); _Append(CCharacter.Space);
             return this;
         }
 
         private GefyraBuilder _Or()
         {
-            Append(CGefyraClausole.Or); Append(CCharacter.Space);
+            _Append(CGefyraClausole.Or); _Append(CCharacter.Space);
             return this;
         }
 
@@ -517,20 +590,20 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         public void Exists(Action<IGefyraSelectClausole> act)
         {
-            Append(CGefyraClausole.Exists);
+            _Append(CGefyraClausole.Exists);
             if (act != null) act.Invoke(this);
-            Append(CCharacter.Space);
+            _Append(CCharacter.Space);
         }
 
         #endregion
 
-        private void AppendParameter(ref IGefyraColumn? gc, ref Object? o)
+        private void _AppendParameter(ref IGefyraColumn? gc, ref Object? o)
         {
             String s; Int32 i;
             CalculateCurrentParameterMetas(out s, out i);
             if (gc == null) gc = GefyraColumn.Invalid;
             _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
-            Append(s);
+            _Append(s);
         }
 
         public override String ToString()

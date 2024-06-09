@@ -23,6 +23,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Constants
             Order = "ORDER",
             Limit = "LIMIT",
             Offset = "OFFSET",
+            Set = "SET",
 
             // Compare
             Equal = "=",

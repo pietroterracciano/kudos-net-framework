@@ -9,8 +9,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Clausoles
 {
     public interface 
         IGefyraJunctionClausole<T>
+    :
+        IGefyraAndClausole<T>,
+        IGefyraOrClausole<T>
     {
-        T And();
-        T Or();
     }
 }
