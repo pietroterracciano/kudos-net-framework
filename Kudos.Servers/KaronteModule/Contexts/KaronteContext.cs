@@ -20,6 +20,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         public KaronteResponsingContext? ResponsingContext { get; internal set; }
         public KaronteRoutingContext? RoutingContext { get; internal set; }
         public KaronteDatabasingContext? DatabasingContext { get; internal set; }
+        public KaronteCloudingContext? CloudingContext { get; internal set; }
         public KaronteCapabilitingContext? CapabilitingContext { get; internal set; }
         public KaronteAuthorizatingContext? AuthorizatingContext { get; internal set; }
         public KaronteAuthenticatingContext? AuthenticatingContext { get; internal set; }
@@ -68,7 +69,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         //    if (o == null) throw new InvalidOperationException();
         //}
 
-        public ServiceType RequestService<ServiceType>()
+        public ServiceType RequireService<ServiceType>()
         {
             Type 
                 t = typeof(ServiceType);
@@ -82,7 +83,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             return srv;
         }
 
-        private Object RequestService(Type? t)
+        private Object RequireService(Type? t)
         {
             Object?
                 srv = GetService(t);
@@ -126,7 +127,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
         }
 
         //public Task<ControllerType> RequestControllerAsync<ControllerType>() { return Task.Run(() => RequestController<ControllerType>()); }
-        public ControllerType RequestController<ControllerType>()
+        public ControllerType RequireController<ControllerType>()
         {
             Type
                 t = typeof(ControllerType);
@@ -140,7 +141,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
             return cnt;
         }
 
-        private Object RequestController(Type? t)
+        private Object RequireController(Type? t)
         {
             Object?
                 cnt = GetController(t);

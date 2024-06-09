@@ -319,6 +319,26 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IServiceCollection AddKaronteClouding(..)
+
+        public static IServiceCollection AddKaronteClouding(this IServiceCollection sc, Action<KaronteCloudingService>? act)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+            else if (__IsServiceRegistered<KaronteCloudingService>())
+                return sc;
+
+            __RegisterService<KaronteCloudingService>();
+
+            KaronteCloudingService kcs = new KaronteCloudingService(ref sc);
+            if (act != null) act.Invoke(kcs);
+            sc.TryAddSingleton<KaronteCloudingService>(kcs);
+
+            return sc;
+        }
+
+        #endregion
+
         #region public static IServiceCollection AddKaronteDatabasing(..)
 
         public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Action<KaronteDatabasingService>? act)
@@ -426,6 +446,7 @@ namespace Kudos.Servers.KaronteModule
 
             Boolean
                 bIsKaronteJSONingServiceRegistered = __IsServiceRegistered<KaronteJSONingService>(),
+                bIsKaronteCloudingServiceRegistered = __IsServiceRegistered<KaronteCloudingService>(),
                 bIsKaronteDatabasingServiceRegistered = __IsServiceRegistered<KaronteDatabasingService>(),
                 bIsKaronteCryptingServiceRegistered = __IsServiceRegistered<KaronteCryptingService>(),
                 bIsKaronteResponsingServiceRegistered = __IsServiceRegistered(CKaronteKey.Responsing),
@@ -460,6 +481,14 @@ namespace Kudos.Servers.KaronteModule
                                 httpc.RequestServices.GetRequiredService<KaronteDatabasingService>();
 
                             kc.DatabasingContext = new KaronteDatabasingContext(ref kdbs, ref kc);
+                        }
+
+                        if (bIsKaronteCloudingServiceRegistered)
+                        {
+                            KaronteCloudingService kcs =
+                                httpc.RequestServices.GetRequiredService<KaronteCloudingService>();
+
+                            kc.CloudingContext = new KaronteCloudingContext(ref kcs, ref kc);
                         }
 
                         if (bIsKaronteCryptingServiceRegistered)

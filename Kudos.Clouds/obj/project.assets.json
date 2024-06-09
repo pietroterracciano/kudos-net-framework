@@ -1,0 +1,187 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "AWSSDK.Core/3.7.304.13": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/AWSSDK.Core.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.Core.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "AWSSDK.Pinpoint/3.7.302.14": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.304.13, 4.0.0)"
+        },
+        "compile": {
+          "lib/net8.0/AWSSDK.Pinpoint.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.Pinpoint.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "Kudos/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Kudos.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Kudos.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AWSSDK.Core/3.7.304.13": {
+      "sha512": "/3YQ8pwLJ2keW6STCOVu5sK8bE8pUomvf4D/UDtXo8kWktZvudIQBvM5izzJVe+lXzAy3nLTtbp8mQNy4UnsSA==",
+      "type": "package",
+      "path": "awssdk.core/3.7.304.13",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "awssdk.core.3.7.304.13.nupkg.sha512",
+        "awssdk.core.nuspec",
+        "images/AWSLogo.png",
+        "lib/net35/AWSSDK.Core.dll",
+        "lib/net35/AWSSDK.Core.pdb",
+        "lib/net35/AWSSDK.Core.xml",
+        "lib/net45/AWSSDK.Core.dll",
+        "lib/net45/AWSSDK.Core.pdb",
+        "lib/net45/AWSSDK.Core.xml",
+        "lib/net8.0/AWSSDK.Core.dll",
+        "lib/net8.0/AWSSDK.Core.pdb",
+        "lib/net8.0/AWSSDK.Core.xml",
+        "lib/netcoreapp3.1/AWSSDK.Core.dll",
+        "lib/netcoreapp3.1/AWSSDK.Core.pdb",
+        "lib/netcoreapp3.1/AWSSDK.Core.xml",
+        "lib/netstandard2.0/AWSSDK.Core.dll",
+        "lib/netstandard2.0/AWSSDK.Core.pdb",
+        "lib/netstandard2.0/AWSSDK.Core.xml",
+        "tools/account-management.ps1"
+      ]
+    },
+    "AWSSDK.Pinpoint/3.7.302.14": {
+      "sha512": "7iDpo30ACVp5VciwIml/IE+8ZQgn1zvUDMFgwvySPLdP5+3K0Nm4j1x1+vqMbp5iPeGFTrZu7yCXKmzsbbpfYQ==",
+      "type": "package",
+      "path": "awssdk.pinpoint/3.7.302.14",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/AWSSDK.Pinpoint.CodeAnalysis.dll",
+        "analyzers/dotnet/cs/SharedAnalysisCode.dll",
+        "awssdk.pinpoint.3.7.302.14.nupkg.sha512",
+        "awssdk.pinpoint.nuspec",
+        "images/AWSLogo.png",
+        "lib/net35/AWSSDK.Pinpoint.dll",
+        "lib/net35/AWSSDK.Pinpoint.pdb",
+        "lib/net35/AWSSDK.Pinpoint.xml",
+        "lib/net45/AWSSDK.Pinpoint.dll",
+        "lib/net45/AWSSDK.Pinpoint.pdb",
+        "lib/net45/AWSSDK.Pinpoint.xml",
+        "lib/net8.0/AWSSDK.Pinpoint.dll",
+        "lib/net8.0/AWSSDK.Pinpoint.pdb",
+        "lib/net8.0/AWSSDK.Pinpoint.xml",
+        "lib/netcoreapp3.1/AWSSDK.Pinpoint.dll",
+        "lib/netcoreapp3.1/AWSSDK.Pinpoint.pdb",
+        "lib/netcoreapp3.1/AWSSDK.Pinpoint.xml",
+        "lib/netstandard2.0/AWSSDK.Pinpoint.dll",
+        "lib/netstandard2.0/AWSSDK.Pinpoint.pdb",
+        "lib/netstandard2.0/AWSSDK.Pinpoint.xml",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
+    "Kudos/1.0.0": {
+      "type": "project",
+      "path": "../Kudos/Kudos.csproj",
+      "msbuildProject": "../Kudos/Kudos.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "AWSSDK.Pinpoint >= 3.7.302.14",
+      "Kudos >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/Users/pietroterracciano/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos.Clouds/Kudos.Clouds.csproj",
+      "projectName": "Kudos.Clouds",
+      "projectPath": "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos.Clouds/Kudos.Clouds.csproj",
+      "packagesPath": "/Users/pietroterracciano/.nuget/packages/",
+      "outputPath": "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos.Clouds/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/pietroterracciano/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "/usr/local/share/dotnet/library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos/Kudos.csproj": {
+              "projectPath": "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos/Kudos.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "dependencies": {
+          "AWSSDK.Pinpoint": {
+            "target": "Package",
+            "version": "[3.7.302.14, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.203/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

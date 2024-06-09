@@ -19,8 +19,9 @@ namespace Kudos.Servers.KaronteModule.Constants
             Unauthorized = EnumUtils.GetKey(HttpStatusCode.Unauthorized),
             UnprocessableContent = EnumUtils.GetKey(HttpStatusCode.UnprocessableContent),
             UnprocessableEntity = EnumUtils.GetKey(HttpStatusCode.UnprocessableEntity),
-
-            Expired = "Expired";
+            ImATeapot = "I'm a teapot",
+            Expired = nameof(Expired),
+            NotNecessary = nameof(NotNecessary);
     }
 }
 

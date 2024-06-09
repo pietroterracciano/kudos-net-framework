@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>Disable</ImplicitUsings>
+    <Nullable>Enable</Nullable>
+    <OutputType>Library</OutputType>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="AmazonWebServiceModule\" />
+    <None Remove="AmazonWebServiceModule\Builders\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\Builders\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\Descriptors\" />
+    <None Remove="AmazonWebServiceModule\Descriptors\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AmazonWebServiceModule\" />
+    <Folder Include="AmazonWebServiceModule\Builders\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\Builders\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\Descriptors\" />
+    <Folder Include="AmazonWebServiceModule\Descriptors\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Pinpoint" Version="3.7.302.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos\Kudos.csproj" />
+  </ItemGroup>
+</Project>

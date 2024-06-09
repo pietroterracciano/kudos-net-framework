@@ -27,13 +27,13 @@ namespace Kudos.Servers.KaronteModule.Contexts
 		public Symmetric? GetSymmetric(String? sn) { return _kcs.Symmetrics.Get<Symmetric>(sn); }
         public Hash? GetHash(String? sn) { return _kcs.Hashes.Get<Hash>(sn); }
 
-        public Symmetric RequestSymmetric(String? sn)
+        public Symmetric RequireSymmetric(String? sn)
         {
             Symmetric? smm = GetSymmetric(sn);
             if (smm == null) throw new InvalidOperationException();
             return smm;
         }
-        public Hash RequestHash(String? sn)
+        public Hash RequireHash(String? sn)
         {
             Hash? hsh = GetHash(sn);
             if (hsh == null) throw new InvalidOperationException();

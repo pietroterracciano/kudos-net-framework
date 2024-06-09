@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "bZMESlJp5U1FY2quCSFiNCLWw09BOn/I1dDx6Aqnn7fABpEFzQhAfwJ6JSPHNs0qgwWbUTahSAw7zoh1PuZorA==",
+  "success": true,
+  "projectFilePath": "/Users/pietroterracciano/Projects/dotNET/dot-net-framework--kudos/Kudos.Clouds/Kudos.Clouds.csproj",
+  "expectedPackageFiles": [
+    "/Users/pietroterracciano/.nuget/packages/awssdk.core/3.7.304.13/awssdk.core.3.7.304.13.nupkg.sha512",
+    "/Users/pietroterracciano/.nuget/packages/awssdk.pinpoint/3.7.302.14/awssdk.pinpoint.3.7.302.14.nupkg.sha512"
+  ],
+  "logs": []
+}
