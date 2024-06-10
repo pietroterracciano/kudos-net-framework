@@ -1,16 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-        <OutputType>Library</OutputType>
+    <PropertyGroup>
+    <Authors>Pietro Terracciano</Authors>
+	<Version>0.24.6.10</Version>
     <TargetFramework>net8.0</TargetFramework>
-	  <Nullable>enable</Nullable>
-    <ApplicationIcon />
-    <StartupObject />
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disabled</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Optimize>false</Optimize>
+      <WarningLevel>4</WarningLevel>
+    <Platform>AnyCPU</Platform>
   </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <Optimize>true</Optimize>
+      <WarningLevel>0</WarningLevel>
+    <Platform>AnyCPU</Platform>
+  </PropertyGroup>
+
+
   <ItemGroup>
     <None Remove="Interfaces\" />
     <None Remove="Utils\Datas\" />

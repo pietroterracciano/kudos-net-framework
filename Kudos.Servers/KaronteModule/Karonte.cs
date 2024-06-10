@@ -385,6 +385,19 @@ namespace Kudos.Servers.KaronteModule
 
         #endregion
 
+        #region public static IServiceCollection AddKaronteBenchmarking(..)
+
+        public static IServiceCollection AddKaronteBenchmarking(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Benchmarking);
+            return sc;
+        }
+
+        #endregion
+
         #region public static IServiceCollection AddKaronteAuthorizating(..)
 
         public static IServiceCollection AddKaronteAuthorizating(this IServiceCollection sc)
@@ -445,6 +458,7 @@ namespace Kudos.Servers.KaronteModule
             __aRegisteredServices = __lRegisteredServices.ToArray();
 
             Boolean
+                bIsKaronteBenchmarkingServiceRegistered = __IsServiceRegistered(CKaronteKey.Benchmarking),
                 bIsKaronteJSONingServiceRegistered = __IsServiceRegistered<KaronteJSONingService>(),
                 bIsKaronteCloudingServiceRegistered = __IsServiceRegistered<KaronteCloudingService>(),
                 bIsKaronteDatabasingServiceRegistered = __IsServiceRegistered<KaronteDatabasingService>(),
@@ -517,6 +531,9 @@ namespace Kudos.Servers.KaronteModule
                         if (bIsKaronteResponsingServiceRegistered)
                             kc.ResponsingContext = new KaronteResponsingContext(ref kc);
 
+                        if (bIsKaronteBenchmarkingServiceRegistered)
+                            kc.BenchmarkingContext = new KaronteBenchmarkingContext(ref kc);
+
                         await rd.Invoke(httpc);
                     }
                 );
@@ -529,12 +546,47 @@ namespace Kudos.Servers.KaronteModule
         public static IApplicationBuilder UseKaronteMiddleware<MiddlewareType>(this IApplicationBuilder ab)
             where MiddlewareType : AKaronteMiddleware
         {
+            return ab.__UseKaronteMiddleware<MiddlewareType>(false);
+        }
+
+        private static IApplicationBuilder __UseKaronteMiddleware<MiddlewareType>(this IApplicationBuilder ab, Boolean bUseBenchmarking)
+            where MiddlewareType : AKaronteMiddleware
+        {
             if (!__IsApplicationRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
 
-            return
+            String? s = typeof(MiddlewareType).FullName;
+
+            if (bUseBenchmarking && __IsServiceRegistered(CKaronteKey.Benchmarking))
                 ab
-                    .UseMiddleware<MiddlewareType>();
+                    .Use
+                    (
+                        async (httpc, rd) =>
+                        {
+                            httpc.RequestServices.GetRequiredService<KaronteContext>()
+                                .BenchmarkingContext.StartBenchmark(s);
+
+                            await rd.Invoke();
+                        }
+                    );
+
+            ab
+                .UseMiddleware<MiddlewareType>();
+
+            if (bUseBenchmarking && __IsServiceRegistered(CKaronteKey.Benchmarking))
+                ab
+                    .Use
+                    (
+                        async (httpc, rd) =>
+                        {
+                            httpc.RequestServices.GetRequiredService<KaronteContext>()
+                                .BenchmarkingContext.StopBenchmark(s);
+
+                            await rd.Invoke();
+                        }
+                    );
+
+            return ab;
         }
 
         #endregion
@@ -577,8 +629,7 @@ namespace Kudos.Servers.KaronteModule
         {
             if
             (
-                !__IsApplicationRegistered(CKaronteKey.Core)
-                || !__IsServiceRegistered(CKaronteKey.Authorizating)
+                !__IsServiceRegistered(CKaronteKey.Authorizating)
             )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Authorizating))
@@ -587,8 +638,7 @@ namespace Kudos.Servers.KaronteModule
             __RegisterApplication(CKaronteKey.Authorizating);
 
             return
-                ab
-                   .UseMiddleware<MiddlewareType>();
+                ab.__UseKaronteMiddleware<MiddlewareType>(true);
         }
 
         #endregion
@@ -600,8 +650,7 @@ namespace Kudos.Servers.KaronteModule
         {
             if
             (
-               !__IsApplicationRegistered(CKaronteKey.Core)
-               || !__IsServiceRegistered<KaronteDatabasingService>()
+               !__IsServiceRegistered<KaronteDatabasingService>()
             )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Databasing))
@@ -610,21 +659,19 @@ namespace Kudos.Servers.KaronteModule
             __RegisterApplication(CKaronteKey.Databasing);
 
             return
-                ab
-                   .UseMiddleware<MiddlewareType>();
+                ab.__UseKaronteMiddleware<MiddlewareType>(true);
         }
 
         #endregion
 
         #region public static IApplicationBuilder UseKaronteResponsing(...)
 
-        public static IApplicationBuilder UseKaronteResponsing<ResponsingMiddlewareType, NonActionResultType>(this IApplicationBuilder ab)
-            where ResponsingMiddlewareType : AKaronteResponsingMiddleware<NonActionResultType>
+        public static IApplicationBuilder UseKaronteResponsing<MiddlewareType, NonActionResultType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteResponsingMiddleware<NonActionResultType>
         {
             if
             (
-               !__IsApplicationRegistered(CKaronteKey.Core)
-               || !__IsServiceRegistered(CKaronteKey.Responsing)
+               !__IsServiceRegistered(CKaronteKey.Responsing)
             )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Responsing))
@@ -633,7 +680,7 @@ namespace Kudos.Servers.KaronteModule
             __RegisterApplication(CKaronteKey.Responsing);
 
             return
-                ab.UseMiddleware<ResponsingMiddlewareType>();
+                ab.__UseKaronteMiddleware<MiddlewareType>(true);
         }
 
         #endregion
@@ -645,8 +692,7 @@ namespace Kudos.Servers.KaronteModule
         {
             if
             (
-               !__IsApplicationRegistered(CKaronteKey.Core)
-               || !__IsServiceRegistered(CKaronteKey.Authenticating)
+               !__IsServiceRegistered(CKaronteKey.Authenticating)
             )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Authenticating))
@@ -655,8 +701,7 @@ namespace Kudos.Servers.KaronteModule
             __RegisterApplication(CKaronteKey.Authenticating);
 
             return
-                ab
-                    .UseMiddleware<MiddlewareType>();
+                ab.__UseKaronteMiddleware<MiddlewareType>(true);
         }
 
         #endregion
@@ -669,8 +714,7 @@ namespace Kudos.Servers.KaronteModule
         {
             if
             (
-               !__IsApplicationRegistered(CKaronteKey.Core)
-               || !__IsServiceRegistered(CKaronteKey.Capabiliting)
+               !__IsServiceRegistered(CKaronteKey.Capabiliting)
             )
                 throw new InvalidOperationException();
             else if (__IsApplicationRegistered(CKaronteKey.Capabiliting))
@@ -679,8 +723,7 @@ namespace Kudos.Servers.KaronteModule
             __RegisterApplication(CKaronteKey.Capabiliting);
 
             return
-                ab
-                    .UseMiddleware<MiddlewareType>();
+                ab.__UseKaronteMiddleware<MiddlewareType>(true);
         }
 
         #endregion

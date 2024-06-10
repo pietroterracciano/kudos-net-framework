@@ -65,7 +65,7 @@ namespace Kudos.Utils
                 return o0;
 
             JsonElement 
-                je = (JsonElement)o;
+                je = (JsonElement)o0;
 
             switch(je.ValueKind)
             {

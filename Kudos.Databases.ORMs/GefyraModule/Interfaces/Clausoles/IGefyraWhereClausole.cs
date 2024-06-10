@@ -1,4 +1,5 @@
-﻿using Kudos.Databases.ORMs.GefyraModule.Enums;
+﻿using System;
+using Kudos.Databases.ORMs.GefyraModule.Enums;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Types;
 

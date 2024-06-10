@@ -1,4 +1,5 @@
-﻿using Kudos.Databases.ORMs.GefyraModule.Utils;
+﻿using System;
+using Kudos.Databases.ORMs.GefyraModule.Utils;
 
 namespace Kudos.Databases.ORMs.GefyraModule.Attributes
 {

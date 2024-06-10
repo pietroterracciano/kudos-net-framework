@@ -37,13 +37,13 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
             Int32?
                 ihttpsc =
-                    OnNonActionResultTransformationToHttpResponseStatusCode(nar);
+                    OnNonActionResultTransformationToHttpResponseStatusCode(kc.ResponsingContext, nar);
 
             if (ihttpsc != null)
                 kc.HttpContext.Response.StatusCode = ihttpsc.Value;
 
             Object? o =
-                OnNonActionResultTransformationToActionResult(nar);
+                OnNonActionResultTransformationToHttpResponseBody(kc.ResponsingContext, nar);
 
             if (kc.JSONingContext == null) return;
 
@@ -67,8 +67,8 @@ namespace Kudos.Servers.KaronteModule.Middlewares
 
         //protected abstract NonActionResultType? OnNonActionResultCreation();
 
-        protected abstract Int32? OnNonActionResultTransformationToHttpResponseStatusCode(NonActionResultType? nar);
+        protected abstract Int32? OnNonActionResultTransformationToHttpResponseStatusCode(KaronteResponsingContext krc, NonActionResultType? nar);
 
-        protected abstract Object? OnNonActionResultTransformationToActionResult(NonActionResultType? nar);
+        protected abstract Object? OnNonActionResultTransformationToHttpResponseBody(KaronteResponsingContext krc, NonActionResultType? nar);
     }
 }

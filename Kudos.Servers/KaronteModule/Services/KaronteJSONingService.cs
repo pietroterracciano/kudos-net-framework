@@ -20,7 +20,11 @@ namespace Kudos.Servers.KaronteModule.Services
 
         public KaronteJSONingService RegisterSerializerOptions(Action<JsonSerializerOptions>? act)
         {
-            if (act != null) act.Invoke(JsonSerializerOptions);
+            if (act != null)
+            {
+                act.Invoke(JsonSerializerOptions);
+                ServiceCollection.ConfigureHttpJsonOptions((jo) => act.Invoke(jo.SerializerOptions));
+            }
             return this;
         }
     }

@@ -4,6 +4,7 @@ using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
 using Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors;
 using Kudos.Types;
 using Kudos.Utils;
+using System;
 using System.Text;
 
 namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities

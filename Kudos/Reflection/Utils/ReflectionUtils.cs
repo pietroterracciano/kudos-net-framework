@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -963,6 +964,38 @@ namespace Kudos.Reflection.Utils
             }
 
             return true;
+        }
+
+        #endregion
+
+        #region public static ... ParseToExpandoObject(...)
+
+        public static ExpandoObject? ParseToExpandoObject(Object? o, BindingFlags bf = CBindingFlags.PublicInstance)
+        {
+            Type?
+                t = o as Type;
+
+            if (t != null || o == null)
+                return null;
+
+            t = o.GetType();
+
+            MemberInfo[]?
+                mia = ArrayUtils.Append<MemberInfo>(GetProperties(t, bf), GetFields(t, bf));
+
+            if (mia == null || mia.Length < 1)
+                return null;
+
+            ExpandoObject eo = new ExpandoObject();
+            IDictionary<String, Object?> d = eo as IDictionary<String, Object?>;
+
+            if (d == null)
+                return null;
+
+            for (int i = 0; i < mia.Length; i++)
+                d[mia[i].Name] = GetMemberValue(o, mia[i]);
+
+            return eo;
         }
 
         #endregion

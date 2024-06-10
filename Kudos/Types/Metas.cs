@@ -37,6 +37,21 @@ namespace Kudos.Types
             return true;
         }
 
+        public KeyValuePair<String, T?>[] Gets<T>()
+        {
+            KeyValuePair<String, Object?>[] kvpa = Gets();
+            KeyValuePair<String, T?>[] kvpa0 = new KeyValuePair<String, T?>[kvpa.Length];
+
+            for(int i=0;i<kvpa.Length; i++)
+                kvpa0[i] = new KeyValuePair<string, T?>(kvpa[i].Key, ObjectUtils.Cast<T>(kvpa[i].Value));
+
+            return kvpa0;
+        }
+        public KeyValuePair<String, Object?>[] Gets()
+        {
+            return _d.ToArray();
+        }
+
         public T? Get<T>(String? s) { return Get<T>(s, _e); }
         public T? Get<T>(String? s, StringComparison e) { return ObjectUtils.Cast<T>(Get(s, e)); }
         public Object? Get(String? s) { return Get(s, _e); }

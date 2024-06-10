@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Utils
 {
-    internal static class DynamicUtils
+    public static class DynamicUtils
     {
         public static Boolean IsNull(dynamic? dnm)
         {

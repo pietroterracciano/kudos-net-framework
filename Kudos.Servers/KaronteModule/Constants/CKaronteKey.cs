@@ -6,6 +6,7 @@ namespace Kudos.Servers.KaronteModule.Constants
     {
         internal static readonly String
             Routing = nameof(Routing),
+            Benchmarking = nameof(Benchmarking),
             Core = nameof(Core),
             Capabiliting = nameof(Capabiliting),
             Authenticating = nameof(Authenticating),
