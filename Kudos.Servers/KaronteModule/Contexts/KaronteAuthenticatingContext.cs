@@ -18,8 +18,8 @@ namespace Kudos.Servers.KaronteModule.Contexts
             if (_bIsEndpointAnalyzed) return;
             _bIsEndpointAnalyzed = true;
 
-            KaronteNoAuthenticatingAttribute?
-                knaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteNoAuthenticatingAttribute>();
+            KaronteNoAuthenticationAttribute?
+                knaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteNoAuthenticationAttribute>();
 
             if (knaa != null)
             {
@@ -27,8 +27,8 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 return;
             }
 
-            KaronteAuthenticatingAttribute?
-                kaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteAuthenticatingAttribute>();
+            KaronteAuthenticationAttribute?
+                kaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteAuthenticationAttribute>();
 
             _bIsAuthenticationRequired = kaa != null;
         }

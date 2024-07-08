@@ -38,14 +38,14 @@ namespace Kudos.Servers.KaronteModule.Descriptors.Routes
             __d = new Dictionary<Type, KaronteControllerRouteDescriptor?>();
         }
 
-        #region internal static void Request<...>(...)
+        #region internal static void Get<...>(...)
 
-        internal static void Request<T>(out KaronteControllerRouteDescriptor? kcrd)
+        internal static void Get<T>(out KaronteControllerRouteDescriptor? kcrd)
             where T : AKaronteController
         {
-            Type t = typeof(T); Request(ref t, out kcrd);
+            Type t = typeof(T); Get(ref t, out kcrd);
         }
-        internal static void Request(ref Type? t, out KaronteControllerRouteDescriptor? kcrd)
+        internal static void Get(ref Type? t, out KaronteControllerRouteDescriptor? kcrd)
         {
             if (t == null) { kcrd = null; return; }
 
@@ -169,7 +169,7 @@ namespace Kudos.Servers.KaronteModule.Descriptors.Routes
             KaronteMethodRouteDescriptor kmrdi;
             for (int i=0; i<mia.Length; i++)
             {
-                KaronteMethodRouteDescriptor.Request(ref _this, ref mia[i], out kmrdi);
+                KaronteMethodRouteDescriptor.Get(ref _this, ref mia[i], out kmrdi);
                 if (kmrdi == null) continue;
                 l.Add(kmrdi);
             }

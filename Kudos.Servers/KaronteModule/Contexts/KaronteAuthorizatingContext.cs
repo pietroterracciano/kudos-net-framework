@@ -72,13 +72,13 @@ namespace Kudos.Servers.KaronteModule.Contexts
             if (_bIsEndpointAnalyzed) return;
             _bIsEndpointAnalyzed = true;
 
-            KaronteNoAuthorizatingAttribute?
-                knaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteNoAuthorizatingAttribute>();
+            KaronteNoAuthorizationAttribute?
+                knaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteNoAuthorizationAttribute>();
 
             if (knaa != null) return;
 
-            KaronteAuthorizatingAttribute?
-                kaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteAuthorizatingAttribute>();
+            KaronteAuthorizationAttribute?
+                kaa = KaronteContext.RoutingContext.GetLastEndpointMetadata<KaronteAuthorizationAttribute>();
 
             if (kaa == null) return;
 

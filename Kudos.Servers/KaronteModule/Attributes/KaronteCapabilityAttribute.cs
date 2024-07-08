@@ -5,7 +5,7 @@ using Kudos.Servers.KaronteModule.Enums;
 
 namespace Kudos.Servers.KaronteModule.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public sealed class KaronteCapabilityAttribute : Attribute
     {
         public readonly HashSet<String>? Routes;
@@ -22,7 +22,7 @@ namespace Kudos.Servers.KaronteModule.Attributes
 
             List<String> l = new List<string>(sa.Length);
 
-            for(int i=0; i<sa.Length; i++)
+            for (int i = 0; i < sa.Length; i++)
             {
                 if (String.IsNullOrWhiteSpace(sa[i])) continue;
                 l.Add(sa[i]);

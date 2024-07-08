@@ -8,6 +8,7 @@ using Kudos.Servers.KaronteModule.Utils;
 using Kudos.Utils;
 using Kudos.Utils.Collections;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 
 namespace Kudos.Servers.KaronteModule.Contexts
@@ -16,6 +17,7 @@ namespace Kudos.Servers.KaronteModule.Contexts
     {
         private readonly Object _lck;
         private EKaronteEndpointStatus? _ekes;
+        private KaronteMethodRouteDescriptor? _kmrd;
 
         internal KaronteRoutingContext(ref KaronteContext kc) : base(ref kc) { _lck = new object(); }
 
@@ -45,6 +47,32 @@ namespace Kudos.Servers.KaronteModule.Contexts
                 }
 
                 return _ekes.Value;
+            }
+        }
+
+        public KaronteMethodRouteDescriptor? GetEndpointMethodRouteDescriptor()
+        {
+            lock(_lck)
+            {
+                String? shkorfp;
+
+                if (_kmrd == null)
+                {
+                    IRouteDiagnosticsMetadata? rdmd = GetLastEndpointMetadata<IRouteDiagnosticsMetadata>();
+                    shkorfp = rdmd != null ? shkorfp = rdmd.Route : null;
+
+                    KaronteMethodRouteDescriptor.Get(ref shkorfp, out _kmrd);
+                }
+
+                if(_kmrd == null)
+                {
+                    RouteNameMetadata? rnmd = GetLastEndpointMetadata<RouteNameMetadata>();
+                    shkorfp = rnmd != null ? rnmd.RouteName : null;
+
+                    KaronteMethodRouteDescriptor.Get(ref shkorfp, out _kmrd);
+                }
+
+                return _kmrd;
             }
         }
 

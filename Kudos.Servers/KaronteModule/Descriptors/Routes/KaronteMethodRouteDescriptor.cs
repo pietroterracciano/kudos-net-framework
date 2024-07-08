@@ -6,14 +6,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Kudos.Constants;
-using System.Text.RegularExpressions;
 using Kudos.Types;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
-using Kudos.Servers.KaronteModule.Utils;
 using System.Text;
-using Kudos.Servers.KaronteModule.Controllers;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
 
 namespace Kudos.Servers.KaronteModule.Descriptors.Routes
 {
@@ -43,9 +38,9 @@ namespace Kudos.Servers.KaronteModule.Descriptors.Routes
             __d = new Dictionary<MethodInfo, KaronteMethodRouteDescriptor?>();
         }
 
-        #region internal static void Request<...>(...)
+        #region internal static void Get(...)
 
-        internal static void Request(ref KaronteControllerRouteDescriptor? kcrd, ref MethodInfo? mi, out KaronteMethodRouteDescriptor? kmrd)
+        internal static void Get(ref KaronteControllerRouteDescriptor? kcrd, ref MethodInfo? mi, out KaronteMethodRouteDescriptor? kmrd)
         {
             if (kcrd == null || mi == null) { kmrd = null; return; }
 
@@ -141,28 +136,13 @@ namespace Kudos.Servers.KaronteModule.Descriptors.Routes
             }
         }
 
-        //internal static void Request(ref Endpoint? end, out KaronteMethodRouteDescriptor? kmrd)
-        //{
-        //    String? shkorfp;
-
-        //    IRouteDiagnosticsMetadata? rdmd = EndpointUtils.GetLastMetadata<IRouteDiagnosticsMetadata>(end);
-        //    shkorfp = rdmd != null ? shkorfp = rdmd.Route : null;
-           
-        //    lock (__m)
-        //    {
-        //        kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
-        //    }
-
-        //    if (kmrd != null) return;
-
-        //    RouteNameMetadata? rnmd = EndpointUtils.GetLastMetadata<RouteNameMetadata>(end);
-        //    shkorfp = rnmd != null ? rnmd.RouteName : null;
-
-        //    lock (__m)
-        //    {
-        //        kmrd = __m.Get<KaronteMethodRouteDescriptor>(shkorfp);
-        //    }
-        //}
+        internal static void Get(ref String? s, out KaronteMethodRouteDescriptor? kmrd)
+        {
+            lock (__m)
+            {
+                kmrd = __m.Get<KaronteMethodRouteDescriptor>(s);
+            }
+        }
 
         #endregion
 

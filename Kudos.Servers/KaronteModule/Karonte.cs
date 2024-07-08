@@ -68,7 +68,7 @@ namespace Kudos.Servers.KaronteModule
         )
         {
             KaronteControllerRouteDescriptor? kcrd;
-            KaronteControllerRouteDescriptor.Request(ref t, out kcrd);
+            KaronteControllerRouteDescriptor.Get(ref t, out kcrd);
 
             if (kcrd == null || kcrd.MethodsRouteDescriptor == null)
                 return;
@@ -376,6 +376,9 @@ namespace Kudos.Servers.KaronteModule
 
         public static IServiceCollection AddKaronteCapabiliting(this IServiceCollection sc)
         {
+            sc
+                .AddKaronteRouting();
+
             if (!__IsServiceRegistered<KaronteContext>())
                 throw new InvalidOperationException();
 

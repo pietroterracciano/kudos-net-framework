@@ -21,6 +21,11 @@ namespace Kudos.Types
             _d = new Dictionary<String, Object?>(iSize);
         }
 
+        public Int32 Count
+        {
+            get { return _d.Count; }
+        }
+
         public Boolean Contains(String? s) { return Contains(s, _e); }
         public Boolean Contains(String? s, StringComparison e)
         {
