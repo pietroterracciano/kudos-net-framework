@@ -28,6 +28,9 @@
     <None Remove="AmazonWebServiceModule\PinpointModule\Builders\" />
     <None Remove="AmazonWebServiceModule\PinpointModule\Descriptors\" />
     <None Remove="AmazonWebServiceModule\Descriptors\" />
+    <None Remove="AmazonWebServiceModule\S3Module\" />
+    <None Remove="AmazonWebServiceModule\S3Module\Builders\" />
+    <None Remove="AmazonWebServiceModule\S3Module\Descriptors\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AmazonWebServiceModule\" />
@@ -36,9 +39,13 @@
     <Folder Include="AmazonWebServiceModule\PinpointModule\Builders\" />
     <Folder Include="AmazonWebServiceModule\PinpointModule\Descriptors\" />
     <Folder Include="AmazonWebServiceModule\Descriptors\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\Builders\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\Descriptors\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Pinpoint" Version="3.7.302.14" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.310.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kudos\Kudos.csproj" />

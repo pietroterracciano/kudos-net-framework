@@ -10,7 +10,7 @@ using Kudos.Utils;
 
 namespace Kudos.Clouds.AmazonWebServiceModule.PinpointModule
 {
-	public class AWSPinpoint
+	public sealed class AWSPinpoint
 	{
         public static class AddressConfiguration
         {

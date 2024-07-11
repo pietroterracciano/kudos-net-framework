@@ -5,7 +5,7 @@ using Kudos.Clouds.AmazonWebServiceModule.Descriptors;
 
 namespace Kudos.Clouds.AmazonWebServiceModule.PinpointModule.Descriptors
 {
-	public class AWSPinpointDescriptor
+	public sealed class AWSPinpointDescriptor
 		: AAWSDescriptor<AmazonPinpointClient>
 	{
 		internal String? ApplicationID;

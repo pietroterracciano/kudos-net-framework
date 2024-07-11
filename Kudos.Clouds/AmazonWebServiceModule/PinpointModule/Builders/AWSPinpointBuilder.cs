@@ -9,7 +9,7 @@ using Kudos.Clouds.AmazonWebServiceModule.PinpointModule.Descriptors;
 
 namespace Kudos.Clouds.AmazonWebServiceModule.PinpointModule.Builders
 {
-    public class AWSPinpointBuilder
+    public sealed class AWSPinpointBuilder
 		: AAWSBuilder<AWSPinpointBuilder, AmazonPinpointClient, AWSPinpointDescriptor, AWSPinpoint>
 	{
         private readonly AWSPinpointDescriptor _awsppd;
