@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>Pietro Terracciano</Authors>
+	<Version>0.24.6.10</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disabled</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="BrevoModule\" />
+    <None Remove="BrevoModule\Builders\" />
+    <None Remove="BrevoModule\TransactionalEmailsApiModule\" />
+    <None Remove="BrevoModule\TransactionalEmailsApiModule\Builders\" />
+    <None Remove="BrevoModule\TransactionalSMSApiModule\" />
+    <None Remove="BrevoModule\TransactionalSMSApiModule\Builders\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BrevoModule\" />
+    <Folder Include="BrevoModule\Builders\" />
+    <Folder Include="BrevoModule\TransactionalEmailsApiModule\" />
+    <Folder Include="BrevoModule\TransactionalEmailsApiModule\Builders\" />
+    <Folder Include="BrevoModule\TransactionalSMSApiModule\" />
+    <Folder Include="BrevoModule\TransactionalSMSApiModule\Builders\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="brevo_csharp" Version="1.0.0" />
+  </ItemGroup>
+</Project>

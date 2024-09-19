@@ -9,7 +9,6 @@ using Kudos.Clouds.AmazonWebServiceModule.S3Module.Descriptors;
 using Amazon.S3;
 using Amazon.S3.Model;
 using System.IO;
-using Kudos.Clouds.AmazonWebServiceModule.S3Module.Builders;
 
 namespace Kudos.Clouds.AmazonWebServiceModule.S3Module
 {
@@ -96,12 +95,6 @@ namespace Kudos.Clouds.AmazonWebServiceModule.S3Module
             return
                 por != null
                 && por.HttpStatusCode == System.Net.HttpStatusCode.OK;
-        }
-
-        public static AWSS3Builder RequestBuilder()
-        {
-            AWSS3Descriptor awss3d = new AWSS3Descriptor();
-            return new AWSS3Builder(ref awss3d);
         }
     }
 }

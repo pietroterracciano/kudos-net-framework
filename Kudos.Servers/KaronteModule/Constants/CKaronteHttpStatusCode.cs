@@ -20,6 +20,7 @@ namespace Kudos.Servers.KaronteModule.Constants
             ImATeapot = 418,
             Expired = 600,
             Wrong = 601,
+            AlreadyInUse = 602,
             NotNecessary = 250;
     }
 }

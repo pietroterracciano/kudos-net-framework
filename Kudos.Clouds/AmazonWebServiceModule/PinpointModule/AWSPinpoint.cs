@@ -138,12 +138,6 @@ namespace Kudos.Clouds.AmazonWebServiceModule.PinpointModule
                 return null;
             }
         }
-
-        public static AWSPinpointBuilder RequestBuilder()
-		{
-			AWSPinpointDescriptor awsppd = new AWSPinpointDescriptor();
-			return new AWSPinpointBuilder(ref awsppd);
-		}
 	}
 }
 

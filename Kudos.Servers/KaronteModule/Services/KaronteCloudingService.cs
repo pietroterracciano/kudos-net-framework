@@ -1,4 +1,5 @@
 ﻿using System;
+using Kudos.Clouds.AmazonWebServiceModule;
 using Kudos.Clouds.AmazonWebServiceModule.PinpointModule;
 using Kudos.Clouds.AmazonWebServiceModule.PinpointModule.Builders;
 using Kudos.Clouds.AmazonWebServiceModule.S3Module;
@@ -26,7 +27,7 @@ namespace Kudos.Servers.KaronteModule.Services
         {
             if (sn != null && act != null)
             {
-                AWSPinpointBuilder awsppb = AWSPinpoint.RequestBuilder();
+                AWSPinpointBuilder awsppb = AWS.RequestPinpointBuilder();
                 act.Invoke(awsppb);
                 AWSPinpointBuilders.Set(sn, awsppb);
             }
@@ -38,7 +39,7 @@ namespace Kudos.Servers.KaronteModule.Services
         {
             if (sn != null && act != null)
             {
-                AWSS3Builder awsppb = AWSS3.RequestBuilder();
+                AWSS3Builder awsppb = AWS.RequestS3Builder();
                 act.Invoke(awsppb);
                 AWSS3Builders.Set(sn, awsppb);
             }

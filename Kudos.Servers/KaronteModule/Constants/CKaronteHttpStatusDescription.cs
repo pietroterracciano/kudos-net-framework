@@ -22,6 +22,7 @@ namespace Kudos.Servers.KaronteModule.Constants
             ImATeapot = "I'm a teapot",
             Expired = nameof(Expired),
             Wrong = nameof(Wrong),
+            AlreadyInUse = "Already in use",
             NotNecessary = nameof(NotNecessary);
     }
 }

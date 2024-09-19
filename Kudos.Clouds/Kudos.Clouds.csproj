@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-        <PropertyGroup>
+    <PropertyGroup>
     <Authors>Pietro Terracciano</Authors>
 	<Version>0.24.6.10</Version>
     <TargetFramework>net8.0</TargetFramework>

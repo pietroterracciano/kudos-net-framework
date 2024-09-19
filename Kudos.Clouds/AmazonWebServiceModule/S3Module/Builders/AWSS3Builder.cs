@@ -11,7 +11,7 @@ namespace Kudos.Clouds.AmazonWebServiceModule.S3Module.Builders
     public sealed class AWSS3Builder
         : AAWSBuilder<AWSS3Builder, AmazonS3Client, AWSS3Descriptor, AWSS3>
     {
-        public AWSS3Builder(ref AWSS3Descriptor dsc) : base(ref dsc) { }
+        internal AWSS3Builder(ref AWSS3Descriptor dsc) : base(ref dsc) { }
 
         protected override void OnBuild(ref AWSS3Descriptor dsc, out AWSS3 bt)
         {
