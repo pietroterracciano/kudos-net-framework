@@ -8,8 +8,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders
     :
         IGefyraInsertClausole,  //C
         IGefyraSelectClausole,  //R
-        IGefyraUpdateClausole   //U
-        //IGefyraDeleteClausole   //D
+        IGefyraUpdateClausole,  //U
+        IGefyraDeleteClausole   //D
     {
     }
 }

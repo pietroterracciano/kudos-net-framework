@@ -31,6 +31,8 @@ namespace Kudos.Constants
             Equal = '=',
             Minor = '<',
             Major = '>',
-            Dollar = '$';
+            Dollar = '$',
+            Plus = '+',
+            Minus = '-';
     }
 }

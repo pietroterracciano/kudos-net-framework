@@ -32,6 +32,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Constants
             GreaterThanOrEqual = ">=",
             LessThan = "<",
             LessThanOrEqual = "<=",
+            Addition = "+=",
+            Subtraction = "-=",
             Like = "LIKE",
             NotLike = "NOT LIKE",
             In = "IN",

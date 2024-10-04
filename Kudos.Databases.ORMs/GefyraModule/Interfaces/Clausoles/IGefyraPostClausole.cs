@@ -8,6 +8,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Clausoles
     public interface
         IGefyraPostClausole<T>
     {
-        IGefyraPostClausoleBuilder<T> Post(IGefyraColumn? gc, Object? o);
+        IGefyraPostClausoleBuilder<T> Post(IGefyraColumn? gc, EGefyraPost egp, Object? o);
     }
 }

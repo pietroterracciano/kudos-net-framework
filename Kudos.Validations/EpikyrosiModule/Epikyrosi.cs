@@ -60,21 +60,41 @@ namespace Kudos.Validations.EpikyrosiModule
 
         #endregion
 
+        #region IsValid
+
+        public static Task<Boolean> IsValidAsync(Object? o) { return Task.Run(() => IsValid(o));  }
+        public static Boolean IsValid(Object? o)
+        {
+            EpikyrosiResult er = Validate(o);
+            return er.IsValid;
+        }
+        public static Task<Boolean> IsValidAsync(Object? o, String? sMemberName) { return Task.Run(() => IsValid(o, sMemberName)); }
+        public static Boolean IsValid(Object? o, String? sMemberName)
+        {
+            EpikyrosiResult er = Validate(o, sMemberName, true);
+            return er.IsValid;
+        }
+        public static Task<Boolean> IsValidAsync(Object? o, String? sMemberName, String? sPoolName) { return Task.Run(() => IsValid(o, sMemberName, sPoolName)); }
+        public static Boolean IsValid(Object? o, String? sMemberName, String? sPoolName)
+        {
+            EpikyrosiResult er = Validate(o, sMemberName, sPoolName, true);
+            return er.IsValid;
+        }
+
+        #endregion
+
         #region Validate
 
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid = false)
-        {
-            return Task.Run(() => Validate(o, bStopOnFirstNotValid));
-        }
-        public static EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid = false)
-        {
-            return Validate(o, null, bStopOnFirstNotValid);
-        }
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid = false)
-        {
-            return Task.Run(() => Validate(o, sPoolName, bStopOnFirstNotValid));
-        }
-        public static EpikyrosiResult Validate(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid = false)
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o) { return Task.Run(() => Validate(o)); }
+        public static EpikyrosiResult Validate(Object? o) { return Validate(o, null, null, true); }
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName) { return Task.Run(() => Validate(o, sMemberName)); }
+        public static EpikyrosiResult Validate(Object? o, String? sMemberName) { return Validate(o, sMemberName, null, true); }
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, bStopOnFirstNotValid)); }
+        public static EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid) { return Validate(o, null, null, bStopOnFirstNotValid); }
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sMemberName, bStopOnFirstNotValid)); }
+        public static EpikyrosiResult Validate(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid) { return Validate(o, sMemberName, null, bStopOnFirstNotValid); }
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName, String? sPoolName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sMemberName, sPoolName, bStopOnFirstNotValid)); }
+        public static EpikyrosiResult Validate(Object? o, String? sMemberName, String? sPoolName, Boolean bStopOnFirstNotValid)
         {
             if (o == null)
                 return EpikyrosiResult.NotValidOnObject;
@@ -100,7 +120,7 @@ namespace Kudos.Validations.EpikyrosiModule
                 if (d0.TryGetValue(sPoolName, out eb))
                     return
                         eb != null
-                            ? eb.Validate(o, bStopOnFirstNotValid)
+                            ? eb.Validate(o, sMemberName, bStopOnFirstNotValid)
                             : EpikyrosiResult.Valid;
 
                 MemberInfo[]? mia;

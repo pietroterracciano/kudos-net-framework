@@ -38,7 +38,14 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
             }
 		}
 
-		public EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid = false)
+        public Task<EpikyrosiResult> ValidateAsync(Object? o) { return Task.Run(() => Validate(o)); }
+        public EpikyrosiResult Validate(Object? o) { return Validate(o, null, true); }
+        public Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName) { return Task.Run(() => Validate(o, sMemberName)); }
+        public EpikyrosiResult Validate(Object? o, String? sMemberName) { return Validate(o, sMemberName, true); }
+        public Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, bStopOnFirstNotValid)); }
+        public EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid) { return Validate(o, null, bStopOnFirstNotValid); }
+        public Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sMemberName, bStopOnFirstNotValid)); }
+        public EpikyrosiResult Validate(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid)
 		{
             Stopwatch sw = new Stopwatch(); sw.Start();
 			List<EpikyrosiNotValidResult> l = new List<EpikyrosiNotValidResult>();
@@ -49,7 +56,7 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 
             Int32 k = 0;
 
-            MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), CBindingFlags.Public);
+            MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), sMemberName, CBindingFlags.Public);
 
 			if (mia == null)
 				goto END;
@@ -79,10 +86,6 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
             return new EpikyrosiResult(ref k, ref sw, ref l);
         }
 
-		public Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid = false)
-		{
-			return Task.Run(() => Validate(o, bStopOnFirstNotValid));
-		}
     }
 }
 

@@ -92,6 +92,12 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
 
                 #endregion
 
+                if(gta == null)
+                {
+                    __d[t] = gtd = Ignored;
+                    return;
+                }
+
                 #region Recupero i dati dall'Attribute (se possibile)
 
                 if (gta != null)
@@ -325,20 +331,20 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
                 return;
             }
 
-            GefyraIgnoreColumnAttribute?
-                gic;
+            //GefyraIgnoreColumnAttribute?
+            //    gic;
 
-            #region Recupero l'attribute per il Member
+            //#region Recupero l'attribute per il Member
 
-            gic = ReflectionUtils.GetCustomAttribute<GefyraIgnoreColumnAttribute>(mi);
+            //gic = ReflectionUtils.GetCustomAttribute<GefyraIgnoreColumnAttribute>(mi);
 
-            #endregion
+            //#endregion
 
-            if (gic != null)
-            {
-                gcd = GefyraColumnDescriptor.Ignored;
-                return;
-            }
+            //if (gic != null)
+            //{
+            //    gcd = GefyraColumnDescriptor.Ignored;
+            //    return;
+            //}
 
             string? sn;
 
@@ -355,6 +361,17 @@ namespace Kudos.Databases.ORMs.GefyraModule.Types.Entities.Descriptors
                 gca = ReflectionUtils.GetCustomAttribute<GefyraColumnAttribute>(mi);
 
                 #endregion
+
+                if(gca == null)
+                {
+                    #region Aggiungo il ColumnDescriptor al dictionary d di cache
+
+                    _d[mi] = gcd = GefyraColumnDescriptor.Ignored;
+
+                    #endregion
+
+                    return;
+                }
 
                 #region Recupero i dati dall'Attribute (se possibile)
 

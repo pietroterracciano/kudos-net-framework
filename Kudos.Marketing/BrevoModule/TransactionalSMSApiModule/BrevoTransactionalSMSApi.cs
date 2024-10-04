@@ -13,12 +13,12 @@ namespace Kudos.Marketing.BrevoModule.TransactionalSMSApiModule
             _tsmsapi = tsmsapi;
         }
 
-        public System.Threading.Tasks.Task SendTransacEmailAsync(SendTransacSms? stsms)
+        public System.Threading.Tasks.Task SendTransacSmsAsync(SendTransacSms? stsms)
         {
-            return System.Threading.Tasks.Task.Run(() => SendTransacEmail(stsms));
+            return System.Threading.Tasks.Task.Run(() => SendTransacSms(stsms));
         }
 
-        public SendSms? SendTransacEmail(SendTransacSms? stsms)
+        public SendSms? SendTransacSms(SendTransacSms? stsms)
         {
             if (stsms != null && _tsmsapi != null)
                 try { return _tsmsapi.SendTransacSms(stsms); } catch (Exception e) { Exception prova = e; }

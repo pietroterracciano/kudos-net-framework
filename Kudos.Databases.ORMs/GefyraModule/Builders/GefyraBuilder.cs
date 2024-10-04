@@ -50,7 +50,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             IGefyraPostClausole<IGefyraSetActionClausoleBuilder>,
             IGefyraPostClausoleBuilder<IGefyraSetActionClausoleBuilder>,
 
-        IGefyraDeleteClausoleBuilder
+        IGefyraDeleteClausoleBuilder,
+            IGefyraDeleteClausole
     {
         private static readonly String
             __sParameterPrefix;
@@ -84,6 +85,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         {
             String? s;
             GefyraCompareUtils.GetString(ref e, out s);
+            _Append(s);
+        }
+
+        private void _Append(ref EGefyraPost e)
+        {
+            String? s;
+            GefyraPostUtils.GetString(ref e, out s);
             _Append(s);
         }
 
@@ -132,12 +140,12 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             _sb0.Append(i);
         }
 
-        private void _Append(String s)
+        private void _Append(String? s)
         {
             _sb0.Append(s);
         }
 
-        private void _Append(Char c)
+        private void _Append(Char? c)
         {
             _sb0.Append(c);
         }
@@ -472,6 +480,16 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #endregion
 
+        #region IGefyraDeleteClausole
+
+        public IGefyraDeleteClausoleBuilder Delete()
+        {
+            _Append(CGefyraClausole.Delete); _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
         #region IGefyraSetClausole
 
         public IGefyraSetClausoleBuilder Set(Action<IGefyraSetActionClausoleBuilder>? act)
@@ -487,9 +505,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraPostClausole
 
-        public IGefyraPostClausoleBuilder<IGefyraSetActionClausoleBuilder> Post(IGefyraColumn? gc, Object? o)
+        public IGefyraPostClausoleBuilder<IGefyraSetActionClausoleBuilder> Post(IGefyraColumn? gc, EGefyraPost egp, Object? o)
         {
-            return _Post(ref gc, ref o);
+            return _Post(ref gc, ref egp, ref o);
         }
 
         #endregion
@@ -520,12 +538,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref object? o)
         {
             _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
-
-            IGefyraColumn? gc0 = o as IGefyraColumn;
-            if (gc0 != null) _Append(ref gc0);
-            else _AppendParameter(ref gc, ref o);
-
-            _Append(CCharacter.Space);
+            _AppendColumnOrParameter(ref gc, ref o); _Append(CCharacter.Space);
             return this;
         }
 
@@ -536,17 +549,30 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             if (act != null) act.Invoke(this);
             _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             return this;
-
         }
 
         #endregion
 
         #region IGefyraPostClausole
 
-        private GefyraBuilder _Post(ref IGefyraColumn? gc, ref object? o)
+        private GefyraBuilder _Post(ref IGefyraColumn? gc, ref EGefyraPost e, ref object? o)
         {
-            EGefyraCompare egc = EGefyraCompare.Equal;
-            return _Compare(ref gc, ref egc, ref o);
+            _Append(ref gc); _Append(CCharacter.Space); _Append(CCharacter.Equal); _Append(CCharacter.Space);
+
+            if(e != EGefyraPost.Equal)
+            {
+                _Append(ref gc); _Append(CCharacter.Space);
+
+                if (e == EGefyraPost.Addition)
+                    _Append(CCharacter.Plus);
+                else
+                    _Append(CCharacter.Minus);
+
+                _Append(CCharacter.Space);
+            }
+
+            _AppendColumnOrParameter(ref gc, ref o); _Append(CCharacter.Space);
+            return this;
         }
 
         #endregion
@@ -597,6 +623,36 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         }
 
         #endregion
+
+        //#region private void _AppendColumn(...)
+
+        //private void _AppendColumn(ref IGefyraColumn? gc)
+        //{
+        //    _Append(ref gc); _Append(CCharacter.Space);
+        //}
+
+        //#endregion
+
+        #region private void _AppendColumnOrParameter(...)
+
+        private void _AppendColumnOrParameter(ref IGefyraColumn? gc, ref object? o)
+        {
+            IGefyraColumn? gc0 = o as IGefyraColumn;
+            if (gc0 != null) _Append(ref gc0);
+            else _AppendParameter(ref gc, ref o);
+        }
+
+        #endregion
+
+        //private GefyraBuilder _CompareOrPost(ref IGefyraColumn? gc, ref EGefyraCompare? egc, ref EGefyraPost? egp, ref Action<IGefyraSelectClausole>? act)
+        //{
+        //    _Append(ref gc); _Append(CCharacter.Space); _Append(ref egc); _Append(ref egp); _Append(CCharacter.Space);
+        //    _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
+        //    if (act != null) act.Invoke(this);
+        //    _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
+        //    return this;
+
+        //}
 
         private void _AppendParameter(ref IGefyraColumn? gc, ref Object? o)
         {
