@@ -44,8 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
-    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
   </ItemGroup>
 

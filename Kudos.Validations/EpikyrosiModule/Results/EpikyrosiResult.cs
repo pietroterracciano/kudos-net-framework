@@ -14,7 +14,8 @@ namespace Kudos.Validations.EpikyrosiModule.Results
         private static readonly Stopwatch __sw;
         internal static readonly EpikyrosiResult
             Valid,
-            NotValidOnObject;
+            NotValidOnObject,
+            NotValidOnMemberName;
 
         static EpikyrosiResult()
         {
@@ -25,10 +26,14 @@ namespace Kudos.Validations.EpikyrosiModule.Results
             Int32 i = 0;
             Valid = new EpikyrosiResult(ref i, ref __sw, ref l);
 
+            l = new List<EpikyrosiNotValidResult>();
             l.Add(new EpikyrosiNotValidResult(ref __mi, EEpikyrosiNotValidOn.Object, "Null"));
             NotValidOnObject = new EpikyrosiResult(ref i, ref __sw, ref l);
-        }
 
+            l = new List<EpikyrosiNotValidResult>();
+            l.Add(new EpikyrosiNotValidResult(ref __mi, EEpikyrosiNotValidOn.MemberName, "Null"));
+            NotValidOnMemberName = new EpikyrosiResult(ref i, ref __sw, ref l);
+        }
 
         public readonly TimeSpan ElapsedTime;
         public readonly EpikyrosiNotValidResult[]? NotValids;

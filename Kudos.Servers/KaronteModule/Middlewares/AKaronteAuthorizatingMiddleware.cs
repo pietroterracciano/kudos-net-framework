@@ -9,7 +9,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     :
         AContexizedKaronteMiddleware<KaronteAuthorizatingContext>
     {
-        public AKaronteAuthorizatingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
+        protected AKaronteAuthorizatingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<KaronteAuthorizatingContext?> OnContextFetch(KaronteContext kc)
         {

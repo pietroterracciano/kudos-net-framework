@@ -26,17 +26,6 @@ namespace Kudos.Databases.Descriptors
 	{
         #region ... static ...
 
-        private static readonly Int32
-          __iInt8__MinValue = -128,
-          __iInt8__MaxValue = 127,
-          __iInt24_MinValue = -8388607,
-          __iInt24_MaxValue = 8388607;
-
-        private static readonly UInt32
-           __iUInt8__MaxValue = 255,
-           __iUInt24_MaxValue = UInt32Utils.NNParse(Math.Pow(2, 24)) - 1,
-           __iUInt30_MaxValue = UInt32Utils.NNParse(Math.Pow(2, 30)) - 1;
-
         private static readonly Metas
             __m;
         private static readonly StringBuilder
@@ -412,7 +401,7 @@ namespace Kudos.Databases.Descriptors
             #region DefaultValue
 
             oDefaultValue = DataRowUtils.GetValue(dr, __sColumnDefault);
-            oDefaultValue = ObjectUtils.Parse(dbdtd.SimplexType, oDefaultValue);
+            //oDefaultValue = ObjectUtils.Parse(dbdtd.SimplexType, oDefaultValue);
 
             #endregion
 

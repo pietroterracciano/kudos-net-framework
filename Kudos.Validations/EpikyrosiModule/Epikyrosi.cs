@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Kudos.Constants;
@@ -62,39 +63,40 @@ namespace Kudos.Validations.EpikyrosiModule
 
         #region IsValid
 
-        public static Task<Boolean> IsValidAsync(Object? o) { return Task.Run(() => IsValid(o));  }
-        public static Boolean IsValid(Object? o)
-        {
-            EpikyrosiResult er = Validate(o);
-            return er.IsValid;
-        }
-        public static Task<Boolean> IsValidAsync(Object? o, String? sMemberName) { return Task.Run(() => IsValid(o, sMemberName)); }
-        public static Boolean IsValid(Object? o, String? sMemberName)
-        {
-            EpikyrosiResult er = Validate(o, sMemberName, true);
-            return er.IsValid;
-        }
-        public static Task<Boolean> IsValidAsync(Object? o, String? sMemberName, String? sPoolName) { return Task.Run(() => IsValid(o, sMemberName, sPoolName)); }
-        public static Boolean IsValid(Object? o, String? sMemberName, String? sPoolName)
-        {
-            EpikyrosiResult er = Validate(o, sMemberName, sPoolName, true);
-            return er.IsValid;
-        }
+        public static Task<Boolean> IsValidMemberAsync(Object? o, [CallerMemberName] String? sMemberName = null) { return Task.Run(() => IsValidMember(o, sMemberName)); }
+        public static Boolean IsValidMember(Object? o, [CallerMemberName] String? sMemberName = null) { return ValidateMember(o, sMemberName).IsValid; }
+
+        public static Task<Boolean> IsValidAsync(Object? o) { return Task.Run(() => IsValid(o)); }
+        public static Boolean IsValid(Object? o) { return Validate(o).IsValid; }
+
+        public static Task<Boolean> IsValidAsync(Object? o, String? sPoolName) { return Task.Run(() => IsValid(o, sPoolName)); }
+        public static Boolean IsValid(Object? o, String? sPoolName) { return Validate(o, sPoolName).IsValid; }
+
+        public static Task<Boolean> IsValidAsync(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid) { return Task.Run(() => IsValid(o, sPoolName, bStopOnFirstNotValid)); }
+        public static Boolean IsValid(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid) { return Validate(o, sPoolName, bStopOnFirstNotValid).IsValid; }
 
         #endregion
 
         #region Validate
 
+        public static Task<EpikyrosiResult> ValidateMemberAsync(Object? o, [CallerMemberName] String? sMemberName = null) { return Task.Run(() => Validate(o, sMemberName, true)); }
+        public static EpikyrosiResult ValidateMember(Object? o, [CallerMemberName] String? sMemberName = null)
+        {
+            return !String.IsNullOrWhiteSpace(sMemberName)
+                ? __Validate(o, sMemberName, null, true)
+                : EpikyrosiResult.NotValidOnMemberName;
+        }
+
         public static Task<EpikyrosiResult> ValidateAsync(Object? o) { return Task.Run(() => Validate(o)); }
-        public static EpikyrosiResult Validate(Object? o) { return Validate(o, null, null, true); }
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName) { return Task.Run(() => Validate(o, sMemberName)); }
-        public static EpikyrosiResult Validate(Object? o, String? sMemberName) { return Validate(o, sMemberName, null, true); }
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, bStopOnFirstNotValid)); }
-        public static EpikyrosiResult Validate(Object? o, Boolean bStopOnFirstNotValid) { return Validate(o, null, null, bStopOnFirstNotValid); }
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sMemberName, bStopOnFirstNotValid)); }
-        public static EpikyrosiResult Validate(Object? o, String? sMemberName, Boolean bStopOnFirstNotValid) { return Validate(o, sMemberName, null, bStopOnFirstNotValid); }
-        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sMemberName, String? sPoolName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sMemberName, sPoolName, bStopOnFirstNotValid)); }
-        public static EpikyrosiResult Validate(Object? o, String? sMemberName, String? sPoolName, Boolean bStopOnFirstNotValid)
+        public static EpikyrosiResult Validate(Object? o) { return __Validate(o, null, null, true); }
+
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sPoolName) { return Task.Run(() => Validate(o, sPoolName)); }
+        public static EpikyrosiResult Validate(Object? o, String? sPoolName) { return __Validate(o, null, sPoolName, true); }
+
+        public static Task<EpikyrosiResult> ValidateAsync(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid) { return Task.Run(() => Validate(o, sPoolName, bStopOnFirstNotValid)); }
+        public static EpikyrosiResult Validate(Object? o, String? sPoolName, Boolean bStopOnFirstNotValid) { return __Validate(o, null, sPoolName, bStopOnFirstNotValid); }
+
+        private static EpikyrosiResult __Validate(Object? o, String? sMemberName, String? sPoolName, Boolean bStopOnFirstNotValid)
         {
             if (o == null)
                 return EpikyrosiResult.NotValidOnObject;
@@ -115,12 +117,17 @@ namespace Kudos.Validations.EpikyrosiModule
 
                 EpikyrosiBuilt? eb;
 
-                d0:
+            d0:
 
                 if (d0.TryGetValue(sPoolName, out eb))
                     return
                         eb != null
-                            ? eb.Validate(o, sMemberName, bStopOnFirstNotValid)
+                            ?
+                            (
+                                !String.IsNullOrWhiteSpace(sMemberName)
+                                    ? eb.ValidateMember(o, sMemberName)
+                                    : eb.Validate(o, bStopOnFirstNotValid)
+                            )
                             : EpikyrosiResult.Valid;
 
                 MemberInfo[]? mia;

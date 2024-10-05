@@ -18,7 +18,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class AKaronteRoutingMiddleware
         : AContexizedKaronteMiddleware<KaronteRoutingContext>
     {
-        public AKaronteRoutingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
+        protected AKaronteRoutingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<KaronteRoutingContext> OnContextFetch(KaronteContext kc)
         {

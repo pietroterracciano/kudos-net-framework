@@ -18,7 +18,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class AKaronteResponsingMiddleware<NonActionResultType>
         : AContexizedKaronteMiddleware<KaronteResponsingContext>
     {
-        public AKaronteResponsingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
+        protected AKaronteResponsingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<KaronteResponsingContext> OnContextFetch(KaronteContext kc)
         {

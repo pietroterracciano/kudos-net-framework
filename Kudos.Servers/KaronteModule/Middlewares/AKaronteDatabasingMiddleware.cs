@@ -19,7 +19,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class AKaronteDatabasingMiddleware
         : AContexizedKaronteMiddleware<KaronteDatabasingContext>
     {
-        public AKaronteDatabasingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
+        protected AKaronteDatabasingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<KaronteDatabasingContext> OnContextFetch(KaronteContext kc)
         {

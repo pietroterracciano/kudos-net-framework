@@ -8,7 +8,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     public abstract class AKaronteCapabilitingMiddleware
         : AContexizedKaronteMiddleware<KaronteCapabilitingContext>
     {
-        public AKaronteCapabilitingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
+        protected AKaronteCapabilitingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
 
         protected override async Task<KaronteCapabilitingContext?> OnContextFetch(KaronteContext kc)
         {

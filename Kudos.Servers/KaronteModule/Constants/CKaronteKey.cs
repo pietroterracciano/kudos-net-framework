@@ -5,6 +5,7 @@ namespace Kudos.Servers.KaronteModule.Constants
     internal static class CKaronteKey
     {
         internal static readonly String
+            Exceptioning = nameof(Exceptioning),
             Routing = nameof(Routing),
             Benchmarking = nameof(Benchmarking),
             Core = nameof(Core),

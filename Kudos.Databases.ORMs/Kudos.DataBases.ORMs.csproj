@@ -92,10 +92,7 @@
     <Compile Include="GefyraModule\Enums\EGefyraPost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Reflection\Kudos.Reflection.csproj" />
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
-    <ProjectReference Include="..\Kudos.Types\Kudos.Types.csproj" />
-    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
     <ProjectReference Include="..\Kudos.Databases\Kudos.Databases.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@
     <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release</Configurations>
+    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -49,9 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Constants\Kudos.Constants.csproj" />
     <ProjectReference Include="..\Kudos.Databases\Kudos.Databases.csproj" />
-    <ProjectReference Include="..\Kudos.Utils\Kudos.Utils.csproj" />
     <ProjectReference Include="..\Kudos.Clouds\Kudos.Clouds.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>

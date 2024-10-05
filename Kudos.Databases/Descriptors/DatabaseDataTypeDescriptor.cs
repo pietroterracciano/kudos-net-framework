@@ -66,6 +66,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedTinyInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.UInt16,
                         UInt16.MinValue,
                         __iUInt8__MaxValue,
@@ -81,6 +82,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.TinyInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.Int16,
                         __iInt8__MinValue,
                         __iInt8__MaxValue,
@@ -96,6 +98,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedSmallInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.UInt16,
                         UInt16.MinValue,
                         UInt16.MaxValue,
@@ -111,6 +114,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.SmallInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.Int16,
                         Int16.MinValue,
                         Int16.MaxValue,
@@ -126,6 +130,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedMediumInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.UInt32,
                         UInt32.MinValue,
                         __iUInt24_MaxValue,
@@ -141,6 +146,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.MediumInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.Int32,
                         __iInt24_MinValue,
                         __iInt24_MaxValue,
@@ -156,6 +162,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.UInt32,
                         UInt32.MinValue,
                         UInt32.MaxValue,
@@ -171,6 +178,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.Integer,
+                        EDatabaseDataCollation.Numerical,
                         CType.Int32,
                         Int32.MinValue,
                         Int32.MaxValue,
@@ -186,6 +194,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedBigInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.UInt64,
                         UInt64.MinValue,
                         UInt64.MaxValue,
@@ -201,6 +210,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.BigInteger,
+                        EDatabaseDataCollation.Numerical,
                         CType.Int64,
                         Int64.MinValue,
                         Int64.MaxValue,
@@ -216,6 +226,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.UnsignedDouble,
+                        EDatabaseDataCollation.Numerical,
                         CType.Double,
                         UInt64.MinValue,
                         System.Double.MaxValue,
@@ -231,6 +242,7 @@ namespace Kudos.Databases.Descriptors
                     new DatabaseDataTypeDescriptor
                     (
                         EDatabaseDataType.Double,
+                        EDatabaseDataCollation.Numerical,
                         CType.Double,
                         UInt64.MinValue,
                         System.Double.MaxValue,
@@ -245,7 +257,8 @@ namespace Kudos.Databases.Descriptors
                 VariableChar =
                     new DatabaseDataTypeDescriptor
                     (
-                        EDatabaseDataType.Double,
+                        EDatabaseDataType.VariableChar,
+                        EDatabaseDataCollation.Textual,
                         CType.String,
                         null,
                         null,
@@ -260,7 +273,8 @@ namespace Kudos.Databases.Descriptors
                 Text =
                     new DatabaseDataTypeDescriptor
                     (
-                        EDatabaseDataType.Double,
+                        EDatabaseDataType.Text,
+                        EDatabaseDataCollation.Textual,
                         CType.String,
                         null,
                         null,
@@ -275,7 +289,8 @@ namespace Kudos.Databases.Descriptors
                 MediumText =
                     new DatabaseDataTypeDescriptor
                     (
-                        EDatabaseDataType.Double,
+                        EDatabaseDataType.MediumText,
+                        EDatabaseDataCollation.Textual,
                         CType.String,
                         null,
                         null,
@@ -290,7 +305,8 @@ namespace Kudos.Databases.Descriptors
                 LongText =
                     new DatabaseDataTypeDescriptor
                     (
-                        EDatabaseDataType.Double,
+                        EDatabaseDataType.LongText,
+                        EDatabaseDataCollation.Textual,
                         CType.String,
                         null,
                         null,
@@ -305,7 +321,8 @@ namespace Kudos.Databases.Descriptors
                 Json =
                     new DatabaseDataTypeDescriptor
                     (
-                        EDatabaseDataType.Double,
+                        EDatabaseDataType.Json,
+                        EDatabaseDataCollation.Textual,
                         CType.String,
                         null,
                         null,
@@ -324,15 +341,17 @@ namespace Kudos.Databases.Descriptors
         #endregion
 
         //public readonly EDatabaseDataType DataType;
-        public readonly Type SimplexType;
+        public readonly Type DeclaringType;
         public readonly Double? MinValue, MaxValue;
         public readonly UInt32? MaxLength;
-        public readonly EDatabaseDataType ComplexType;
+        public readonly EDatabaseDataType Type;
+        public readonly EDatabaseDataCollation Collation;
 
-        private DatabaseDataTypeDescriptor(EDatabaseDataType ect, Type t, Double? dmnv, Double? dmxv, UInt32? uimxl)
+        private DatabaseDataTypeDescriptor(EDatabaseDataType edbdt, EDatabaseDataCollation edbdc, Type t, Double? dmnv, Double? dmxv, UInt32? uimxl)
         {
-            ComplexType = ect;
-            SimplexType = t;
+            Type = edbdt;
+            Collation = edbdc;
+            DeclaringType = t;
             MinValue = dmnv;
             MaxValue = dmxv;
             MaxLength = uimxl;

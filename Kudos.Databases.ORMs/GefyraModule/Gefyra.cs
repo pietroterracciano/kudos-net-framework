@@ -224,10 +224,21 @@ namespace Kudos.Databases.ORMs.GefyraModule
                 return;
             }
 
-            oOut = ObjectUtils.Parse(dbcd.DataTypeDescriptor.SimplexType, oIn);
+            Type?
+                tDeclaring;
+
+            if (dbcd.DataTypeDescriptor.Collation == EDatabaseDataCollation.Numerical)
+                tDeclaring =
+                    dbcd.IsNullable
+                        ? NumericUtils.ParseToNType(dbcd.DataTypeDescriptor.DeclaringType)
+                        : NumericUtils.ParseToNNType(dbcd.DataTypeDescriptor.DeclaringType);
+            else
+                tDeclaring = dbcd.DataTypeDescriptor.DeclaringType;
+            
+            oOut = ObjectUtils.Parse(tDeclaring, oIn);
 
             #region UInt16
-            if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt16)
+            if (tDeclaring == CType.UInt16 || tDeclaring == CType.NullableUInt16)
             {
                 UInt16? i = oOut as UInt16?;
                 if (i != null)
@@ -238,7 +249,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region UInt32
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt32)
+            else if (tDeclaring == CType.UInt32 || tDeclaring == CType.NullableUInt32)
             {
                 UInt32? i = oOut as UInt32?;
                 if (i != null)
@@ -249,7 +260,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region UInt64
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.UInt64)
+            else if (tDeclaring == CType.UInt64 || tDeclaring == CType.NullableUInt64)
             {
                 UInt64? i = oOut as UInt64?;
                 if (i != null)
@@ -260,7 +271,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region Int16
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int16)
+            else if (tDeclaring == CType.Int16 || tDeclaring == CType.NullableInt16)
             {
                 Int16? i = oOut as Int16?;
                 if (i != null)
@@ -271,7 +282,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region Int32
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int32)
+            else if (tDeclaring == CType.Int32 || tDeclaring == CType.NullableInt32)
             {
                 Int32? i = oOut as Int32?;
                 if (i != null)
@@ -282,7 +293,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region Int64
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Int64)
+            else if (tDeclaring == CType.Int64 || tDeclaring == CType.NullableInt64)
             {
                 Int64? i = oOut as Int64?;
                 if (i != null)
@@ -293,7 +304,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region Single
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Single)
+            else if (tDeclaring == CType.Single || tDeclaring == CType.NullableSingle)
             {
                 Single? i = oOut as Single?;
                 if (i != null)
@@ -304,7 +315,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region Double
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.Double)
+            else if (tDeclaring == CType.Double || tDeclaring == CType.NullableDouble)
             {
                 Double? i = oOut as Double?;
                 if (i != null)
@@ -315,7 +326,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             }
             #endregion
             #region String
-            else if (dbcd.DataTypeDescriptor.SimplexType == CType.String)
+            else if (tDeclaring == CType.String)
             {
                 Int32? i = Int32Utils.Parse(dbcd.CurrentMaxLength);
                 if (i != null) oOut = StringUtils.Truncate(oOut as String, i.Value);
@@ -333,7 +344,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             )
                 return;
 
-            oOut = ReflectionUtils.CreateInstance(dbcd.DataTypeDescriptor.SimplexType);
+            oOut = ReflectionUtils.CreateInstance(tDeclaring);
 
             //if (oOut != null)
             //    return;

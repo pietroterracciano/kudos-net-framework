@@ -1,7 +1,10 @@
-﻿using Kudos.Crypters.KryptoModule.SymmetricModule;
+﻿using Amazon.Runtime;
+using Kudos.Converters;
+using Kudos.Crypters.KryptoModule.SymmetricModule;
 using Kudos.Databases.Chainers;
 using Kudos.Databases.Chains;
 using Kudos.Databases.Interfaces.Chains;
+using Kudos.Enums;
 using Kudos.Reflection.Utils;
 using Kudos.Servers.KaronteModule.Attributes;
 using Kudos.Servers.KaronteModule.Constants;
@@ -294,6 +297,28 @@ namespace Kudos.Servers.KaronteModule
             if (act != null) act.Invoke(kjsons);
             sc.TryAddSingleton<KaronteJSONingService>(kjsons);
 
+            if (__IsServiceRegistered(CKaronteKey.Routing))
+                sc
+                    .AddControllers()
+                        .AddJsonOptions
+                        (
+                            (jsono) =>
+                            {
+                                jsono.JsonSerializerOptions.PropertyNameCaseInsensitive = kjsons.JsonSerializerOptions.PropertyNameCaseInsensitive;
+                                jsono.JsonSerializerOptions.PropertyNamingPolicy = kjsons.JsonSerializerOptions.PropertyNamingPolicy;
+                                jsono.JsonSerializerOptions.DefaultBufferSize = kjsons.JsonSerializerOptions.DefaultBufferSize;
+                                jsono.JsonSerializerOptions.DefaultIgnoreCondition = kjsons.JsonSerializerOptions.DefaultIgnoreCondition;
+                                jsono.JsonSerializerOptions.DictionaryKeyPolicy = kjsons.JsonSerializerOptions.DictionaryKeyPolicy;
+                                jsono.JsonSerializerOptions.IgnoreReadOnlyFields = kjsons.JsonSerializerOptions.IgnoreReadOnlyFields;
+                                jsono.JsonSerializerOptions.IgnoreReadOnlyProperties = kjsons.JsonSerializerOptions.IgnoreReadOnlyProperties;
+                                jsono.JsonSerializerOptions.WriteIndented = kjsons.JsonSerializerOptions.WriteIndented;
+                                jsono.JsonSerializerOptions.Encoder = kjsons.JsonSerializerOptions.Encoder;
+                                jsono.JsonSerializerOptions.IncludeFields = kjsons.JsonSerializerOptions.IncludeFields;
+                                for (int i = 0; i < kjsons.JsonSerializerOptions.Converters.Count; i++)
+                                    jsono.JsonSerializerOptions.Converters.Add(kjsons.JsonSerializerOptions.Converters[i]);
+                            }
+                        );
+
             return sc;
         }
 
@@ -403,6 +428,19 @@ namespace Kudos.Servers.KaronteModule
                 throw new InvalidOperationException();
 
             __RegisterService(CKaronteKey.Capabiliting);
+            return sc;
+        }
+
+        #endregion
+
+        #region public static IServiceCollection AddKaronteExceptioning(..)
+
+        public static IServiceCollection AddKaronteExceptioning(this IServiceCollection sc)
+        {
+            if (!__IsServiceRegistered<KaronteContext>())
+                throw new InvalidOperationException();
+
+            __RegisterService(CKaronteKey.Exceptioning);
             return sc;
         }
 
@@ -619,6 +657,32 @@ namespace Kudos.Servers.KaronteModule
                     );
 
             return ab;
+        }
+
+        #endregion
+
+        #region public static IApplicationBuilder UseKaronteExceptioning(...)
+
+        public static IApplicationBuilder UseKaronteExceptioning<MiddlewareType>(this IApplicationBuilder ab)
+            where MiddlewareType : AKaronteExceptioningMiddleware
+        {
+            if
+            (
+                !__IsServiceRegistered(CKaronteKey.Exceptioning)
+            )
+                throw new InvalidOperationException();
+
+            //__RegisterApplication(CKaronteKey.Exceptioning);
+
+            return
+                ab
+                    .UseExceptionHandler
+                    (
+                        ab =>
+                        {
+                            ab.__UseKaronteMiddleware<MiddlewareType>(true);
+                        }
+                    );
         }
 
         #endregion

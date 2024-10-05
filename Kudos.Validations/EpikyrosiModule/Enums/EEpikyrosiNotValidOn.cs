@@ -5,6 +5,7 @@ namespace Kudos.Validations.EpikyrosiModule.Enums
 	public enum EEpikyrosiNotValidOn
     {
 		Object,
+        MemberName,
         MinValue,
         MaxValue,
         MinLength,

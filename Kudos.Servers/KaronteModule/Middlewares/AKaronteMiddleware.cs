@@ -12,7 +12,7 @@ namespace Kudos.Servers.KaronteModule.Middlewares
     {
         private readonly RequestDelegate _rd;
 
-        public AKaronteMiddleware(ref RequestDelegate rd)
+        protected AKaronteMiddleware(ref RequestDelegate rd)
         {
             _rd = rd;
         }
