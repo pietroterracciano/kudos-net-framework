@@ -10,6 +10,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Clausoles
     public interface 
         IGefyraLimitClausole
     {
-        IGefyraLimitClausoleBuilder Limit(int i);
+        IGefyraLimitClausoleBuilder Limit(uint i);
     }
 }

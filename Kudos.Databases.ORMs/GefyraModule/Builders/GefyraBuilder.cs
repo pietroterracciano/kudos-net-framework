@@ -42,6 +42,8 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         IGefyraLimitClausoleBuilder,
         IGefyraOffsetClausoleBuilder,
 
+        IGefyraCountClausoleBuilder,
+
         IGefyraUpdateClausoleBuilder,
             IGefyraUpdateClausole,
             IGefyraSetClausole,
@@ -111,7 +113,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private void _Append(ref IGefyraTable? gt)
         {
-            if (gt == null) _Append(GefyraTable.Invalid.GetSQL());
+            if (gt == null) { _Append(GefyraTable.Invalid.GetSQL()); return; }
             else if (gt == GefyraTable.Ignored) return;
             _Append(gt.GetSQL());
         }
@@ -130,9 +132,14 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         private void _Append(ref IGefyraColumn? gc)
         {
-            if (gc == null) _Append(GefyraColumn.Invalid.GetSQL());
+            if (gc == null) { _Append(GefyraColumn.Invalid.GetSQL()); return; }
             else if (gc == GefyraColumn.Ignored) return;
             _Append(gc.GetSQL()); _lgcConsumed.Add(gc);
+        }
+
+        private void _Append(ref UInt32 i)
+        {
+            _sb0.Append(i);
         }
 
         private void _Append(ref Int32 i)
@@ -143,6 +150,11 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         private void _Append(String? s)
         {
             _sb0.Append(s);
+        }
+
+        private void _Remove(int i, int l)
+        {
+            _sb0.Remove(i, l);
         }
 
         private void _Append(Char? c)
@@ -232,7 +244,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         {
             _Append(CGefyraClausole.Select);
             _Append(CCharacter.Space);
-            if (gca == null || gca.Length < 1)
+            if (gca == null || gca.Length < 1 || ( gca.Length == 1 && gca[0] == null ) )
                 _Append(CCharacter.Asterisk);
             else
             {
@@ -245,6 +257,28 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
                         _lgcOnOutput.Add(gca[i]);
                     }
             }
+            _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraCountClausole
+
+        public IGefyraCountClausoleBuilder Count()
+        {
+            if (_lgcConsumed.Count < 1)
+                _Remove(_sb0.Length - 2, 2);
+            else
+            {
+                _Append(CCharacter.Comma);
+                _Append(CCharacter.Space);
+            }
+
+            _Append(CGefyraClausole.Count);
+            _Append(CCharacter.LeftRoundBracket);
+            _Append(CCharacter.Asterisk);
+            _Append(CCharacter.RightRoundBracket);
             _Append(CCharacter.Space);
             return this;
         }
@@ -452,7 +486,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraLimitClausole
 
-        public IGefyraLimitClausoleBuilder Limit(int i)
+        public IGefyraLimitClausoleBuilder Limit(uint i)
         {
             _Append(CGefyraClausole.Limit); _Append(CCharacter.Space); _Append(ref i); _Append(CCharacter.Space);
             return this;
@@ -462,7 +496,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #region IGefyraOffsetClausole
 
-        public IGefyraOffsetClausoleBuilder Offset(int i)
+        public IGefyraOffsetClausoleBuilder Offset(uint i)
         {
             _Append(CGefyraClausole.Offset); _Append(CCharacter.Space); _Append(ref i); _Append(CCharacter.Space);
             return this;

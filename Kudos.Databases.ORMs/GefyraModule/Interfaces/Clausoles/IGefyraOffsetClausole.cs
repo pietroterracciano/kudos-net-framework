@@ -10,6 +10,6 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Clausoles
     public interface 
         IGefyraOffsetClausole
     {
-        public IGefyraOffsetClausoleBuilder Offset(int i);
+        public IGefyraOffsetClausoleBuilder Offset(uint i);
     }
 }
