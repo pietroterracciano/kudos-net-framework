@@ -3,6 +3,7 @@ using System.Collections;
 using System.Data;
 using System.Numerics;
 using System.Reflection;
+using System.Threading.Tasks;
 using Kudos.Constants;
 using Kudos.Databases.Descriptors;
 using Kudos.Databases.Enums;
@@ -56,7 +57,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Parse
 
-        //public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
+        public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
         public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
         {
             return Parse(typeof(T), dt, gb) as T[];
@@ -103,7 +104,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             return oa1;
         }
 
-        //public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
+        public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
         public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
         {
             return ObjectUtils.Cast<T>(Parse(typeof(T), dr, gb));
@@ -166,9 +167,10 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Fit
 
-        //public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => {  Fit<T>(dbh, ref t0); }); }
-        //public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
-        public static void Fit<T>(IDatabaseHandler? dbh, ref T? t) { T? t0; __Fit(ref dbh, ref t, out t0, true); }
+        //public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => { Fit<T>(dbh, ref t0); }); }
+        public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
+
+        //public static void Fit<T>(IDatabaseHandler? dbh, ref T? t) { T? t0; __Fit(ref dbh, ref t, out t0, true); }
         public static T? Fit<T>(IDatabaseHandler? dbh, T? t) { T? t0; __Fit(ref dbh, ref t, out t0, false); return t0; }
         private static void __Fit<T>(ref IDatabaseHandler? dbh, ref T? t, out T? t0, Boolean bInPlace)
         { 

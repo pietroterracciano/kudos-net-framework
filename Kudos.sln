@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos", "Kudos\Kudos.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databases", "Kudos.Databases\Kudos.Databases.csproj", "{A6D56F0B-D942-4740-9FCA-F5CF883A48BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Servers", "Kudos.Servers\Kudos.Servers.csproj", "{5C6E82F2-C610-43A8-8221-5AA1B2F4B567}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Serving", "Kudos.Serving\Kudos.Serving.csproj", "{5C6E82F2-C610-43A8-8221-5AA1B2F4B567}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databases.ORMs", "Kudos.Databases.ORMs\Kudos.Databases.ORMs.csproj", "{F53B514F-5A79-4069-8BF0-6F16AAFB281F}"
 EndProject
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Validations", "Kudos.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Crypters", "Kudos.Crypters\Kudos.Crypters.csproj", "{8334C561-F19E-4498-B24E-40F6A399A158}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Clouds", "Kudos.Clouds\Kudos.Clouds.csproj", "{8E475E5E-CFFC-4249-8FC6-95734CA90B22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Clouding", "Kudos.Clouding\Kudos.Clouding.csproj", "{8E475E5E-CFFC-4249-8FC6-95734CA90B22}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Marketing", "Kudos.Marketing\Kudos.Marketing.csproj", "{B6BD261F-D876-4ADF-A4C7-6683CA9710F1}"
 EndProject

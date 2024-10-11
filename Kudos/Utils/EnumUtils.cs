@@ -1,5 +1,6 @@
 ﻿using Kudos.Constants;
 using Kudos.Enums;
+using Kudos.Reflection.Utils;
 using Kudos.Utils.Collections;
 using Kudos.Utils.Numerics;
 using Kudos.Utils.Texts;
@@ -63,8 +64,29 @@ namespace Kudos.Utils
 
         #region public static ... GetFlags<...>(...)
 
-        public static T[]? GetFlags<T>() where T : Enum { return ObjectUtils.Cast<T[]?>(GetFlags(typeof(T))); }
-        public static T[]? GetFlags<T>(T? t) where T : Enum { return ObjectUtils.Cast<T[]?>(GetFlags(t as Enum)); }
+        public static T[]? GetFlags<T>() where T : Enum
+        {
+            Enum[]? ea = GetFlags(typeof(T));
+            T[]? ta;
+            _GetFlags(ref ea, out ta);
+            return ta;
+        }
+        public static T[]? GetFlags<T>(T? t) where T : Enum
+        {
+            Enum[]? ea = GetFlags(t as Enum);
+            T[]? ta;
+            _GetFlags(ref ea, out ta);
+            return ta;
+        }
+
+        private static void _GetFlags<T>(ref Enum[]? ea, out T[]? ta)
+        {
+            if (ea == null) { ta = null; return; }
+            ta = new T[ea.Length];
+            if (ta == null) { ta = null; return; }
+            Array.Copy(ea, ta, ta.Length);
+        }
+
         public static Enum[]? GetFlags(Enum? e) 
         {
             if (e == null)

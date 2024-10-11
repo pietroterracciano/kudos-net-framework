@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+    <Authors>Pietro Terracciano</Authors>
+	<Version>0.24.6.10</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disabled</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Optimize>false</Optimize>
+      <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <Optimize>true</Optimize>
+      <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="AmazonWebServiceModule\" />
+    <None Remove="AmazonWebServiceModule\Builders\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\Builders\" />
+    <None Remove="AmazonWebServiceModule\PinpointModule\Descriptors\" />
+    <None Remove="AmazonWebServiceModule\Descriptors\" />
+    <None Remove="AmazonWebServiceModule\S3Module\" />
+    <None Remove="AmazonWebServiceModule\S3Module\Builders\" />
+    <None Remove="AmazonWebServiceModule\S3Module\Descriptors\" />
+    <None Remove="GoogleCloudModule\" />
+    <None Remove="GoogleCloudModule\FirebaseCloudMessagingModule\" />
+    <None Remove="GoogleCloudModule\Builders\" />
+    <None Remove="GoogleCloudModule\FirebaseCloudMessagingModule\Builders\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AmazonWebServiceModule\" />
+    <Folder Include="AmazonWebServiceModule\Builders\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\Builders\" />
+    <Folder Include="AmazonWebServiceModule\PinpointModule\Descriptors\" />
+    <Folder Include="AmazonWebServiceModule\Descriptors\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\Builders\" />
+    <Folder Include="AmazonWebServiceModule\S3Module\Descriptors\" />
+    <Folder Include="GoogleCloudModule\" />
+    <Folder Include="GoogleCloudModule\FirebaseCloudMessagingModule\" />
+    <Folder Include="GoogleCloudModule\Builders\" />
+    <Folder Include="GoogleCloudModule\FirebaseCloudMessagingModule\Builders\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Pinpoint" Version="3.7.302.14" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.310.2" />
+    <PackageReference Include="FirebaseAdmin" Version="3.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kudos\Kudos.csproj" />
+  </ItemGroup>
+</Project>
