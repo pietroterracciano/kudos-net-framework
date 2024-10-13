@@ -15,6 +15,7 @@ namespace Kudos.Databases.Interfaces.Chains
         IMySQLDatabaseChain SetPort(UInt16? i);
         IMySQLDatabaseChain SetKeepAlive(UInt32? i);
         IMySQLDatabaseChain SetConnectionProtocol(MySqlConnectionProtocol? e);
+        IMySQLDatabaseChain IsConnectionResetEnabled(Boolean? b);
         IMySQLDatabaseChain IsSessionPoolInteractive(Boolean? b);
     }
 }

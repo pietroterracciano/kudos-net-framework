@@ -16,7 +16,8 @@ namespace Kudos.Databases.Controllers
         SqlCommand
     >
     {
-        internal MSSQLDatabaseHandler(ref SqlConnectionStringBuilder scsb) : base(EDatabaseType.MicrosoftSQL, ref scsb) { }
+        internal MSSQLDatabaseHandler(ref SqlConnectionStringBuilder scsb, ref EDatabaseConnectionBehaviour? edcb)
+            : base(EDatabaseType.MicrosoftSQL, ref scsb, ref edcb) { }
 
         protected override long ExecuteNonQuery_GetLastInsertedID(SqlCommand cmd)
         {

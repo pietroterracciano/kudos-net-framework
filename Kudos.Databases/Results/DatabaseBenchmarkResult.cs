@@ -17,18 +17,21 @@ namespace Kudos.Databases.Results
             Empty = new DatabaseBenchmarkResult();
         }
 
-        public TimeSpan ElapsedTimeOnWaiting { get; private set;}
-        public TimeSpan ElapsedTimeOnExecution { get; private set; }
+        public TimeSpan ElapsedTimeOnWaiting { get; private set; }
+        public TimeSpan ElapsedTimeOnConnecting { get; private set; }
+        public TimeSpan ElapsedTimeOnExecuting { get; private set; }
 
         private readonly Stopwatch
-            _swOnExecution,
+            _swOnConnecting,
+            _swOnExecuting,
             _swOnWaiting;
 
         internal DatabaseBenchmarkResult()
         {
             _swOnWaiting = new Stopwatch();
-            _swOnExecution = new Stopwatch();
-            ElapsedTimeOnWaiting = ElapsedTimeOnExecution = TimeSpan.Zero;
+            _swOnExecuting = new Stopwatch();
+            _swOnConnecting = new Stopwatch();
+            ElapsedTimeOnWaiting = ElapsedTimeOnConnecting = ElapsedTimeOnExecuting = TimeSpan.Zero;
         }
 
         internal DatabaseBenchmarkResult StartOnWaiting()
@@ -37,16 +40,22 @@ namespace Kudos.Databases.Results
             return this;
         }
 
-        internal DatabaseBenchmarkResult StartOnExecution()
+        internal DatabaseBenchmarkResult StartOnConnecting()
         {
-            _swOnExecution.Start();
+            _swOnConnecting.Start();
             return this;
         }
 
-        internal DatabaseBenchmarkResult Start()
+        internal DatabaseBenchmarkResult StartOnExecuting()
         {
-            return StartOnWaiting().StartOnExecution();
+            _swOnExecuting.Start();
+            return this;
         }
+
+        //internal DatabaseBenchmarkResult Start()
+        //{
+        //    return StartOnWaiting().StartOnExecuting();
+        //}
 
         internal DatabaseBenchmarkResult StopOnWaiting()
         {
@@ -59,12 +68,23 @@ namespace Kudos.Databases.Results
             return this;
         }
 
-        internal DatabaseBenchmarkResult StopOnExecution()
+        internal DatabaseBenchmarkResult StopOnConnecting()
         {
-            if (_swOnExecution.IsRunning)
+            if (_swOnConnecting.IsRunning)
             {
-                _swOnExecution.Stop();
-                ElapsedTimeOnExecution = _swOnExecution.Elapsed;
+                _swOnConnecting.Stop();
+                ElapsedTimeOnConnecting = _swOnConnecting.Elapsed;
+            }
+
+            return this;
+        }
+
+        internal DatabaseBenchmarkResult StopOnExecuting()
+        {
+            if (_swOnExecuting.IsRunning)
+            {
+                _swOnExecuting.Stop();
+                ElapsedTimeOnExecuting = _swOnExecuting.Elapsed;
             }
 
             return this;
@@ -72,7 +92,7 @@ namespace Kudos.Databases.Results
 
         internal DatabaseBenchmarkResult Stop()
         {
-            return StopOnWaiting().StopOnExecution();
+            return StopOnWaiting().StopOnConnecting().StopOnExecuting();
         }
     }
 }

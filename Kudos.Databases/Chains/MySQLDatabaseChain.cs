@@ -18,11 +18,13 @@ namespace Kudos.Databases.Chains
     {
         internal string? _Host;
         internal EDatabaseCharacterSet? _CharacterSet;
-        internal bool? _IsSessionPoolInteractive;
+        internal bool? _IsSessionPoolInteractive, _IsConnectionResetEnabled;
         internal ushort? _Port;
         internal uint? _KeepAlive;
         internal MySqlConnectionProtocol? _ConnectionProtocol;
 
+
+        public IMySQLDatabaseChain IsConnectionResetEnabled(bool? b) { _IsConnectionResetEnabled = b; return this; }
         public IMySQLDatabaseChain SetCharacterSet(EDatabaseCharacterSet? e) { _CharacterSet = e; return this; }
         public IMySQLDatabaseChain SetHost(string? s) { _Host = s; return this; }
         public IMySQLDatabaseChain SetPort(ushort? i) { _Port = i; return this; }
@@ -46,6 +48,7 @@ namespace Kudos.Databases.Chains
 
             mscsb.DnsSrv = false;
 
+            if (_MinimumPoolSize != null) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
             if (_IsPoolingEnabled != null) mscsb.Pooling = _IsPoolingEnabled.Value;
             if (_MinimumPoolSize != null) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
             if (_MaximumPoolSize != null) mscsb.MaximumPoolSize = _MaximumPoolSize.Value;
@@ -66,10 +69,11 @@ namespace Kudos.Databases.Chains
             if (_IsSessionPoolInteractive != null) mscsb.InteractiveSession = _IsSessionPoolInteractive.Value;
             if (_CommandTimeout != null) mscsb.DefaultCommandTimeout = _CommandTimeout.Value;
             if (_IsCompressionEnabled != null) mscsb.UseCompression = _IsCompressionEnabled.Value;
+            if (_IsConnectionResetEnabled != null) mscsb.ConnectionReset = _IsConnectionResetEnabled.Value;
 
             if (_ConnectionProtocol != null) mscsb.ConnectionProtocol = _ConnectionProtocol.Value;
 
-            return new MySQLDatabaseHandler(ref mscsb);
+            return new MySQLDatabaseHandler(ref mscsb, ref _ConnectionBehaviour);
         }
 
         internal MySQLDatabaseChain(DatabaseChain? o) : base(o) { }

@@ -36,7 +36,7 @@ namespace Kudos.Databases.Chains
             if (_CommandTimeout != null) scsb.CommandTimeout = Int32Utils.NNParse(_CommandTimeout.Value);
             if (_IsCompressionEnabled != null) scsb.Encrypt = _IsCompressionEnabled.Value;
 
-            return new MSSQLDatabaseHandler(ref scsb);
+            return new MSSQLDatabaseHandler(ref scsb, ref _ConnectionBehaviour);
         }
 
         internal MSSQLDatabaseChain(DatabaseChain? o) : base(o) { }

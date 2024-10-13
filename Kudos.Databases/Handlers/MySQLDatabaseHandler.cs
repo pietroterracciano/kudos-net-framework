@@ -16,7 +16,8 @@ namespace Kudos.Databases.Controllers
         MySqlCommand
     >
     {
-        internal MySQLDatabaseHandler(ref MySqlConnectionStringBuilder mscsb) : base(EDatabaseType.MySQL, ref mscsb) { }
+        internal MySQLDatabaseHandler(ref MySqlConnectionStringBuilder mscsb, ref EDatabaseConnectionBehaviour? edcb)
+            : base(EDatabaseType.MySQL, ref mscsb, ref edcb) { }
 
         protected override Int64 ExecuteNonQuery_GetLastInsertedID(MySqlCommand oCommand)
         {

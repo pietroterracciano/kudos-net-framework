@@ -1,4 +1,5 @@
 ﻿using Kudos.Constants;
+using Kudos.Databases.Enums;
 using Kudos.Databases.Interfaces.Chains;
 using Kudos.Reflection.Utils;
 using Kudos.Utils;
@@ -16,9 +17,11 @@ namespace Kudos.Databases.Chains
         internal string? _UserName, _UserPassword, _SchemaName;
         internal uint? _CommandTimeout, _ConnectionTimeout, _SessionPoolTimeout;
         internal ushort? _MinimumPoolSize, _MaximumPoolSize;
-        internal bool? _IsAutoCommitEnabled, _IsCompressionEnabled, _IsLoggingEnabled, _IsPoolingEnabled;
+        internal bool? _IsAutomaticCommitEnabled, _IsCompressionEnabled, _IsLoggingEnabled, _IsPoolingEnabled;
+        internal EDatabaseConnectionBehaviour? _ConnectionBehaviour;
 
-        public IDatabaseChain IsAutoCommitEnabled(bool? b) { _IsAutoCommitEnabled = b; return this; }
+        public IDatabaseChain SetConnectionBehaviour(EDatabaseConnectionBehaviour? edcb) { _ConnectionBehaviour = edcb; return this; }
+        public IDatabaseChain IsAutomaticCommitEnabled(bool? b) { _IsAutomaticCommitEnabled = b; return this; }
         public IDatabaseChain IsCompressionEnabled(bool? b) { _IsCompressionEnabled = b; return this; }
         public IDatabaseChain IsLoggingEnabled(bool? b) { _IsLoggingEnabled = b; return this; }
         public IDatabaseChain IsPoolingEnabled(bool? b) { _IsPoolingEnabled = b; return this; }

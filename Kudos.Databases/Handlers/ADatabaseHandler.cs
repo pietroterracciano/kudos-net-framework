@@ -52,13 +52,17 @@ namespace Kudos.Databases.Controllers
         private IDatabaseHandler
             _this;
 
+        private readonly EDatabaseConnectionBehaviour?
+            _eConnectionBehaviour;
+
         public EDatabaseType Type { get; private set; }
 
-        internal ADatabaseHandler(EDatabaseType e, ref DbConnectionStringBuilderType csb)
+        internal ADatabaseHandler(EDatabaseType e, ref DbConnectionStringBuilderType csb, ref EDatabaseConnectionBehaviour? edcb)
         {
             _this = this;
             _lck = new Object();
             Type = e;
+            _eConnectionBehaviour = edcb;
             _oConnection = new DbConnectionType() { ConnectionString = csb.ToString() };
         }
 
@@ -68,7 +72,7 @@ namespace Kudos.Databases.Controllers
 
         public DatabaseResult OpenConnection()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnConnecting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionOpened())
@@ -117,13 +121,26 @@ namespace Kudos.Databases.Controllers
             );
         }
 
+        private void _AutoOpening()
+        {
+            if
+            (
+                IsConnectionOpened()
+                || _eConnectionBehaviour == null
+                || !_eConnectionBehaviour.Value.HasFlag(EDatabaseConnectionBehaviour.AutomaticOpening)
+            )
+                return;
+
+            OpenConnection();
+        }
+
         #endregion
 
         #region public DatabaseResult CloseConnection()
 
         public DatabaseResult CloseConnection()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnConnecting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionClosed())
@@ -150,6 +167,19 @@ namespace Kudos.Databases.Controllers
                     return CloseConnection();
                 }
             );
+        }
+
+        private void _AutoClosing()
+        {
+            if
+            (
+                IsConnectionClosed()
+                || _eConnectionBehaviour == null
+                || !_eConnectionBehaviour.Value.HasFlag(EDatabaseConnectionBehaviour.AutomaticClosing)
+            )
+                return;
+
+            CloseConnection();
         }
 
         #endregion
@@ -189,7 +219,7 @@ namespace Kudos.Databases.Controllers
         public Task<DatabaseResult> ChangeSchemaAsync(String? s) { return Task.Run(() => ChangeSchema(s)); }
         public DatabaseResult ChangeSchema(String? s)
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionOpened())
@@ -222,7 +252,7 @@ namespace Kudos.Databases.Controllers
         public Task<DatabaseResult> BeginTransactionAsync() { return Task.Run(BeginTransaction); }
         public DatabaseResult BeginTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionOpened())
@@ -247,7 +277,7 @@ namespace Kudos.Databases.Controllers
         public Task<DatabaseResult> CommitTransactionAsync() { return Task.Run(CommitTransaction); }
         public DatabaseResult CommitTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionOpened())
@@ -272,7 +302,7 @@ namespace Kudos.Databases.Controllers
         public Task<DatabaseResult> RollbackTransactionAsync() { return Task.Run(RollbackTransaction); }
         public DatabaseResult RollbackTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecution();
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
             DatabaseErrorResult? dber;
 
             if (!IsConnectionOpened())
@@ -380,7 +410,11 @@ namespace Kudos.Databases.Controllers
 
             lock (_lck)
             {
-                dbbr.StopOnWaiting().StartOnExecution();
+                dbbr.StopOnWaiting().StartOnConnecting();
+
+                _AutoOpening();
+
+                dbbr.StopOnConnecting().StartOnExecuting();
 
                 if (!Command__Prepare(ref s, ref a, out err))
                 {
@@ -399,6 +433,10 @@ namespace Kudos.Databases.Controllers
                     err = OnException(ref e);
                     if (err == null) err = new DatabaseErrorResult(ref e);
                 }
+
+                dbbr.StopOnExecuting();
+
+                _AutoClosing();
             }
 
             END_METHOD:
@@ -446,7 +484,11 @@ namespace Kudos.Databases.Controllers
 
             lock (_lck)
             {
-                dbbr.StopOnWaiting().StartOnExecution();
+                dbbr.StopOnWaiting().StartOnConnecting();
+
+                _AutoOpening();
+
+                dbbr.StopOnConnecting().StartOnExecuting();
 
                 if (!Command__Prepare(ref s, ref a, out err))
                 {
@@ -478,6 +520,10 @@ namespace Kudos.Databases.Controllers
                     err = OnException(ref e);
                     if(err == null) err = new DatabaseErrorResult(ref e);
                 }
+
+                dbbr.StopOnExecuting();
+
+                _AutoClosing();
             }
 
             END_METHOD:
