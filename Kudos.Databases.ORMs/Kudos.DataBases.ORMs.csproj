@@ -90,6 +90,7 @@
     <Compile Include="GefyraModule\Enums\EGefyraJoin.cs" />
     <Compile Include="GefyraModule\Enums\EGefyraOrder.cs" />
     <Compile Include="GefyraModule\Enums\EGefyraPost.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraAgainst.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kudos\Kudos.csproj" />

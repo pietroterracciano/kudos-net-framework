@@ -20,9 +20,9 @@ namespace Kudos.Serving.KaronteModule.Services.Crypting
             return this;
         }
 
-        internal Symmetric? Require(String? sn)
+        internal Symmetric Require(String? sn)
         {
-            Symmetric? smm;
+            Symmetric smm;
             _RequireMeta<Symmetric>(ref sn, out smm);
             return smm;
         }

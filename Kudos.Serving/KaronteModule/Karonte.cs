@@ -11,6 +11,7 @@ using Kudos.Serving.KaronteModule.Constants;
 using Kudos.Serving.KaronteModule.Contexts;
 using Kudos.Serving.KaronteModule.Contexts.Clouding;
 using Kudos.Serving.KaronteModule.Contexts.Crypting;
+using Kudos.Serving.KaronteModule.Contexts.Databasing;
 using Kudos.Serving.KaronteModule.Contexts.Marketing;
 using Kudos.Serving.KaronteModule.Controllers;
 using Kudos.Serving.KaronteModule.Descriptors.Routes;
@@ -19,6 +20,7 @@ using Kudos.Serving.KaronteModule.Middlewares;
 using Kudos.Serving.KaronteModule.Services;
 using Kudos.Serving.KaronteModule.Services.Clouding;
 using Kudos.Serving.KaronteModule.Services.Crypting;
+using Kudos.Serving.KaronteModule.Services.Databasing;
 using Kudos.Serving.KaronteModule.Services.Marketing;
 using Kudos.Serving.KaronteModule.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +29,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
@@ -390,6 +393,26 @@ namespace Kudos.Serving.KaronteModule
 
         #endregion
 
+        #region public static IServiceCollection AddKarontePoolizedDatabasing(..)
+
+        //public static IServiceCollection AddKarontePoolizedDatabasing(this IServiceCollection sc, Action<KarontePoolizedDatabasingService>? act)
+        //{
+        //    if (!__IsServiceRegistered<KaronteContext>())
+        //        throw new InvalidOperationException();
+        //    else if (__IsServiceRegistered<KarontePoolizedDatabasingService>())
+        //        return sc;
+
+        //    __RegisterService<KarontePoolizedDatabasingService>();
+
+        //    KarontePoolizedDatabasingService kpds = new KarontePoolizedDatabasingService(ref sc);
+        //    if (act != null) act.Invoke(kpds);
+        //    sc.TryAddSingleton<KarontePoolizedDatabasingService>(kpds);
+
+        //    return sc;
+        //}
+
+        #endregion
+
         #region public static IServiceCollection AddKaronteDatabasing(..)
 
         public static IServiceCollection AddKaronteDatabasing(this IServiceCollection sc, Action<KaronteDatabasingService>? act)
@@ -401,9 +424,9 @@ namespace Kudos.Serving.KaronteModule
 
             __RegisterService<KaronteDatabasingService>();
 
-            KaronteDatabasingService kdbs = new KaronteDatabasingService(ref sc);
-            if (act != null) act.Invoke(kdbs);
-            sc.TryAddSingleton<KaronteDatabasingService>(kdbs);
+            KaronteDatabasingService kds = new KaronteDatabasingService(ref sc);
+            if (act != null) act.Invoke(kds);
+            sc.TryAddSingleton<KaronteDatabasingService>(kds);
 
             return sc;
         }
@@ -439,18 +462,31 @@ namespace Kudos.Serving.KaronteModule
 
         #endregion
 
-        #region public static IServiceCollection AddKaronteExceptioning(..)
+        //#region public static IServiceCollection AddKaronteExceptioning(..)
 
-        public static IServiceCollection AddKaronteExceptioning(this IServiceCollection sc)
-        {
-            if (!__IsServiceRegistered<KaronteContext>())
-                throw new InvalidOperationException();
+        //public static IServiceCollection AddKaronteExceptioning(this IServiceCollection sc)
+        //{
+        //    if (!__IsServiceRegistered<KaronteContext>())
+        //        throw new InvalidOperationException();
 
-            __RegisterService(CKaronteKey.Exceptioning);
-            return sc;
-        }
+        //    __RegisterService(CKaronteKey.Exceptioning);
+        //    return sc;
+        //}
 
-        #endregion
+        //#endregion
+
+        //#region public static IServiceCollection AddKaronteExceptioning(..)
+
+        //public static IServiceCollection AddKaronteExceptioning(this IServiceCollection sc)
+        //{
+        //    if (!__IsServiceRegistered<KaronteContext>())
+        //        throw new InvalidOperationException();
+
+        //    __RegisterService(CKaronteKey.Exceptioning);
+        //    return sc;
+        //}
+
+        //#endregion
 
         #region public static IServiceCollection AddKaronteBenchmarking(..)
 
@@ -511,9 +547,25 @@ namespace Kudos.Serving.KaronteModule
 
         #endregion
 
+        #region public static IApplicationBuilder UseApplicationLifetime(...)
+
+        public static IApplicationBuilder UseApplicationLifetime(this IApplicationBuilder ab, Action<IHostApplicationLifetime>? act)
+        {
+            if (act == null) return ab;
+            IHostApplicationLifetime? hal = ab.ApplicationServices.GetService<IHostApplicationLifetime>();
+            if (hal == null) return ab;
+            act.Invoke(hal);
+            return ab;
+        }
+
+        #endregion
+
         #region public static IApplicationBuilder UseKaronteCore(...)
 
-        public static IApplicationBuilder UseKaronteCore(this IApplicationBuilder ab)
+        public static IApplicationBuilder UseKaronteCore
+        (
+            this IApplicationBuilder ab
+        )
         {
             if (!__IsServiceRegistered<KaronteContext>())
                 throw new InvalidOperationException();
@@ -529,6 +581,7 @@ namespace Kudos.Serving.KaronteModule
                 bIsKaronteJSONingServiceRegistered = __IsServiceRegistered<KaronteJSONingService>(),
                 bIsKaronteCloudingServiceRegistered = __IsServiceRegistered<KaronteCloudingService>(),
                 bIsKaronteMarketingServiceRegistered = __IsServiceRegistered<KaronteMarketingService>(),
+                //bIsKarontePoolizedDatabasingServiceRegistered = __IsServiceRegistered<KarontePoolizedDatabasingService>(),
                 bIsKaronteDatabasingServiceRegistered = __IsServiceRegistered<KaronteDatabasingService>(),
                 bIsKaronteCryptingServiceRegistered = __IsServiceRegistered<KaronteCryptingService>(),
                 bIsKaronteResponsingServiceRegistered = __IsServiceRegistered(CKaronteKey.Responsing),
@@ -543,7 +596,7 @@ namespace Kudos.Serving.KaronteModule
                 (
                     async (httpc, rd) =>
                     {
-                        KaronteContext kc = httpc.RequestServices.GetRequiredService<KaronteContext>();
+                        KaronteContext kc = HttpContextUtils.RequireService<KaronteContext>(httpc);
                         kc.RegisteredServices = __aRegisteredServices;
                         kc.HttpContext = httpc;
 
@@ -557,12 +610,20 @@ namespace Kudos.Serving.KaronteModule
                             kc.JSONingContext = new KaronteJSONingContext(ref kjsons, ref kc);
                         }
 
+                        //if (bIsKarontePoolizedDatabasingServiceRegistered)
+                        //{
+                        //    KarontePoolizedDatabasingService kpds =
+                        //        httpc.RequestServices.GetRequiredService<KarontePoolizedDatabasingService>();
+
+                        //    kc.PoolizedDatabasingContext = new KarontePoolizedDatabasingContext(ref kpds, ref kc);
+                        //}
+
                         if (bIsKaronteDatabasingServiceRegistered)
                         {
-                            KaronteDatabasingService kdbs =
+                            KaronteDatabasingService kds =
                                 httpc.RequestServices.GetRequiredService<KaronteDatabasingService>();
 
-                            kc.DatabasingContext = new KaronteDatabasingContext(ref kdbs, ref kc);
+                            kc.DatabasingContext = new KaronteDatabasingContext(ref kds, ref kc);
                         }
 
                         if (bIsKaronteCloudingServiceRegistered)
@@ -672,10 +733,7 @@ namespace Kudos.Serving.KaronteModule
         public static IApplicationBuilder UseKaronteExceptioning<MiddlewareType>(this IApplicationBuilder ab)
             where MiddlewareType : AKaronteExceptioningMiddleware
         {
-            if
-            (
-                !__IsServiceRegistered(CKaronteKey.Exceptioning)
-            )
+            if (!__IsApplicationRegistered(CKaronteKey.Core))
                 throw new InvalidOperationException();
 
             //__RegisterApplication(CKaronteKey.Exceptioning);
@@ -692,6 +750,31 @@ namespace Kudos.Serving.KaronteModule
         }
 
         #endregion
+
+        //#region public static IApplicationBuilder UseKaronteAborting(...)
+
+        //public static IApplicationBuilder UseKaronteAborting(this IApplicationBuilder ab, Action? act)
+        //{
+        //    if (!__IsApplicationRegistered(CKaronteKey.Core))
+        //        throw new InvalidOperationException();
+        //    else if (act == null)
+        //        return ab;
+
+        //    //__RegisterApplication(CKaronteKey.Exceptioning);
+
+        //    return
+        //        ab
+        //            .Use
+        //            (
+        //                async (httpc, rd) =>
+        //                {
+        //                    httpc.RequestAborted.Register(act);
+        //                    await rd.Invoke();
+        //                }
+        //            );
+        //}
+
+        //#endregion
 
         #region public static IApplicationBuilder UseKaronteRouting(...)
 
@@ -744,6 +827,27 @@ namespace Kudos.Serving.KaronteModule
         }
 
         #endregion
+
+        //#region public static IApplicationBuilder UseKarontePoolizedDatabasing(...)
+
+        //public static IApplicationBuilder UseKarontePoolizedDatabasing<MiddlewareType>(this IApplicationBuilder ab)
+        //    where MiddlewareType : AKarontePoolizedDatabasingMiddleware
+        //{
+        //    if
+        //    (
+        //       !__IsServiceRegistered<KarontePoolizedDatabasingService>()
+        //    )
+        //        throw new InvalidOperationException();
+        //    else if (__IsApplicationRegistered(CKaronteKey.PoolizedDatabasing))
+        //        return ab;
+
+        //    __RegisterApplication(CKaronteKey.PoolizedDatabasing);
+
+        //    return
+        //        ab.__UseKaronteMiddleware<MiddlewareType>(true);
+        //}
+
+        //#endregion
 
         #region public static IApplicationBuilder UseKaronteDatabasing(...)
 

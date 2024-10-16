@@ -14,6 +14,7 @@ using System.Dynamic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Kudos.Reflection.Utils
 {
@@ -426,6 +427,10 @@ namespace Kudos.Reflection.Utils
 
         #region public static Boolean SetPropertyValue(...)
 
+        public static Task<Boolean> SetPropertyValueAsync(object? o, PropertyInfo? pi, object? oValue, bool bForceValueCompatibility = true)
+        {
+            return Task.Run(() => SetPropertyValue(o, pi, oValue, bForceValueCompatibility));
+        }
         public static bool SetPropertyValue(object? o, PropertyInfo? pi, object? oValue, bool bForceValueCompatibility = true)
         {
             if (o != null && pi != null && pi.SetMethod != null)
@@ -468,7 +473,9 @@ namespace Kudos.Reflection.Utils
 
         #region public static Object? GetPropertyValue(...)
 
+        public static Task<T?> GetPropertyValueAsync<T>(object? o, PropertyInfo? pi) { return Task.Run(() => GetPropertyValue<T>(o, pi)); }
         public static T? GetPropertyValue<T>(object? o, PropertyInfo? pi) { return ObjectUtils.Cast<T>(GetPropertyValue(o, pi)); }
+        public static Task<object?> GetPropertyValueAsync(object? o, PropertyInfo? pi) { return Task.Run(() => GetPropertyValue(o, pi)); }
         public static object? GetPropertyValue(object? o, PropertyInfo? pi)
         {
             if (o != null && pi != null && pi.GetMethod != null)
@@ -562,11 +569,13 @@ namespace Kudos.Reflection.Utils
 
         #region public static Boolean InvokeConstructor(...)
 
-        public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object?[]? a)
-        {
-            return ObjectUtils.Cast<T>(InvokeConstructor(ci, a));
-        }
-
+        public static Task<T?> InvokeConstructorAsync<T>(ConstructorInfo? ci) { return Task.Run(() => InvokeConstructor<T>(ci)); }
+        public static T? InvokeConstructor<T>(ConstructorInfo? ci) { return ObjectUtils.Cast<T>(InvokeConstructor(ci)); }
+        public static Task<T?> InvokeConstructorAsync<T>(ConstructorInfo? ci, params object?[]? a) { return Task.Run(() => InvokeConstructor<T>(ci,a)); }
+        public static T? InvokeConstructor<T>(ConstructorInfo? ci, params object?[]? a) { return ObjectUtils.Cast<T>(InvokeConstructor(ci, a)); }
+        public static Task<Object?> InvokeConstructorAsync(ConstructorInfo? ci) { return Task.Run(() => InvokeConstructor(ci)); }
+        public static Object? InvokeConstructor(ConstructorInfo? ci) { return InvokeConstructor(ci, null); }
+        public static Task<Object?> InvokeConstructorAsync(ConstructorInfo? ci, params object?[]? a) { return Task.Run(() => InvokeConstructor(ci, a)); }
         public static Object? InvokeConstructor(ConstructorInfo? ci, params object?[]? a)
         {
             if (ci != null)
@@ -579,12 +588,19 @@ namespace Kudos.Reflection.Utils
 
         #region public static Boolean InvokeMethod(...)
 
-        public static T? InvokeMethod<T>(object? o, MethodInfo? mi, params object[]? a)
+        public static Task<T?> InvokeMethodAsync<T>(object? o, MethodInfo? mi) { return Task.Run(() => InvokeMethod<T>(o, mi)); }
+        public static T? InvokeMethod<T>(object? o, MethodInfo? mi) { return ObjectUtils.Cast<T>(InvokeMethod(o, mi)); }
+        public static Task<T?> InvokeMethodAsync<T>(object? o, MethodInfo? mi, params object[]? a) { return Task.Run(() => InvokeMethod<T>(o, mi, a)); }
+        public static T? InvokeMethod<T>(object? o, MethodInfo? mi, params object[]? a) { return ObjectUtils.Cast<T>(InvokeMethod(o, mi, a)); }
+        public static Task<Object?> InvokeMethodAsync(object? o, MethodInfo? mi) { return Task.Run(() => InvokeMethod(o, mi)); }
+        public static Object? InvokeMethod(object? o, MethodInfo? mi) { return InvokeMethod(o, mi, null); }
+        public static Task<Object?> InvokeMethodAsync(object? o, MethodInfo? mi, params object[]? a) { return Task.Run(() => InvokeMethod(o, mi, a)); }
+        public static Object? InvokeMethod(object? o, MethodInfo? mi, params object[]? a)
         {
             if (mi != null && o != null)
-                try { return ObjectUtils.Cast<T>(mi.Invoke(o, a)); } catch { }
+                try { return mi.Invoke(o, a); } catch { }
 
-            return default(T);
+            return null;
         }
 
         #endregion

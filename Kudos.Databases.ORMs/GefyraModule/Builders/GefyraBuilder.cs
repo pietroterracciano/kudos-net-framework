@@ -38,6 +38,9 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             IGefyraCompareClausoleBuilder<IGefyraWhereActionClausoleBuilder>,
             IGefyraCompareClausole<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>,
             IGefyraCompareClausoleBuilder<IGefyraJunctionClausole<IGefyraWhereActionClausoleBuilder>>,
+            IGefyraMatchClausoleBuilder<IGefyraWhereActionClausoleBuilder>,
+            IGefyraAgainstClausoleBuilder<IGefyraWhereActionClausoleBuilder>,
+
         IGefyraOrderByClausoleBuilder,
         IGefyraLimitClausoleBuilder,
         IGefyraOffsetClausoleBuilder,
@@ -82,6 +85,13 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
         }
 
         #region private void _Append(...)
+
+        private void _Append(ref EGefyraAgainst e)
+        {
+            String? s;
+            GefyraAgainstUtils.GetString(ref e, out s);
+            _Append(s);
+        }
 
         private void _Append(ref EGefyraCompare e)
         {
@@ -471,6 +481,24 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
 
         #endregion
 
+        #region IGefyraMatchClausole
+
+        public IGefyraMatchClausoleBuilder<IGefyraWhereActionClausoleBuilder> Match(IGefyraColumn? gc, params IGefyraColumn[]? gca)
+        {
+            return _Match(ref gc, ref gca);
+        }
+
+        #endregion
+
+        #region IGefyraAgainstClausole
+
+        public IGefyraAgainstClausoleBuilder<IGefyraWhereActionClausoleBuilder> Against(string? s, EGefyraAgainst ega)
+        {
+            return _Against(ref s, ref ega);
+        }
+
+        #endregion
+
         #endregion
 
         #region IGefyraOrderByClausole
@@ -582,6 +610,30 @@ namespace Kudos.Databases.ORMs.GefyraModule.Builders
             _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
             if (act != null) act.Invoke(this);
             _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraMatchClausole
+
+        private GefyraBuilder _Match(ref IGefyraColumn? gc, ref IGefyraColumn[]? gca)
+        {
+            _Append(CGefyraClausole.Match); _Append(CCharacter.Space);
+            IGefyraColumn?[]? gca0 = ArrayUtils.UnShift(gc, gca);
+            _Append(CCharacter.LeftRoundBracket); _Append(ref gca0); _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
+            return this;
+        }
+
+        #endregion
+
+        #region IGefyraAgainstClausole
+
+        private GefyraBuilder _Against(ref String? s, ref EGefyraAgainst ega)
+        {
+            _Append(CGefyraClausole.Against); _Append(CCharacter.Space);
+            _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.SingleQuote); _Append(s); _Append(CCharacter.SingleQuote); _Append(CCharacter.Space);
+            _Append(ref ega); _Append(CCharacter.RightRoundBracket); _Append(CCharacter.Space);
             return this;
         }
 

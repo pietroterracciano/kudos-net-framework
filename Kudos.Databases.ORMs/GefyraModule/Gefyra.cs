@@ -3,6 +3,7 @@ using System.Collections;
 using System.Data;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Kudos.Constants;
 using Kudos.Databases.Descriptors;
@@ -11,6 +12,7 @@ using Kudos.Databases.Interfaces;
 using Kudos.Databases.ORMs.GefyraModule.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Builts;
 using Kudos.Databases.ORMs.GefyraModule.Constants;
+using Kudos.Databases.ORMs.GefyraModule.Enums;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders;
 using Kudos.Databases.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databases.ORMs.GefyraModule.Types.Entities;
@@ -57,7 +59,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
 
         #region Parse
 
-        public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
+        //public static Task<T[]?> ParseAsync<T>(DataTable? dt, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dt, gb)); }
         public static T[]? Parse<T>(DataTable? dt, GefyraBuilt? gb = null)
         {
             return Parse(typeof(T), dt, gb) as T[];
@@ -104,7 +106,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
             return oa1;
         }
 
-        public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
+        //public static Task<T?> ParseAsync<T>(DataRow? dr, GefyraBuilt? gb = null) { return Task.Run(() => Parse<T>(dr, gb)); }
         public static T? Parse<T>(DataRow? dr, GefyraBuilt? gb = null)
         {
             return ObjectUtils.Cast<T>(Parse(typeof(T), dr, gb));
@@ -168,7 +170,7 @@ namespace Kudos.Databases.ORMs.GefyraModule
         #region Fit
 
         //public static Task FitAsync<T>(IDatabaseHandler? dbh, ref T? t) { T? t0 = t; return Task.Run(() => { Fit<T>(dbh, ref t0); }); }
-        public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
+        //public static Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? t) { return Task.Run(() => Fit<T>(dbh, t)); }
 
         //public static void Fit<T>(IDatabaseHandler? dbh, ref T? t) { T? t0; __Fit(ref dbh, ref t, out t0, true); }
         public static T? Fit<T>(IDatabaseHandler? dbh, T? t) { T? t0; __Fit(ref dbh, ref t, out t0, false); return t0; }
@@ -371,6 +373,45 @@ namespace Kudos.Databases.ORMs.GefyraModule
             //else if (dbcd.DataTypeDescriptor.SimplexType == CType.String)
             //    oOut = String.Empty;
         }
+
+        #endregion
+
+        #region PrepareAgainst
+
+        //public static Task<String?> PrepareAgainstAsync(String? s, EGefyraAgainst? ega) { return Task.Run(() => PrepareAgainst(s, ega)); }
+        public static String? PrepareAgainst(String? s, EGefyraAgainst? ega)
+        {
+            if (s == null || ega != EGefyraAgainst.InBooleanMode)
+                return s;
+
+            s =
+                s
+                    .Replace(CCharacter.Plus, CCharacter.Space)
+                    .Replace(CCharacter.Minus, CCharacter.Space)
+                    .Replace(CCharacter.Asterisk, CCharacter.Space)
+                    .Replace(CCharacter.Tilde, CCharacter.Space)
+                    .Replace(CCharacter.LeftRoundBracket, CCharacter.Space)
+                    .Replace(CCharacter.RightRoundBracket, CCharacter.Space)
+                    .Replace(CCharacter.SingleQuote, CCharacter.Space)
+                    .Replace(CCharacter.DoubleQuote, CCharacter.Space)
+                    .Replace(CCharacter.At, CCharacter.Space)
+                    ;
+
+            String[]
+                sa = s.Split(CCharacter.Space, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            StringBuilder
+                sb = new StringBuilder(s.Length);
+
+            for (int i = 0; i < sa.Length; i++)
+            {
+                if (sb.Length > 0) sb.Append(CCharacter.Space);
+                sb.Append(CCharacter.Plus).Append(sa[i]).Append(CCharacter.Asterisk);
+            }
+
+            return sb.ToString();
+        }
+
 
         #endregion
 

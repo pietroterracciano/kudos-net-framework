@@ -14,9 +14,9 @@ namespace Kudos.Types
 
         public MonitorizedObject() { _lck = new object(); }
 
-        protected void _TryAcquireMonitor() { ThreadingUtils.TryAcquireMonitor(_lck); }
-        protected void _TryAcquireMonitor(int iTimeout) { ThreadingUtils.TryAcquireMonitor(_lck, iTimeout); }
-        protected void _AcquireMonitor() { ThreadingUtils.AcquireMonitor(_lck); }
-        protected void _ReleaseMonitor() { ThreadingUtils.ReleaseMonitor(_lck); }
+        protected void _TryEnterMonitor() { ThreadingUtils.TryEnterMonitor(_lck); }
+        protected void _TryEnterMonitor(int iTimeout) { ThreadingUtils.TryEnterMonitor(_lck, iTimeout); }
+        protected void _EnterMonitor() { ThreadingUtils.EnterMonitor(_lck); }
+        protected void _ExitMonitor() { ThreadingUtils.ExitMonitor(_lck); }
     }
 }

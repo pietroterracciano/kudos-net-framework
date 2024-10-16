@@ -15,7 +15,7 @@ namespace Kudos.Databases.Interfaces.Chains
         IDatabaseChain SetUserPassword(String? s);
         IDatabaseChain SetSessionPoolTimeout(UInt32? i);
         IDatabaseChain IsCompressionEnabled(Boolean? b);
-        IDatabaseChain IsPoolingEnabled(Boolean? b);
+        //IDatabaseChain IsPoolingEnabled(Boolean? b);
         IDatabaseChain SetConnectionBehaviour(EDatabaseConnectionBehaviour? edcb);
         IDatabaseChain IsAutomaticCommitEnabled(Boolean? b);
         IDatabaseChain SetCommandTimeout(UInt32? i);

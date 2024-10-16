@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Kudos.Databases.Interfaces
 {
-    public interface IActionableDatabaseHandler
+    public interface IActionableDatabaseHandler : IDisposable 
     {
         DatabaseResult OpenConnection();
         Task<DatabaseResult> OpenConnectionAsync();
         DatabaseResult CloseConnection();
         Task<DatabaseResult> CloseConnectionAsync();
         Boolean IsConnectionOpened();
+        Boolean IsConnectionOpening();
         Boolean IsConnectionBroken();
         Boolean IsConnectionClosed();
         Task<DatabaseResult> ChangeSchemaAsync(String? s);
@@ -43,5 +44,7 @@ namespace Kudos.Databases.Interfaces
         DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName);
         DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName);
         DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dbtd);
+
+        public Task<ValueTask> DisposeAsync();
     }
 }

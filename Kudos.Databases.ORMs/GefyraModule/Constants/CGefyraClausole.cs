@@ -58,6 +58,14 @@ namespace Kudos.Databases.ORMs.GefyraModule.Constants
             // Other
             On = "ON",
             As = "AS",
-            By = "BY";
+            By = "BY",
+
+            // FullText
+            Match = "MATCH",
+            Against = "AGAINST",
+            InBooleanMode = "IN BOOLEAN MODE",
+            InNaturalLanguageMode = "IN NATURAL LANGUAGE MODE",
+            InNaturalLanguageWithQueryExpansion = "IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION",
+            WithQueryExpansion = "WITH QUERY EXPANSION";
     }
 }

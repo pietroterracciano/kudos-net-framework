@@ -20,6 +20,8 @@ namespace Kudos.Constants
             Comma = ',',
             Space = ' ',
             BackTick = '`',
+            SingleQuote = '\'',
+            DoubleQuote = '"',
             Tilde = '~',
             Underscore = '_',
             LeftRoundBracket = '(',

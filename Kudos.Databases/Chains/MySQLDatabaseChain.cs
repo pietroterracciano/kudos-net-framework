@@ -1,16 +1,11 @@
 ﻿using Kudos.Databases.Constants;
 using Kudos.Databases.Controllers;
 using Kudos.Databases.Enums;
+using Kudos.Databases.Handlers;
 using Kudos.Databases.Interfaces;
 using Kudos.Databases.Interfaces.Chains;
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Kudos.Databases.Chains
 {
@@ -48,10 +43,9 @@ namespace Kudos.Databases.Chains
 
             mscsb.DnsSrv = false;
 
-            if (_MinimumPoolSize != null) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
-            if (_IsPoolingEnabled != null) mscsb.Pooling = _IsPoolingEnabled.Value;
-            if (_MinimumPoolSize != null) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
-            if (_MaximumPoolSize != null) mscsb.MaximumPoolSize = _MaximumPoolSize.Value;
+            mscsb.Pooling = HasValidMinimumPoolSize || HasValidMaximumPoolSize;
+            if (HasValidMinimumPoolSize) mscsb.MinimumPoolSize = _MinimumPoolSize.Value;
+            if (HasValidMaximumPoolSize) mscsb.MaximumPoolSize = _MaximumPoolSize.Value;
 
             if (_CharacterSet != null)
                 switch (_CharacterSet)

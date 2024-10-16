@@ -25,10 +25,10 @@ namespace Kudos.Serving.KaronteModule.Middlewares
             return kc.ResponsingContext = new KaronteResponsingContext(ref kc);
         }
 
-        protected override async Task<EKaronteBounce> OnContextReceive(KaronteResponsingContext krc)
-        {
-            return EKaronteBounce.MoveForward;
-        }
+        //protected override async Task<EKaronteBounce> OnContextReceive(KaronteResponsingContext krc)
+        //{
+        //    return EKaronteBounce.MoveForward;
+        //}
 
         protected override async Task OnBounceEnd(KaronteContext kc)
         {

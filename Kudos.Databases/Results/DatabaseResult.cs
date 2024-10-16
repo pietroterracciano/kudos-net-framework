@@ -10,7 +10,9 @@ namespace Kudos.Databases.Results
     {
         public static readonly DatabaseResult
             Empty,
-            InternalFailure;
+            InternalFailure,
+            ImpossibleToBeginTransaction,
+            NotInTransaction;
 
         static DatabaseResult()
         {
@@ -21,6 +23,12 @@ namespace Kudos.Databases.Results
 
             DatabaseErrorResult? dberInternalFailure = DatabaseErrorResult.InternalFailure;
             InternalFailure = new DatabaseResult(ref dberInternalFailure, ref dbbrEmpty);
+
+            DatabaseErrorResult? dbreImpossibleToBeginTransaction = DatabaseErrorResult.ImpossibleToBeginTransaction;
+            ImpossibleToBeginTransaction = new DatabaseResult(ref dbreImpossibleToBeginTransaction, ref dbbrEmpty);
+
+            DatabaseErrorResult? dbreNotInTransaction = DatabaseErrorResult.NotInTransaction;
+            NotInTransaction = new DatabaseResult(ref dbreNotInTransaction, ref dbbrEmpty);
         }
 
         public readonly DatabaseBenchmarkResult Benchmark;

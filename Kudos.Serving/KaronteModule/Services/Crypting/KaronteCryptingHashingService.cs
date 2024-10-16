@@ -20,9 +20,9 @@ namespace Kudos.Serving.KaronteModule.Services.Crypting
             return this;
         }
 
-        internal Hash? Require(String? sn)
+        internal Hash Require(String? sn)
         {
-            Hash? hsh;
+            Hash hsh;
             _RequireMeta(ref sn, out hsh);
             return hsh;
         }

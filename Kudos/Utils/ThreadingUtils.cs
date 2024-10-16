@@ -11,24 +11,24 @@ namespace Kudos.Utils
     {
         private static readonly Int32 __it = Timeout.Infinite;
 
-        public static void TryAcquireMonitor(Object? o) { TryAcquireMonitor(o, __it); }
-        public static void TryAcquireMonitor(Object? o, int iTimeout)
+        public static void TryEnterMonitor(Object? o) { TryEnterMonitor(o, __it); }
+        public static void TryEnterMonitor(Object? o, int iTimeout)
         {
             if (o == null) return;
             Boolean b = false;
             try { Monitor.TryEnter(o, __it, ref b); } catch { }
-            if (b) _ReleaseMonitor(ref o);
+            if (b) _ExitMonitor(ref o);
         }
 
-        public static void AcquireMonitor(Object? o)
+        public static void EnterMonitor(Object? o)
         {
             if (o == null) return;
             Boolean b = false;
             try { Monitor.Enter(o, ref b); } catch { }
-            if (b) _ReleaseMonitor(ref o);
+            if (b) _ExitMonitor(ref o);
         }
 
-        public static void ReleaseMonitor(Object? o) { if (o != null) _ReleaseMonitor(ref o); }
-        private static void _ReleaseMonitor(ref Object o) { try { Monitor.Exit(o); } catch { } }
+        public static void ExitMonitor(Object? o) { if (o != null) _ExitMonitor(ref o); }
+        private static void _ExitMonitor(ref Object o) { try { Monitor.Exit(o); } catch { } }
     }
 }

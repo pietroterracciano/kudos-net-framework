@@ -35,9 +35,9 @@ namespace Kudos.Serving.KaronteModule.Services.Clouding
             return this;
         }
 
-        internal GCLFirebaseCloudMessaging? RequireFirebaseCloudMessaging(String? sn)
+        internal GCLFirebaseCloudMessaging RequireFirebaseCloudMessaging(String? sn)
         {
-            GCLFirebaseCloudMessaging? gclfcm;
+            GCLFirebaseCloudMessaging gclfcm;
             _RequireMeta(ref __fcm, ref sn, out gclfcm);
             return gclfcm;
         }

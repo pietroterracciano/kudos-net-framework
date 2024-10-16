@@ -5,6 +5,7 @@ using Kudos.Databases.Interfaces.Chains;
 using Kudos.Databases.Results;
 using Kudos.Serving.KaronteModule.Constants;
 using Kudos.Serving.KaronteModule.Contexts;
+using Kudos.Serving.KaronteModule.Contexts.Databasing;
 using Kudos.Serving.KaronteModule.Enums;
 using Kudos.Serving.KaronteModule.Utils;
 using Microsoft.AspNetCore.Http;
@@ -24,12 +25,6 @@ namespace Kudos.Serving.KaronteModule.Middlewares
         protected override async Task<KaronteDatabasingContext> OnContextFetch(KaronteContext kc)
         {
             return kc.DatabasingContext;
-        }
-
-        protected override async Task OnBounceEnd(KaronteContext kc)
-        {
-            if (!kc.DatabasingContext.HasDatabaseHandler) return;
-            await kc.DatabasingContext.DatabaseHandler.CloseConnectionAsync();
         }
     }
 }

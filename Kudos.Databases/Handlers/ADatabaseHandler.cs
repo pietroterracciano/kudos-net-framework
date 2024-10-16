@@ -34,7 +34,7 @@ namespace Kudos.Databases.Controllers
             DbConnectionType,
             DbCommandType
         > 
-    : 
+    :
         IDatabaseHandler
         where DbConnectionStringBuilderType : DbConnectionStringBuilder
         where DbConnectionType : DbConnection, new()
@@ -185,6 +185,13 @@ namespace Kudos.Databases.Controllers
         #endregion
 
         #region Status
+
+        public Boolean IsConnectionOpening()
+        {
+            return
+                _oConnection.State == ConnectionState.Connecting
+                && _oCommand != null;
+        }
 
         public Boolean IsConnectionOpened()
         {
@@ -573,6 +580,23 @@ namespace Kudos.Databases.Controllers
             DatabaseColumnDescriptor[]? dbcda;
             DatabaseColumnDescriptor.Get(ref _this, ref dscTable, out dbcda);
             return dbcda;
+        }
+
+        #endregion
+
+        #region Dispose()
+
+        public void Dispose()
+        {
+            if(_oCommand != null) try {_oCommand.Dispose(); } catch { }
+            if (_oConnection != null) try { _oConnection.Dispose(); } catch { }
+        }
+
+        public async Task<ValueTask> DisposeAsync()
+        {
+            if (_oCommand != null) try { await _oCommand.DisposeAsync(); } catch { }
+            if (_oConnection != null) try { await _oConnection.DisposeAsync(); } catch { }
+            return ValueTask.CompletedTask;
         }
 
         #endregion

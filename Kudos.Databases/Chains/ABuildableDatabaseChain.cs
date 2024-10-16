@@ -11,9 +11,9 @@ namespace Kudos.Databases.Chains
 
         public abstract IDatabaseHandler BuildHandler();
 
-        public DatabasePoolizedHandler BuildPoolizedHandler(int i)
+        public IPoolizedDatabaseHandler BuildPoolizedHandler()
         {
-            return new DatabasePoolizedHandler(this, i);
+            return new PoolizedDatabaseHandler(this);
         }
     }
 }

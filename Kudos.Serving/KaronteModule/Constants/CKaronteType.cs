@@ -1,14 +1,20 @@
 ﻿using System;
 using Kudos.Serving.KaronteModule.Contexts;
+using Kudos.Serving.KaronteModule.Contexts.Databasing;
 using Microsoft.AspNetCore.Http;
 
 namespace Kudos.Serving.KaronteModule.Constants
 {
-	internal static class CKaronteType
+	public static class CKaronteType
 	{
-		internal static readonly Type
+        public static readonly Type
 			KaronteContext = typeof(KaronteContext),
-			HttpContext = typeof(HttpContext);
+			KaronteAuthorizatingContext = typeof(KaronteAuthorizatingContext),
+            KarontePoolizedDatabasingContext = typeof(KarontePoolizedDatabasingContext),
+            KaronteAuthenticatingContext = typeof(KaronteAuthenticatingContext),
+            KaronteResponsingContext = typeof(KaronteResponsingContext),
+            KaronteDatabasingContext = typeof(KaronteDatabasingContext),
+            HttpContext = typeof(HttpContext);
 	}
 }
 

@@ -26,10 +26,12 @@
     <None Remove="Interfaces\" />
     <None Remove="Utils\Datas\" />
     <None Remove="Converters\" />
+    <None Remove="Reflection\Utils\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
     <Folder Include="Utils\Datas\" />
     <Folder Include="Converters\" />
+    <Folder Include="Reflection\Utils\" />
   </ItemGroup>
 </Project>

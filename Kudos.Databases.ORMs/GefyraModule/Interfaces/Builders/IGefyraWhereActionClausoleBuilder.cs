@@ -13,6 +13,7 @@ namespace Kudos.Databases.ORMs.GefyraModule.Interfaces.Builders
         IGefyraWhereActionClausoleBuilder
     :
         IGefyraCompareClausole<IGefyraWhereActionClausoleBuilder>,
+        IGefyraMatchClausole<IGefyraWhereActionClausoleBuilder>,
         IGefyraOpenBlockClausole<IGefyraWhereActionClausoleBuilder>,
         IGefyraExistsClausole
     {

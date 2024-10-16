@@ -7,6 +7,8 @@ using Kudos.Reflection.Utils;
 using Kudos.Serving.KaronteModule.Contexts.Clouding;
 using Kudos.Serving.KaronteModule.Contexts.Marketing;
 using Kudos.Serving.KaronteModule.Contexts.Crypting;
+using Kudos.Serving.KaronteModule.Contexts.Databasing;
+using System.Threading.Tasks;
 
 namespace Kudos.Serving.KaronteModule.Contexts
 {
@@ -22,6 +24,7 @@ namespace Kudos.Serving.KaronteModule.Contexts
         public KaronteResponsingContext? ResponsingContext { get; internal set; }
         public KaronteRoutingContext? RoutingContext { get; internal set; }
         public KaronteDatabasingContext? DatabasingContext { get; internal set; }
+        //public KarontePoolizedDatabasingContext? PoolizedDatabasingContext { get; internal set; }
         public KaronteCloudingContext? CloudingContext { get; internal set; }
         public KaronteMarketingContext? MarketingContext { get; internal set; }
         public KaronteCapabilitingContext? CapabilitingContext { get; internal set; }
@@ -73,13 +76,14 @@ namespace Kudos.Serving.KaronteModule.Contexts
         //    if (o == null) throw new InvalidOperationException();
         //}
 
+        //public Task<ServiceType> RequireServiceAsync<ServiceType>() { return Task.Run(() => RequireService<ServiceType>()); }
         public ServiceType RequireService<ServiceType>()
         {
             Type 
                 t = typeof(ServiceType);
 
             ServiceType?
-                srv = ObjectUtils.Cast<ServiceType>(GetService(t));
+                srv = ObjectUtils.Cast<ServiceType>(_GetService(t));
 
             if (srv == null)
                 throwRequiredServiceException(t);
@@ -87,10 +91,10 @@ namespace Kudos.Serving.KaronteModule.Contexts
             return srv;
         }
 
-        private Object RequireService(Type? t)
+        private Object _RequireService(Type? t)
         {
             Object?
-                srv = GetService(t);
+                srv = _GetService(t);
 
             if (srv == null)
                 throwRequiredServiceException(t);
@@ -98,12 +102,13 @@ namespace Kudos.Serving.KaronteModule.Contexts
             return srv;
         }
 
+        //public Task<ServiceType?> GetServiceAsync<ServiceType>() { return Task.Run(() => GetService<ServiceType>()); }
         public ServiceType? GetService<ServiceType>()
         {
-            return ObjectUtils.Cast<ServiceType>(GetService(typeof(ServiceType)));
+            return ObjectUtils.Cast<ServiceType>(_GetService(typeof(ServiceType)));
         }
 
-        private Object? GetService(Type? t)
+        private Object? _GetService(Type? t)
         {
             lock (_lck0)
             {
@@ -130,14 +135,14 @@ namespace Kudos.Serving.KaronteModule.Contexts
             }
         }
 
-        //public Task<ControllerType> RequestControllerAsync<ControllerType>() { return Task.Run(() => RequestController<ControllerType>()); }
+        //public Task<ControllerType> RequireControllerAsync<ControllerType>() { return Task.Run(() => RequireController<ControllerType>()); }
         public ControllerType RequireController<ControllerType>()
         {
             Type
                 t = typeof(ControllerType);
 
             ControllerType?
-                cnt = ObjectUtils.Cast<ControllerType>(GetController(t));
+                cnt = ObjectUtils.Cast<ControllerType>(_GetController(t));
 
             if (cnt == null)
                 throwRequiredControllerException(t);
@@ -145,10 +150,10 @@ namespace Kudos.Serving.KaronteModule.Contexts
             return cnt;
         }
 
-        private Object RequireController(Type? t)
+        private Object _RequireController(Type? t)
         {
             Object?
-                cnt = GetController(t);
+                cnt = _GetController(t);
 
             if (cnt == null)
                 throwRequiredControllerException(t);
@@ -156,12 +161,13 @@ namespace Kudos.Serving.KaronteModule.Contexts
             return cnt;
         }
 
+        //public Task<ControllerType?> GetControllerAsync<ControllerType>() { return Task.Run(() => GetController<ControllerType>()); }
         public ControllerType? GetController<ControllerType>()
         {
-            return ObjectUtils.Cast<ControllerType>(GetController(typeof(ControllerType)));
+            return ObjectUtils.Cast<ControllerType>(_GetController(typeof(ControllerType)));
         }
 
-        private Object? GetController(Type? t)//, params Object[]? os)
+        private Object? _GetController(Type? t)//, params Object[]? os)
         {
             lock (_lck1)
             {
@@ -192,7 +198,7 @@ namespace Kudos.Serving.KaronteModule.Contexts
                 if (rss != null)
                 {
                     for (int i = 0; i < rss.Length; i++)
-                        lo.Add(GetService(rss[i]));
+                        lo.Add(_GetService(rss[i]));
                 }
 
                 Object?

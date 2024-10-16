@@ -50,8 +50,8 @@ namespace Kudos.Serving.KaronteModule.Services
             lock (_m) { o = _m.Get<T>(smk); }
 		}
 
-        protected void _RequireMeta<T>(ref String? smk, out T? o) { _RequireMeta<T>(ref __sNull, ref smk, out o); }
-        protected void _RequireMeta<T>(ref String? smkp, ref String? smks, out T? o)
+        protected void _RequireMeta<T>(ref String? smk, out T o) { _RequireMeta<T>(ref __sNull, ref smk, out o); }
+        protected void _RequireMeta<T>(ref String? smkp, ref String? smks, out T o)
 		{
             _GetMeta<T>(ref smkp, ref smks, out o);
 			if (o == null) throw new InvalidOperationException();

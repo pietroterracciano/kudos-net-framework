@@ -32,6 +32,7 @@
     <Compile Remove="Utils\DatabaseColumnTypeUtils.cs" />
     <Compile Remove="Utils\DatabaseDataTypeUtils.cs" />
     <None Remove="Exceptions\" />
+    <None Remove="Policies\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +46,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
+    <ProjectReference Include="..\Kudos.Pooling\Kudos.Pooling.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,9 +55,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.10" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Descriptors\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Policies\" />
   </ItemGroup>
 </Project>

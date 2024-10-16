@@ -13,6 +13,7 @@ namespace Kudos.Serving.KaronteModule.Constants
             Authenticating = nameof(Authenticating),
             Authorizating = nameof(Authorizating),
             Databasing = nameof(Databasing),
+            PoolizedDatabasing = nameof(PoolizedDatabasing),
             JSONing = nameof(JSONing),
             Crypting = nameof(Crypting),
             Responsing = nameof(Responsing),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,23 @@ namespace Kudos.Utils
 {
     public static class DynamicUtils
     {
+        public static dynamic? Union(params dynamic[]? da)
+        {
+            if (da == null) return null;
+
+            List<ExpandoObject> leo = new List<ExpandoObject>(da.Length);
+
+            ExpandoObject? eoi;
+            for(int i=0; i<da.Length; i++)
+            {
+                eoi = da[i] as ExpandoObject;
+                if (eoi == null) continue;
+                leo.Add(eoi);
+            }
+
+            return ExpandoObjectUtils.Union(leo.ToArray());
+        }
+
         public static Boolean IsNull(dynamic? dnm)
         {
             Object? o = dnm as Object;

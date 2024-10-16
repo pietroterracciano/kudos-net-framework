@@ -40,9 +40,9 @@ namespace Kudos.Serving.KaronteModule.Services.Clouding
             return this;
         }
 
-        internal AWSS3? RequireS3(String? sn)
+        internal AWSS3 RequireS3(String? sn)
         {
-            AWSS3? awss3;
+            AWSS3 awss3;
             _RequireMeta(ref __s3, ref sn, out awss3);
             return awss3;
         }
@@ -68,9 +68,9 @@ namespace Kudos.Serving.KaronteModule.Services.Clouding
             return this;
         }
 
-        internal AWSPinpoint? RequirePinpoint(String? sn)
+        internal AWSPinpoint RequirePinpoint(String? sn)
         {
-            AWSPinpoint? awsp;
+            AWSPinpoint awsp;
             _RequireMeta(ref __p, ref sn, out awsp);
             return awsp;
         }

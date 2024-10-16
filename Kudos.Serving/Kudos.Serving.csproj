@@ -54,6 +54,9 @@
     <None Remove="KaronteModule\Contexts\Crypting\" />
     <None Remove="KaronteModule\Contexts\Clouding\" />
     <None Remove="KaronteModule\Contexts\Marketing\" />
+    <None Remove="KaronteModule\Services\Databasing\" />
+    <None Remove="KaronteModule\Contexts\Databasing\" />
+    <Compile Remove="KaronteModule\Middlewares\AKarontePoolizedDatabasingMiddleware.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,6 +80,8 @@
     <Folder Include="KaronteModule\Contexts\Crypting\" />
     <Folder Include="KaronteModule\Contexts\Clouding\" />
     <Folder Include="KaronteModule\Contexts\Marketing\" />
+    <Folder Include="KaronteModule\Services\Databasing\" />
+    <Folder Include="KaronteModule\Contexts\Databasing\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Kudos.Crypters">

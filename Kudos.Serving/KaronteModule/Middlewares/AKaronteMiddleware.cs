@@ -21,7 +21,11 @@ namespace Kudos.Serving.KaronteModule.Middlewares
         {
             EKaronteBounce ekb = await OnBounceStart(kc);
 
-            if (ekb == EKaronteBounce.MoveForward)
+            if
+            (
+                ekb == EKaronteBounce.MoveForward
+                && !hc.RequestAborted.IsCancellationRequested
+            )
                 await _rd.Invoke(hc);
 
             await OnBounceEnd(kc);
