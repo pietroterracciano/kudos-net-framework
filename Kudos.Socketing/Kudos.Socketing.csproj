@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+    <Authors>Pietro Terracciano</Authors>
+	<Version>0.24.6.10</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>disabled</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release</Configurations>
+    <NoWarn>NU1605</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Optimize>false</Optimize>
+      <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <Optimize>true</Optimize>
+      <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+    <ItemGroup>
+      <Content Update="Properties\launchSettings.json">
+        <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Builders\" />
+      <None Remove="Packets\" />
+      <None Remove="Listeners\" />
+      <None Remove="Descriptors\" />
+      <None Remove="Interfaces\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Builders\" />
+      <Folder Include="Packets\" />
+      <Folder Include="Listeners\" />
+      <Folder Include="Descriptors\" />
+      <Folder Include="Interfaces\" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Kudos\Kudos.csproj">
+        <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+      </ProjectReference>
+    </ItemGroup>
+</Project>

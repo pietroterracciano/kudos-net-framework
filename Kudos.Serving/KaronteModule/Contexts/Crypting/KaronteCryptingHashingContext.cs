@@ -24,7 +24,7 @@ namespace Kudos.Serving.KaronteModule.Contexts.Crypting
         }
 
         public Hash? Get(String? sn) { return _kchs.Get(sn); }
-        public Hash? Require(String? sn) { return _kchs.Require(sn); }
+        public Hash Require(String? sn) { return _kchs.Require(sn); }
 	}
 }
 

@@ -24,6 +24,6 @@ namespace Kudos.Serving.KaronteModule.Contexts.Crypting
         }
 
         public Symmetric? Get(String? sn) { return _kcss.Get(sn); }
-        public Symmetric? Require(String? sn) { return _kcss.Require(sn); }
+        public Symmetric Require(String? sn) { return _kcss.Require(sn); }
     }
 }
