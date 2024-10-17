@@ -13,6 +13,7 @@ namespace Kudos.Socketing.Interfaces
         //public Task SendPacketAsync(Object? o, JsonSerializerOptions? jsonso);
         //public Task SendPacketAsync(String? s);
         //public Task SendPacketAsync(String? s, Encoding? enc);
+        public void BlinkOnPongReceived();
         public Task SendPacketAsync(Byte[]? ba);
     }
 }

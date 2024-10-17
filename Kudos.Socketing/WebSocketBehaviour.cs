@@ -8,6 +8,7 @@ using Kudos.Socketing.Builders;
 using Kudos.Socketing.Descriptors;
 using Kudos.Socketing.Interfaces;
 using Kudos.Socketing.Packets;
+using Kudos.Types.TimeStamps.UnixTimeStamp;
 using Kudos.Utils;
 using Kudos.Utils.Texts;
 
@@ -22,12 +23,14 @@ public sealed class WebSocketBehaviour
         __baPing;
 
     private static readonly String
-        __sNormalClosure;
+        __sNormalClosure,
+        __sEndpointUnavailable;
 
     static WebSocketBehaviour()
     {
         __baPing = BytesUtils.Parse("PING");
         __sNormalClosure = nameof(WebSocketCloseStatus.NormalClosure);
+        __sEndpointUnavailable = nameof(WebSocketCloseStatus.EndpointUnavailable);
     }
 
     public static WebSocketBehaviourBuilder RequestBuilder()
@@ -40,6 +43,7 @@ public sealed class WebSocketBehaviour
     private readonly WebSocketBehaviourDescriptor _wsbd;
     private readonly Object _lck;
     private Task? _tPingPong;
+    private long _iPong;
 
     internal WebSocketBehaviour(WebSocketBehaviourDescriptor wsbd)
     {
@@ -70,6 +74,7 @@ public sealed class WebSocketBehaviour
                     async () =>
                     {
                         Byte[]? ba;
+                        BlinkOnPongReceived();
 
                         while (_IsWebSocketOpened())
                         {
@@ -79,6 +84,9 @@ public sealed class WebSocketBehaviour
                                 await SendPacketAsync(__baPing);
 
                             Thread.Sleep(_wsbd.PingPongProtocolBehaviourDescriptor.Interval.Value);
+
+                            if (Math.Abs(UnixTimeStamp.GetCurrent() - _iPong) > _wsbd.PingPongProtocolBehaviourDescriptor.Interval.Value.TotalMilliseconds)
+                                await _CloseAsync(WebSocketCloseStatus.EndpointUnavailable, __sEndpointUnavailable);
                         }
                     }
                 );
@@ -114,8 +122,7 @@ public sealed class WebSocketBehaviour
                 try { _wsbd.OnReceivePacket(this, wsrp.Bytes); } catch { }
         }
 
-        if(_IsWebSocketOpened())
-            try { _wsbd.WebSocket.CloseAsync(wscs.Value, scsd, _wsbd.CancellationToken).Wait(); } catch { }
+        _CloseAsync(wscs.Value, scsd).Wait();
 
         return this;
     }
@@ -178,7 +185,12 @@ public sealed class WebSocketBehaviour
 
     #endregion
 
-    #region private async Task _CloseAsync(...)
+    public void BlinkOnPongReceived()
+    {
+        _iPong = UnixTimeStamp.GetCurrent();
+    }
+
+    #region public async Task _CloseAsync(...)
 
     private async Task _CloseAsync(WebSocketCloseStatus wscs)
     {

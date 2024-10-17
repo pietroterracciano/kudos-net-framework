@@ -142,6 +142,22 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
                 && o0._i == o1._i;
         }
 
+        public static UnixTimeStamp operator +(UnixTimeStamp o0, UnixTimeStamp o1)
+        {
+            return
+                o0.Kind == o1.Kind
+                    ? new UnixTimeStamp(o0._i + o1._i, o0.Kind)
+                    : new UnixTimeStamp(long.MaxValue, ETimeStampKind.Unspecified);
+        }
+
+        public static UnixTimeStamp operator -(UnixTimeStamp o0, UnixTimeStamp o1)
+        {
+            return
+                o0.Kind == o1.Kind
+                    ? new UnixTimeStamp(o0._i - o1._i, o0.Kind)
+                    : new UnixTimeStamp(long.MaxValue, ETimeStampKind.Unspecified);
+        }
+
         public static bool operator !=(UnixTimeStamp o0, UnixTimeStamp o1)
         {
             return !(o0 == o1);
@@ -160,6 +176,16 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
         public static implicit operator uint(UnixTimeStamp o)
         {
             return UInt32Utils.NNParse(o.ToSeconds());
+        }
+
+        public static implicit operator float(UnixTimeStamp o)
+        {
+            return o.ToMilliSeconds();
+        }
+
+        public static implicit operator double(UnixTimeStamp o)
+        {
+            return o.ToMilliSeconds();
         }
 
         public static implicit operator long(UnixTimeStamp o)
