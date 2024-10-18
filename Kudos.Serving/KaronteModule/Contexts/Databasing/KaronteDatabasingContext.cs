@@ -1,6 +1,6 @@
 ﻿using System;
-using Kudos.Databases.Interfaces;
-using Kudos.Databases.Interfaces.Chains;
+using Kudos.Databasing.Interfaces;
+using Kudos.Databasing.Interfaces.Chains;
 using Kudos.Serving.KaronteModule.Services.Databasing;
 
 namespace Kudos.Serving.KaronteModule.Contexts.Databasing

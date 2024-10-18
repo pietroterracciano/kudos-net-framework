@@ -1,6 +1,6 @@
-﻿using Kudos.Databases.Chainers;
-using Kudos.Databases.Interfaces.Chains;
-using Kudos.Databases.Interfaces;
+﻿using Kudos.Databasing.Chainers;
+using Kudos.Databasing.Interfaces.Chains;
+using Kudos.Databasing.Interfaces;
 using Kudos.Serving.KaronteModule.Contexts;
 using Kudos.Serving.KaronteModule.Enums;
 using Kudos.Serving.KaronteModule.Utils;

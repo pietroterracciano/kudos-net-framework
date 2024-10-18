@@ -23,7 +23,7 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp.Converters.JSONs
             JsonSerializerOptions oJsonSerializerOptions
         )
         {
-            try { oUtf8JsonWriter.WriteNumberValue(oUnixTimeStamp.ToMilliSeconds()); }
+            try { oUtf8JsonWriter.WriteNumberValue(oUnixTimeStamp.Milliseconds); }
             catch { oUtf8JsonWriter.WriteNumberValue(0); }
         }
     }

@@ -16,11 +16,6 @@ namespace Kudos.Serving.KaronteModule.Constants
             NotImplemented = EnumUtils.GetValue(HttpStatusCode.NotImplemented).Value,
             Unauthorized = EnumUtils.GetValue(HttpStatusCode.Unauthorized).Value,
             UnprocessableContent = EnumUtils.GetValue(HttpStatusCode.UnprocessableContent).Value,
-            UnprocessableEntity = EnumUtils.GetValue(HttpStatusCode.UnprocessableEntity).Value,
-            ImATeapot = 418,
-            Expired = 600,
-            Wrong = 601,
-            AlreadyInUse = 602,
-            NotNecessary = 250;
+            UnprocessableEntity = EnumUtils.GetValue(HttpStatusCode.UnprocessableEntity).Value;
     }
 }

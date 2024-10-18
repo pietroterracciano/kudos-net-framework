@@ -1,9 +1,9 @@
 ﻿using Amazon.Runtime;
 using Kudos.Converters;
 using Kudos.Crypters.KryptoModule.SymmetricModule;
-using Kudos.Databases.Chainers;
-using Kudos.Databases.Chains;
-using Kudos.Databases.Interfaces.Chains;
+using Kudos.Databasing.Chainers;
+using Kudos.Databasing.Chains;
+using Kudos.Databasing.Interfaces.Chains;
 using Kudos.Enums;
 using Kudos.Reflection.Utils;
 using Kudos.Serving.KaronteModule.Attributes;

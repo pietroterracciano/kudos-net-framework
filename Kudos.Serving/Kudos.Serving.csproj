@@ -60,7 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kudos.Databases\Kudos.Databases.csproj" />
+    <ProjectReference Include="..\Kudos.Databasing\Kudos.Databasing.csproj" />
     <ProjectReference Include="..\Kudos.Clouding\Kudos.Clouding.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>

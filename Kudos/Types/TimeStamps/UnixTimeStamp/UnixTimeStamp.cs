@@ -11,15 +11,7 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
     [JsonConverter(typeof(UnixTimeStampJSONConverter))]
     public struct UnixTimeStamp
     {
-        private static readonly Double
-            __dSecondsMultiplier;
-
-        static UnixTimeStamp()
-        {
-            __dSecondsMultiplier = 1000.0d;
-        }
-
-        private long _i;
+        public readonly long Milliseconds;
 
         public ETimeStampKind Kind
         {
@@ -31,29 +23,57 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
         public UnixTimeStamp(DateTime dt)
         {
             if (dt.Kind == DateTimeKind.Unspecified) dt = dt.ToUniversalTime();
-            _i = Int64Utils.NNParse((dt - DateTimeUtils.GetOrigin(dt.Kind)).TotalMilliseconds);
-            Kind = TimeStampKindUtils.Parse(dt.Kind);
+            Milliseconds = Int64Utils.NNParse((dt - DateTimeUtils.GetOrigin(dt.Kind)).TotalMilliseconds);
+            Kind = TimeStampKindUtils.Parse(dt.Kind).Value;
         }
 
-        public UnixTimeStamp(uint i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
-        public UnixTimeStamp(int i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
+        public UnixTimeStamp(double d, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(d), eKind) { }
+        public UnixTimeStamp(float f, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(f), eKind) { }
         public UnixTimeStamp(ulong i, ETimeStampKind eKind = ETimeStampKind.Universal) : this(Int64Utils.NNParse(i), eKind) { }
         public UnixTimeStamp(long i, ETimeStampKind eKind = ETimeStampKind.Universal)
         {
-            _i = i;
+            Milliseconds = i;
             Kind = eKind;
         }
 
         #region To()
 
-        public long ToMilliSeconds()
+        public UnixTimeStamp ToUniversalKind()
         {
-            return _i;
+            return ToDateTime().ToUniversalTime();
+        }
+
+        public UnixTimeStamp ToLocalKind()
+        {
+            return ToDateTime().ToLocalTime();
+        }
+
+        public UnixTimeStamp ToKind(ETimeStampKind e)
+        {
+            return
+                e == ETimeStampKind.Local
+                    ? ToLocalKind()
+                    : ToUniversalKind();
         }
 
         public int ToSeconds()
         {
-            return Int32Utils.NNParse(Math.Round(_i / __dSecondsMultiplier));
+            return Int32Utils.NNParse(Milliseconds / 1000);
+        }
+
+        public int ToMinutes()
+        {
+            return ToSeconds() / 60;
+        }
+
+        public int ToHours()
+        {
+            return ToMinutes() / 60;
+        }
+
+        public int ToDays()
+        {
+            return ToHours() / 24;
         }
 
         public DateTime ToDateTime()
@@ -61,17 +81,17 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
             return
                 DateTimeUtils.GetOrigin
                 (
-                    DateTimeKindUtils.Parse(Kind)
+                    DateTimeKindUtils.Parse(Kind).Value
                 )
                 .AddTicks
                 (
-                    Int64Utils.NNParse(_i) * TimeSpan.TicksPerMillisecond
+                    Milliseconds * TimeSpan.TicksPerMillisecond
                 );
         }
 
         public override string ToString()
         {
-            return _i.ToString() + TimeStampKindUtils.ToString(Kind);
+            return Milliseconds + TimeStampKindUtils.ToString(Kind);
         }
 
         #endregion
@@ -80,7 +100,7 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
 
         public UnixTimeStamp AddMilliSeconds(int i)
         {
-            return new UnixTimeStamp(_i + Int64Utils.NNParse(i), Kind);
+            return new UnixTimeStamp(Milliseconds + i, Kind);
         }
 
         public UnixTimeStamp AddSeconds(int i)
@@ -109,53 +129,44 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
 
         public static bool operator <=(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                && o0._i <= o1._i;
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds <= o1.Milliseconds;
         }
 
         public static bool operator >=(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                && o0._i >= o1._i;
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds >= o1.Milliseconds;
         }
 
         public static bool operator >(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                && o0._i > o1._i;
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds > o1.Milliseconds;
         }
 
         public static bool operator <(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                && o0._i < o1._i;
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds < o1.Milliseconds;
         }
 
         public static bool operator ==(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                && o0._i == o1._i;
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds == o1.Milliseconds;
         }
 
         public static UnixTimeStamp operator +(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                    ? new UnixTimeStamp(o0._i + o1._i, o0.Kind)
-                    : new UnixTimeStamp(long.MaxValue, ETimeStampKind.Unspecified);
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds + o1.Milliseconds;
         }
 
         public static UnixTimeStamp operator -(UnixTimeStamp o0, UnixTimeStamp o1)
         {
-            return
-                o0.Kind == o1.Kind
-                    ? new UnixTimeStamp(o0._i - o1._i, o0.Kind)
-                    : new UnixTimeStamp(long.MaxValue, ETimeStampKind.Unspecified);
+            if (o0.Kind != o1.Kind) o0 = o0.ToKind(o1.Kind);
+            return o0.Milliseconds - o1.Milliseconds;
         }
 
         public static bool operator !=(UnixTimeStamp o0, UnixTimeStamp o1)
@@ -168,34 +179,34 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
             return o.ToString();
         }
 
-        public static implicit operator int(UnixTimeStamp o)
-        {
-            return o.ToSeconds();
-        }
+        //public static implicit operator int(UnixTimeStamp o)
+        //{
+        //    return o.ToSeconds();
+        //}
 
-        public static implicit operator uint(UnixTimeStamp o)
-        {
-            return UInt32Utils.NNParse(o.ToSeconds());
-        }
+        //public static implicit operator uint(UnixTimeStamp o)
+        //{
+        //    return UInt32Utils.NNParse(o.ToSeconds());
+        //}
 
         public static implicit operator float(UnixTimeStamp o)
         {
-            return o.ToMilliSeconds();
+            return o.Milliseconds;
         }
 
         public static implicit operator double(UnixTimeStamp o)
         {
-            return o.ToMilliSeconds();
+            return o.Milliseconds;
         }
 
         public static implicit operator long(UnixTimeStamp o)
         {
-            return o.ToMilliSeconds();
+            return o.Milliseconds;
         }
 
         public static implicit operator ulong(UnixTimeStamp o)
         {
-            return UInt64Utils.NNParse(o.ToMilliSeconds());
+            return UInt64Utils.NNParse(o.Milliseconds);
         }
 
         public static implicit operator DateTime(UnixTimeStamp o)
@@ -208,9 +219,9 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
         //    return new TimeStamp(oString);
         //}
 
-        public static implicit operator UnixTimeStamp(DateTime oDateTime)
+        public static implicit operator UnixTimeStamp(DateTime dt)
         {
-            return new UnixTimeStamp(oDateTime);
+            return new UnixTimeStamp(dt);
         }
 
         public static implicit operator UnixTimeStamp(uint i)
@@ -223,9 +234,19 @@ namespace Kudos.Types.TimeStamps.UnixTimeStamp
             return new UnixTimeStamp(l);
         }
 
+        public static implicit operator UnixTimeStamp(float f)
+        {
+            return new UnixTimeStamp(f);
+        }
+
+        public static implicit operator UnixTimeStamp(double d)
+        {
+            return new UnixTimeStamp(d);
+        }
+
         #endregion
 
-        public static UnixTimeStamp GetOrigin(ETimeStampKind eKind = ETimeStampKind.Universal) { return new UnixTimeStamp(DateTimeUtils.GetOrigin(DateTimeKindUtils.Parse(eKind))); }
-        public static UnixTimeStamp GetCurrent(ETimeStampKind eKind = ETimeStampKind.Universal) { return new UnixTimeStamp(DateTimeUtils.GetCurrent(DateTimeKindUtils.Parse(eKind))); }
+        public static UnixTimeStamp GetOrigin(ETimeStampKind eKind = ETimeStampKind.Universal) { return new UnixTimeStamp(DateTimeUtils.GetOrigin(DateTimeKindUtils.Parse(eKind).Value)); }
+        public static UnixTimeStamp GetCurrent(ETimeStampKind eKind = ETimeStampKind.Universal) { return new UnixTimeStamp(DateTimeUtils.GetCurrent(DateTimeKindUtils.Parse(eKind).Value)); }
     }
 }

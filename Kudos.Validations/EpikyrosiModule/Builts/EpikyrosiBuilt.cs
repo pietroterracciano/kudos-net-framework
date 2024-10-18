@@ -55,7 +55,7 @@ namespace Kudos.Validations.EpikyrosiModule.Builts
 
             Int32 k = 0;
 
-            MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), sMemberName, CBindingFlags.Public);
+            MemberInfo[]? mia = ReflectionUtils.GetMembers(o.GetType(), sMemberName, CBindingFlags.All | BindingFlags.GetField | BindingFlags.GetProperty);
 
 			if (mia == null)
 				goto END;

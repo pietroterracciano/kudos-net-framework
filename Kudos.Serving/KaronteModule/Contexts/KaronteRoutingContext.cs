@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Kudos.Databases.Interfaces;
+using Kudos.Databasing.Interfaces;
 using Kudos.Serving.KaronteModule.Constants;
 using Kudos.Serving.KaronteModule.Descriptors.Routes;
 using Kudos.Serving.KaronteModule.Enums;

@@ -11,39 +11,38 @@ namespace Kudos.Types.TimeStamps.Utils
     {
         private static readonly String
             __sLocal = "LCL",
-            __sUniversal = "UNV",
-            __sUnspecified = "UNS";
+            __sUniversal = "UNV";
+            //__sUnspecified = "UNS";
 
         private static readonly Dictionary<ETimeStampKind, String>
             __d0 = new Dictionary<ETimeStampKind, String>()
             {
                 { ETimeStampKind.Local, __sLocal },
-                { ETimeStampKind.Universal, __sUniversal },
-                { ETimeStampKind.Unspecified, __sUnspecified }
+                { ETimeStampKind.Universal, __sUniversal }//,
+                //{ ETimeStampKind.Unspecified, __sUnspecified }
             };
 
         private static readonly Dictionary<DateTimeKind, ETimeStampKind>
             __d1 = new Dictionary<DateTimeKind, ETimeStampKind>()
             {
                 { DateTimeKind.Local, ETimeStampKind.Local },
-                { DateTimeKind.Utc, ETimeStampKind.Universal },
-                { DateTimeKind.Unspecified, ETimeStampKind.Unspecified }
+                { DateTimeKind.Utc, ETimeStampKind.Universal }//,
+                //{ DateTimeKind.Unspecified, ETimeStampKind.Unspecified }
             };
 
 
-        internal static String ToString(ETimeStampKind e)
+        internal static String? ToString(ETimeStampKind e)
         {
-            String s;
-            if (!__d0.TryGetValue(e, out s))
-                s = String.Empty;
+            String? s;
+            __d0.TryGetValue(e, out s);
             return s;
         }
 
-        internal static ETimeStampKind Parse(DateTimeKind e)
+        internal static ETimeStampKind? Parse(DateTimeKind e)
         {
             ETimeStampKind e1;
-            if (!__d1.TryGetValue(e, out e1))
-                e1 = ETimeStampKind.Unspecified;
+            __d1.TryGetValue(e, out e1);
+                //e1 = ETimeStampKind.Unspecified;
             return e1;
         }
     }

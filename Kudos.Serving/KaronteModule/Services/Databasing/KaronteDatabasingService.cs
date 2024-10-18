@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.Json;
-using Kudos.Databases.Chainers;
-using Kudos.Databases.Interfaces;
-using Kudos.Databases.Interfaces.Chains;
+using Kudos.Databasing.Chainers;
+using Kudos.Databasing.Interfaces;
+using Kudos.Databasing.Interfaces.Chains;
 using Kudos.Types;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -17,17 +17,16 @@ namespace Kudos.Types.TimeStamps.Utils
             __d = new Dictionary<ETimeStampKind, DateTimeKind>()
             {
                 { ETimeStampKind.Local, DateTimeKind.Local },
-                { ETimeStampKind.Universal, DateTimeKind.Utc },
-                { ETimeStampKind.Unspecified, DateTimeKind.Unspecified }
+                { ETimeStampKind.Universal, DateTimeKind.Utc }//,
+                //{ ETimeStampKind.Unspecified, DateTimeKind.Unspecified }
             };
         }
 
 
-        internal static DateTimeKind Parse(ETimeStampKind e)
+        internal static DateTimeKind? Parse(ETimeStampKind e)
         {
             DateTimeKind e1;
-            if (!__d.TryGetValue(e, out e1))
-                e1 = DateTimeKind.Unspecified;
+            __d.TryGetValue(e, out e1);
             return e1;
         }
     }

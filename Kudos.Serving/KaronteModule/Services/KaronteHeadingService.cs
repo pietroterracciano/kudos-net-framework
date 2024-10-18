@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
 using Kudos.Constants;
-using Kudos.Databases.Chainers;
-using Kudos.Databases.Interfaces.Chains;
+using Kudos.Databasing.Chainers;
+using Kudos.Databasing.Interfaces.Chains;
 using Kudos.Serving.KaronteModule.Contexts;
 using Kudos.Serving.KaronteModule.Middlewares;
 using Kudos.Types;

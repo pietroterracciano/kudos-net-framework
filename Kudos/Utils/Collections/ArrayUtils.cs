@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using Kudos.Constants;
@@ -22,6 +23,29 @@ namespace Kudos.Utils.Collections
 
         public static T[]? CreateInstance<T>(int i) { return CreateInstance(typeof(T), i) as T[]; }
         public static Object[]? CreateInstance(Type? t, int i) { if (t != null && i > -1) try { return Array.CreateInstance(t, i) as Object[]; } catch { } return null; }
+
+        #endregion
+
+        #region RemoveNullEntries()
+
+        public static T[]? RemoveNullEntries<T>(T?[]? oa)
+        {
+            return ObjectUtils.Cast<T[]>(RemoveNullEntries(oa as Object?[]));
+        }
+        public static Object[]? RemoveNullEntries(Object?[]? oa)
+        {
+            if (oa == null || oa.Length < 1) return null;
+
+            List<Object> lo = new List<object>(oa.Length);
+
+            for (int i = 0; i < oa.Length; i++)
+            {
+                if (oa[i] == null) continue;
+                lo.Add(oa[i]);
+            }
+
+            return lo.ToArray();
+        }
 
         #endregion
 

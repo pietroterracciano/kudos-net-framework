@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos", "Kudos\Kudos.csproj", "{0EE497F6-1B34-44A8-94E9-07C3452DA530}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databases", "Kudos.Databases\Kudos.Databases.csproj", "{A6D56F0B-D942-4740-9FCA-F5CF883A48BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databasing", "Kudos.Databasing\Kudos.Databasing.csproj", "{A6D56F0B-D942-4740-9FCA-F5CF883A48BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Serving", "Kudos.Serving\Kudos.Serving.csproj", "{5C6E82F2-C610-43A8-8221-5AA1B2F4B567}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databases.ORMs", "Kudos.Databases.ORMs\Kudos.Databases.ORMs.csproj", "{F53B514F-5A79-4069-8BF0-6F16AAFB281F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Databasing.ORMs", "Kudos.Databasing.ORMs\Kudos.Databasing.ORMs.csproj", "{F53B514F-5A79-4069-8BF0-6F16AAFB281F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudos.Validations", "Kudos.Validations\Kudos.Validations.csproj", "{0E9D8DFC-6AF9-48F4-9F4C-6786DC1673FC}"
 EndProject

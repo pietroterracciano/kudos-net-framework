@@ -37,6 +37,8 @@ namespace Kudos.Constants
             NullableDecimal = typeof(Decimal?),
             Decimal = typeof(Decimal),
             NullableChar = typeof(Char?),
+            Byte = typeof(Byte),
+            NullableByte = typeof(Byte?),
             Char = typeof(Char),
             String = typeof(String),
             NullableBoolean = typeof(Boolean?),

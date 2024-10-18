@@ -1,5 +1,5 @@
 ﻿using System;
-using Kudos.Databases.Interfaces;
+using Kudos.Databasing.Interfaces;
 using Kudos.Serving.KaronteModule.Services.Databasing;
 
 namespace Kudos.Serving.KaronteModule.Contexts.Databasing

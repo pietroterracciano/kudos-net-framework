@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Reflection;
 using Kudos.Utils;
+using Kudos.Utils.Numerics;
 using Kudos.Validations.EpikyrosiModule.Enums;
 using Kudos.Validations.EpikyrosiModule.Results;
 
@@ -29,7 +30,7 @@ namespace Kudos.Validations.EpikyrosiModule.Rules
 			MaxLength;
 
         public EpikyrosiNumericRule()
-            : base(typeof(T)) { }
+            : base(NumericUtils.ParseToNType(typeof(T))) { }
 
         protected override void _OnValidate(ref object v, ref MemberInfo mi, out EpikyrosiNotValidResult? envr)
         {

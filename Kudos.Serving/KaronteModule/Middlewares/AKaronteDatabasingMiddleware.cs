@@ -1,8 +1,8 @@
 ﻿using Kudos.Constants;
-using Kudos.Databases.Chainers;
-using Kudos.Databases.Interfaces;
-using Kudos.Databases.Interfaces.Chains;
-using Kudos.Databases.Results;
+using Kudos.Databasing.Chainers;
+using Kudos.Databasing.Interfaces;
+using Kudos.Databasing.Interfaces.Chains;
+using Kudos.Databasing.Results;
 using Kudos.Serving.KaronteModule.Constants;
 using Kudos.Serving.KaronteModule.Contexts;
 using Kudos.Serving.KaronteModule.Contexts.Databasing;
