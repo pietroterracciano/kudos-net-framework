@@ -1,13 +1,14 @@
 ﻿using Kudos.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Builts;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
+using Kudos.Databasing.ORMs.GefyraModule.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Enums;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Builders;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Clausoles;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Types;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities;
+
 using Kudos.Databasing.ORMs.GefyraModule.Utils;
 using Kudos.Utils.Collections;
 using Kudos.Utils.Numerics;
@@ -73,6 +74,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
         private readonly StringBuilder _sb1;
         private /*readonly*/ List<GefyraParameter> _lgp;
         private /*readonly*/ List<IGefyraColumn> _lgcOnOutput, _lgcConsumed;
+        private /*readonly*/ HashSet<IGefyraTable> _hsJoiningTables;
 
         internal GefyraBuilder()
         {
@@ -80,6 +82,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
             _lgp = new List<GefyraParameter>();
             _lgcOnOutput = new List<IGefyraColumn>();
             _lgcConsumed = new List<IGefyraColumn>();
+            _hsJoiningTables = new HashSet<IGefyraTable>();
             _sb0 = new StringBuilder();
             _sb1 = new StringBuilder();
         }
@@ -121,11 +124,11 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
             _Append(s);
         }
 
-        private void _Append(ref IGefyraTable? gt)
+        private Boolean _Append(ref IGefyraTable? gt)
         {
-            if (gt == null) { _Append(GefyraTable.Invalid.GetSQL()); return; }
-            else if (gt == GefyraTable.Ignored) return;
-            _Append(gt.GetSQL());
+            if (gt == null) { _Append(GefyraTable.Invalid.GetSQL()); return false; }
+            else if (gt == GefyraTable.Ignored) return false;
+            _Append(gt.GetSQL()); return true;
         }
 
         private void _Append(ref IGefyraColumn?[]? gca)
@@ -309,7 +312,12 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         public IGefyraJoinClausoleBuilder Join(EGefyraJoin e, IGefyraTable? gt)
         {
-            _Append(ref e); _Append(CCharacter.Space); _Append(CGefyraClausole.Join); _Append(CCharacter.Space); _Append(ref gt); _Append(CCharacter.Space);
+            _Append(ref e);
+            _Append(CCharacter.Space);
+            _Append(CGefyraClausole.Join);
+            _Append(CCharacter.Space);
+            if (_Append(ref gt)) _hsJoiningTables.Add(gt);
+            _Append(CCharacter.Space);
             return this;
         }
 
@@ -590,7 +598,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         public GefyraBuilt Build()
         {
-            return new GefyraBuilt(ref _sb0, ref _lgp, ref _lgcOnOutput);
+            return new GefyraBuilt(ref _hsJoiningTables, ref _sb0, ref _lgp, ref _lgcOnOutput);
         }
 
         #endregion

@@ -99,7 +99,10 @@ namespace Kudos.Utils.Collections
 
         #region public static T[]? Append<T>(...)
 
-        public static T[]? Append<T>(T[]? ta0, T[]? ta1)
+        public static T?[]? Append<T>(T?[]? t0, T? t1) { return Append<T>(t0, new T?[] { t1 }); }
+        public static T?[]? Append<T>(T? t0, T?[]? t1) { return Append<T>(new T?[] { t0 }, t1); }
+        public static T?[]? Append<T>(T? t0, T? t1) { return Append<T>(new T?[] { t0 }, new T?[] { t1 }); }
+        public static T?[]? Append<T>(T?[]? ta0, T?[]? ta1)
         {
             if (ta0 == null && ta1 == null)
                 return null;

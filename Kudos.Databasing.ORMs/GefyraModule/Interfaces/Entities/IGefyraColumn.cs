@@ -1,22 +1,16 @@
-﻿using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Actions;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Kudos.Databasing.ORMs.GefyraModule.Entities;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Actions;
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities
 {
     public interface
         IGefyraColumn
     :
-        IGefyraEntity,
-        IGefyraEntityDeclaringTableDescriptor,
-        IGefyraSimplexizedColumnDescriptor,
+        IGefyraComplexizedEntity,
+        IGefyraDeclaringTableDescriptor,
+        IGefyraColumnDescriptor,
         IGefyraEntityAsAction<GefyraColumn>
-        //IGefyraEntityAsAction<GefyraColumn>
     {
     }
 }

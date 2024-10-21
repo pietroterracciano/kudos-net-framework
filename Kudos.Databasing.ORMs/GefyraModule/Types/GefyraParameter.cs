@@ -1,7 +1,6 @@
 ﻿using System;
-using Kudos.Databasing.ORMs.GefyraModule.Enums;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities;
+
 using Kudos.Types;
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Types

@@ -37,6 +37,11 @@
     <None Remove="GefyraModule\Mappers\**" />
     <None Remove="GefyraModule\Models\**" />
     <None Remove="GefyraModule\Wrappers\**" />
+    <None Remove="GefyraModule\Interfaces\Descriptors\" />
+    <None Remove="GefyraModule\Entity\" />
+    <None Remove="GefyraModule\Interfaces\Entities\Actions\" />
+    <None Remove="GefyraModule\Descriptors\" />
+    <None Remove="GefyraModule\Interfaces\Actions\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -104,5 +109,10 @@
     <Folder Include="GefyraModule\Interfaces\Commands\" />
     <Folder Include="GefyraModule\Models\Contexts\" />
     <Folder Include="GefyraModule\Contexts\" />
+    <Folder Include="GefyraModule\Interfaces\Descriptors\" />
+    <Folder Include="GefyraModule\Entity\" />
+    <Folder Include="GefyraModule\Interfaces\Entities\Actions\" />
+    <Folder Include="GefyraModule\Descriptors\" />
+    <Folder Include="GefyraModule\Interfaces\Actions\" />
   </ItemGroup>
 </Project>

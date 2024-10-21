@@ -1,7 +1,7 @@
 ﻿using Kudos.Databasing.ORMs.GefyraModule.Interfaces;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Types;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities;
+
 using Kudos.Utils.Collections;
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,23 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builts
         private readonly Dictionary<String, Int32> _d;
         private readonly String[] _gpaa;
         private readonly Object?[] _gpva;
+
+        public readonly IGefyraTable[] JoiningTables;
         public readonly IGefyraColumn[] InputColumns, OutputColumns;
 
-        private KeyValuePair<String, Object>[]? _kvp;
+        private KeyValuePair<String, Object?>[]? _kvp;
 
-        internal GefyraBuilt(ref StringBuilder sb, ref List<GefyraParameter> lgp, ref List<IGefyraColumn> lgc)
+        internal GefyraBuilt
+        (
+            ref HashSet<IGefyraTable> hs,
+            ref StringBuilder sb,
+            ref List<GefyraParameter> lgp,
+            ref List<IGefyraColumn> lgc
+        )
         {
             _lck = new object();
+
+            JoiningTables = hs.ToArray();
 
             Text = sb.ToString();
 
@@ -74,18 +84,18 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builts
             return true;
         }
 
-        public KeyValuePair<String, Object>[] GetParameters()
+        public KeyValuePair<String, Object?>[] GetParameters()
         {
             lock(_lck)
             {
                 if (_kvp != null)
                     return _kvp;
 
-                _kvp = new KeyValuePair<String, Object>[_gpaa.Length];
+                _kvp = new KeyValuePair<String, Object?>[_gpaa.Length];
 
                 for (int i = 0; i < _gpaa.Length; i++)
                     _kvp[i] =
-                        new KeyValuePair<String, Object>
+                        new KeyValuePair<String, Object?>
                         (
                             _gpaa[i],
                             _gpva[i]

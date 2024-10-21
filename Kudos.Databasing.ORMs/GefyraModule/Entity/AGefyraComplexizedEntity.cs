@@ -1,23 +1,21 @@
-﻿using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Actions;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors;
+﻿using System;
 using Kudos.Types;
-using Kudos.Utils;
-using System;
 using System.Text;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Actions;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
+namespace Kudos.Databasing.ORMs.GefyraModule.Entity
 {
-    public abstract class 
-        AGefyraEntity<EntityType, DescriptorType>
+    public abstract class
+        AGefyraComplexizedEntity<EntityType, DescriptorType>
     :
-        TokenizedObject,
-        IGefyraEntity
+        AGefyraSimplexizedEntity<EntityType>,
+        IGefyraComplexizedEntity
     where
-        EntityType : AGefyraEntity<EntityType, DescriptorType>
+        EntityType : AGefyraComplexizedEntity<EntityType, DescriptorType>
     where
-        DescriptorType : IGefyraEntityDescriptor
+        DescriptorType : IGefyraDescriptor
     {
         private /*readonly*/ StringBuilder
             _sb;
@@ -45,27 +43,27 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
 
         #region HashKey
 
-        public string HashKey { get { return _Descriptor.HashKey; } }
+        public override string HashKey { get { return _Descriptor.HashKey; } }
 
         #endregion
 
-        protected AGefyraEntity(ref EntityType et, ref String sa) : this()
+        protected AGefyraComplexizedEntity(ref EntityType et, ref String sa) : this()
         {
             _sb = et._sb;
             _mAlias = et._mAlias;
             _Descriptor = et._Descriptor;
             HasAlias = !String.IsNullOrWhiteSpace(Alias = sa);
         }
-        protected AGefyraEntity(ref DescriptorType dsc) : this()
+        protected AGefyraComplexizedEntity(ref DescriptorType dsc) : this()
         {
             _sb = new StringBuilder();
             _mAlias = new Metas(StringComparison.OrdinalIgnoreCase);
             _Descriptor = dsc;
         }
 
-        private AGefyraEntity() { _this = this as EntityType; }
+        private AGefyraComplexizedEntity() { _this = this as EntityType; }
 
-        string IGefyraEntityGetSQLAction.GetSQL()
+        string IGefyraGetSQLAction.GetSQL()
         {
             String s; _GetSQL(out s); return s;
         }
@@ -93,7 +91,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
 
         public EntityType As(String? sAlias)
         {
-            lock(_mAlias)
+            lock (_mAlias)
             {
                 EntityType? t = _mAlias.Get<EntityType>(sAlias);
                 if (t != null) return t;
@@ -108,3 +106,4 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
         protected abstract void _OnGetSQL(ref StringBuilder sb);
     }
 }
+

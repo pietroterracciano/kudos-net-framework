@@ -20,6 +20,26 @@ namespace Kudos.Serving.KaronteModule.Controllers
                 throw new OperationCanceledException();
         }
 
+        #region protected ... _Require...()
+
+        [NonAction]
+        protected T? _GetController<T>()
+        where T : AKaronteController
+        { return KaronteContext.GetController<T>(); }
+
+        [NonAction]
+        protected T _RequireController<T>()
+            where T : AKaronteController
+        { return KaronteContext.RequireController<T>(); }
+
+        [NonAction]
+        protected T? _GetService<T>() { return KaronteContext.GetService<T>(); }
+
+        [NonAction]
+        protected T _RequireService<T>() { return KaronteContext.RequireService<T>(); }
+
+        #endregion
+
         [NonAction]
         public override string? ToString()
         {

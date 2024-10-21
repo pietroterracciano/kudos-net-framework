@@ -11,6 +11,9 @@ using Kudos.Databasing.Controllers;
 using Kudos.Databasing.Interfaces;
 using Kudos.Types;
 using System.Text;
+using System.Threading.Tasks;
+using Kudos.Utils;
+using System.Threading;
 
 namespace Kudos.Databasing.Descriptors
 {
@@ -18,6 +21,8 @@ namespace Kudos.Databasing.Descriptors
 	{
         #region ... static ...
 
+        private static readonly SemaphoreSlim
+            __ss;
         private static readonly Metas
            __m;
         private static readonly StringBuilder
@@ -32,8 +37,13 @@ namespace Kudos.Databasing.Descriptors
             __ssnPrefix,
             __sSQL;
 
+        private static String
+            __sNullable;
+
         static DatabaseTableDescriptor()
         {
+            __sNullable = null;
+
             __sTableName = "TABLE_NAME";
             __sTableSchema = "TABLE_SCHEMA";
             __sEngine = "ENGINE";
@@ -43,6 +53,8 @@ namespace Kudos.Databasing.Descriptors
             __snPrefix = "n";
             __m = new Metas(StringComparison.OrdinalIgnoreCase);
             __sb = new StringBuilder();
+
+            __ss = new SemaphoreSlim(1);
 
             __sSQL =
                 "SELECT * FROM information_schema.TABLES WHERE " + __sTableName + " = @" + __sTableName;
@@ -85,94 +97,108 @@ namespace Kudos.Databasing.Descriptors
 
         #endregion
 
-        #region internal void static Get(...)
+        #region internal static ... Get...(...)
 
-        internal static void Get(ref IDatabaseHandler? dbh, ref String? ssn, ref String? sn, out DatabaseTableDescriptor? dbtd)
+        internal static void Get(ref IDatabaseHandler? dbh, ref String? sn, out DatabaseTableDescriptor? dtd)
+        {
+            Get(ref dbh, ref __sNullable, ref sn, out dtd);
+        }
+        internal static void Get(ref IDatabaseHandler? dbh, ref String? ssn, ref String? sn, out DatabaseTableDescriptor? dtd)
+        {
+            Task<DatabaseTableDescriptor?> t = GetAsync(dbh, ssn, sn);
+            t.Wait();
+            dtd = t.Result;
+        }
+        internal static async Task<DatabaseTableDescriptor?> GetAsync(IDatabaseHandler? dbh, String? sn)
+        {
+            return await GetAsync(dbh, null, sn);
+        }
+        internal static async Task<DatabaseTableDescriptor?> GetAsync(IDatabaseHandler? dbh, String? ssn, String? sn)
         {
             if (dbh == null)
-            {
-                dbtd = null;
-                return;
-            }
+                return null;
 
             String?[]?
                 sa = DatabaseTableUtils.NormalizeNames(ssn, sn);
 
             if (sa == null || String.IsNullOrWhiteSpace(sa[1]))
-            {
-                dbtd = null;
-                return;
-            }
+                return null;
 
             String? shk;
             __CalculateHashKey(ref sa[0], ref sa[1], out shk);
             if (shk == null)
+                return null;
+
+            await SemaphoreUtils.WaitSemaphoreAsync(__ss);
+
+            DatabaseTableDescriptor? dbtd = __m.Get<DatabaseTableDescriptor>(shk);
+
+            if (dbtd != null)
             {
-                dbtd = null;
-                return;
+                SemaphoreUtils.ReleaseSemaphore(__ss);
+                return dbtd;
             }
 
-            lock (__m)
+            String
+                sSQL;
+
+            KeyValuePair<String, Object?>[]
+                kvpa;
+
+            lock (__sb)
             {
-                dbtd = __m.Get<DatabaseTableDescriptor>(shk);
+                __sb
+                    .Clear()
+                    .Append(__sSQL);
 
-                if (dbtd != null)
-                    return;
-
-                String
-                    sSQL;
-
-                KeyValuePair<String, Object?>[]
-                   kvpa;
-
-                lock (__sb)
+                if (!String.IsNullOrWhiteSpace(sa[0]))
                 {
-                    __sb
-                        .Clear()
-                        .Append(__sSQL);
-
-                    if (!String.IsNullOrWhiteSpace(sa[0]))
-                    {
-                        kvpa = new KeyValuePair<string, object?>[2];
-
-                        __sb
-                            .Append(CCharacter.Space).Append(CDatabaseClausole.And)
-                            .Append(CCharacter.Space).Append(__sTableSchema)
-                            .Append(CCharacter.Space).Append(CCharacter.Equal)
-                            .Append(CCharacter.Space).Append(CCharacter.At).Append(__sTableSchema);
-                    }
-                    else
-                        kvpa = new KeyValuePair<string, object?>[1];
+                    kvpa = new KeyValuePair<string, object?>[2];
 
                     __sb
-                        .Append(CCharacter.Space).Append(CDatabaseClausole.Limit)
-                        .Append(CCharacter.Space).Append(1);
-
-                    sSQL = __sb.ToString();
+                        .Append(CCharacter.Space).Append(CDatabaseClausole.And)
+                        .Append(CCharacter.Space).Append(__sTableSchema)
+                        .Append(CCharacter.Space).Append(CCharacter.Equal)
+                        .Append(CCharacter.Space).Append(CCharacter.At).Append(__sTableSchema);
                 }
+                else
+                    kvpa = new KeyValuePair<string, object?>[1];
 
+                __sb
+                    .Append(CCharacter.Space).Append(CDatabaseClausole.Limit)
+                    .Append(CCharacter.Space).Append(1);
 
-                if (kvpa.Length > 0)
-                    kvpa[0] = new KeyValuePair<string, object?>(__sTableName, sa[1]);
-                if (kvpa.Length > 1)
-                    kvpa[1] = new KeyValuePair<string, object?>(__sTableSchema, sa[0]);
-
-                DatabaseQueryResult
-                    dbqr = dbh.ExecuteQuery(sSQL, 1, kvpa);
-
-                if (dbqr.HasError)
-                    return;
-
-                DataRow? dr = DataTableUtils.GetFirstRow(dbqr.Data);
-
-                ssn = DataRowUtils.GetValue<String>(dr, __sTableSchema);
-                sn = DataRowUtils.GetValue<String>(dr, __sTableName);
-
-                if(!String.IsNullOrWhiteSpace(ssn) && !String.IsNullOrWhiteSpace(sn))
-                    dbtd = new DatabaseTableDescriptor(ref ssn, ref sn, ref shk);
-
-                __m.Set(shk, dbtd);
+                sSQL = __sb.ToString();
             }
+
+
+            if (kvpa.Length > 0)
+                kvpa[0] = new KeyValuePair<string, object?>(__sTableName, sa[1]);
+            if (kvpa.Length > 1)
+                kvpa[1] = new KeyValuePair<string, object?>(__sTableSchema, sa[0]);
+
+            DatabaseQueryResult
+                dbqr = await dbh.ExecuteQueryAsync(sSQL, 1, kvpa);
+
+            if (dbqr.HasError)
+            {
+                SemaphoreUtils.ReleaseSemaphore(__ss);
+                return dbtd;
+            }
+
+            DataRow? dr = DataTableUtils.GetFirstRow(dbqr.Data);
+
+            ssn = DataRowUtils.GetValue<String>(dr, __sTableSchema);
+            sn = DataRowUtils.GetValue<String>(dr, __sTableName);
+
+            if(!String.IsNullOrWhiteSpace(ssn) && !String.IsNullOrWhiteSpace(sn))
+                dbtd = new DatabaseTableDescriptor(ref ssn, ref sn, ref shk);
+
+            __m.Set(shk, dbtd);
+
+            SemaphoreUtils.ReleaseSemaphore(__ss);
+
+            return dbtd;
         }
 
         #endregion
@@ -183,6 +209,8 @@ namespace Kudos.Databasing.Descriptors
             SchemaName;
         public readonly String
             TableName;
+
+        public static object ThreadUtils { get; private set; }
 
         internal DatabaseTableDescriptor(ref String ssn, ref String sn, ref String shk) : base(ref shk)
         {

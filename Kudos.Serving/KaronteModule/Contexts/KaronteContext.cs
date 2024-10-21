@@ -9,6 +9,7 @@ using Kudos.Serving.KaronteModule.Contexts.Marketing;
 using Kudos.Serving.KaronteModule.Contexts.Crypting;
 using Kudos.Serving.KaronteModule.Contexts.Databasing;
 using System.Threading.Tasks;
+using Kudos.Serving.KaronteModule.Controllers;
 
 namespace Kudos.Serving.KaronteModule.Contexts
 {
@@ -137,6 +138,7 @@ namespace Kudos.Serving.KaronteModule.Contexts
 
         //public Task<ControllerType> RequireControllerAsync<ControllerType>() { return Task.Run(() => RequireController<ControllerType>()); }
         public ControllerType RequireController<ControllerType>()
+            where ControllerType : AKaronteController
         {
             Type
                 t = typeof(ControllerType);
@@ -163,6 +165,7 @@ namespace Kudos.Serving.KaronteModule.Contexts
 
         //public Task<ControllerType?> GetControllerAsync<ControllerType>() { return Task.Run(() => GetController<ControllerType>()); }
         public ControllerType? GetController<ControllerType>()
+            where ControllerType : AKaronteController
         {
             return ObjectUtils.Cast<ControllerType>(_GetController(typeof(ControllerType)));
         }

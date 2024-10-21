@@ -1,27 +1,22 @@
 ﻿using Kudos.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Attributes;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Utils;
 using Kudos.Reflection.Utils;
 using Kudos.Types;
 using Kudos.Utils.Collections;
-using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
+namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 {
-    public class
+    public sealed class
         GefyraTableDescriptor
-    : 
-        AGefyraEntityDescriptor,
+    :
+        AGefyraDescriptor,
         IGefyraTableDescriptor
     {
         #region ... static ...
@@ -296,6 +291,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
             #region Recupero tutti i Members del DeclaringType
 
             mia = ReflectionUtils.GetMembers(DeclaringType, CBindingFlags.Instance);
+            if (mia == null) return;
 
             #endregion
 
@@ -330,21 +326,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
                 gcd = GefyraColumnDescriptor.Invalid;
                 return;
             }
-
-            //GefyraIgnoreColumnAttribute?
-            //    gic;
-
-            //#region Recupero l'attribute per il Member
-
-            //gic = ReflectionUtils.GetCustomAttribute<GefyraIgnoreColumnAttribute>(mi);
-
-            //#endregion
-
-            //if (gic != null)
-            //{
-            //    gcd = GefyraColumnDescriptor.Ignored;
-            //    return;
-            //}
 
             string? sn;
 
@@ -422,7 +403,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
             out GefyraColumnDescriptor gcd
         )
         {
-            MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CGefyraBindingFlags.OnGetMembers);
+            MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CBindingFlags.Instance);
             RequestColumnDescriptor(ref mi, out gcd);
             if (gcd != GefyraColumnDescriptor.Invalid) return;
             RequestColumnDescriptor(ref mi, ref sn, out gcd);

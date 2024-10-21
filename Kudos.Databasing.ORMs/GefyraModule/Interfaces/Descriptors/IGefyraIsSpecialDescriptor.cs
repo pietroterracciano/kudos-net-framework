@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors
+namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors
 {
-    public interface IGefyraEntityIsSpecialDescriptor
+    public interface IGefyraIsSpecialDescriptor
     {
         #region IsSpecial
 

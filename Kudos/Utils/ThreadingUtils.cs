@@ -14,21 +14,21 @@ namespace Kudos.Utils
         public static void TryEnterMonitor(Object? o) { TryEnterMonitor(o, __it); }
         public static void TryEnterMonitor(Object? o, int iTimeout)
         {
-            if (o == null) return;
-            Boolean b = false;
-            try { Monitor.TryEnter(o, __it, ref b); } catch { }
-            if (b) _ExitMonitor(ref o);
+            if (o == null || iTimeout < 1) return;
+            //Boolean b = false;
+            try { Monitor.TryEnter(o, iTimeout); } catch { }
+            //if (b) _ExitMonitor(ref o);
         }
 
         public static void EnterMonitor(Object? o)
         {
             if (o == null) return;
-            Boolean b = false;
-            try { Monitor.Enter(o, ref b); } catch { }
-            if (b) _ExitMonitor(ref o);
+            //Boolean b = false;
+            try { Monitor.Enter(o); } catch { }
+            //if (b) _ExitMonitor(ref o);
         }
 
-        public static void ExitMonitor(Object? o) { if (o != null) _ExitMonitor(ref o); }
-        private static void _ExitMonitor(ref Object o) { try { Monitor.Exit(o); } catch { } }
+        public static void ExitMonitor(Object? o) { if(o != null) try { Monitor.Exit(o); } catch { } }
+        //private static void _ExitMonitor(ref Object o) { try { Monitor.Exit(o); } catch { } }
     }
 }

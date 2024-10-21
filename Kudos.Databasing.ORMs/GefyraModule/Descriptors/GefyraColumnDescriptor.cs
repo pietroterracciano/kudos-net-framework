@@ -1,27 +1,20 @@
 ﻿using Kudos.Constants;
-using Kudos.Databasing.ORMs.GefyraModule.Attributes;
-using Kudos.Databasing.ORMs.GefyraModule.Constants;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
-using Kudos.Reflection.Utils;
-using Kudos.Types;
-using Kudos.Utils.Texts;
-using MySqlX.XDevAPI.Relational;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
+namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 {
-    public class
+    public sealed class
         GefyraColumnDescriptor
     :
-        AGefyraEntityDescriptor,
-        IGefyraSimplexizedColumnDescriptor,
-        IGefyraEntityDeclaringTableDescriptorDescriptor
+        AGefyraDescriptor,
+        IGefyraColumnDescriptor,
+        IGefyraDeclaringTableDescriptorDescriptor
     {
         #region ... static ...
 
@@ -36,6 +29,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
             sn = "!GefyraIgnoredColumn!";
             GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Ignored);
         }
+
         #endregion
 
         #region DeclaringTableDescriptor

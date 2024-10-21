@@ -88,4 +88,9 @@
       <HintPath>..\Kudos.Crypters\bin\Debug\net8.0\Kudos.Crypters.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Properties\launchSettings.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

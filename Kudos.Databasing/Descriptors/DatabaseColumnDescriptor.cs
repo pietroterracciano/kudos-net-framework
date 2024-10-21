@@ -18,6 +18,8 @@ using Kudos.Databasing.Enums;
 using static Mysqlx.Expect.Open.Types.Condition.Types;
 using Kudos.Utils;
 using System.Data.SqlTypes;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Kudos.Databasing.Descriptors
 {
@@ -26,6 +28,8 @@ namespace Kudos.Databasing.Descriptors
 	{
         #region ... static ...
 
+        private static readonly SemaphoreSlim
+            __ss;
         private static readonly Metas
             __m;
         private static readonly StringBuilder
@@ -79,6 +83,8 @@ namespace Kudos.Databasing.Descriptors
             __m = new Metas(StringComparison.OrdinalIgnoreCase);
             __sb = new StringBuilder();
 
+            __ss = new SemaphoreSlim(1);
+
             __sSQL =
                 "SELECT * FROM information_schema.COLUMNS WHERE " + __sTableName + " = @" + __sTableName + " AND " + __sTableSchema + " = @" + __sTableSchema;
         }
@@ -107,84 +113,258 @@ namespace Kudos.Databasing.Descriptors
 
         #region internal void static Get(...)
 
-        internal static void Get(ref IDatabaseHandler? dbh, ref DatabaseTableDescriptor? dbtd, ref String? sn, out DatabaseColumnDescriptor? dbcd)
+        internal static void Get
+        (
+            ref IDatabaseHandler? dbh,
+            ref String? sTableName,
+            ref String? sn,
+            out DatabaseColumnDescriptor? dcd
+        )
         {
-            DatabaseColumnDescriptor[]? dbcda;
-            Get(ref dbh, ref dbtd, out dbcda);
-            if (dbtd == null) { dbcd = null; return; }
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref dbh, ref sTableName, out dtd);
+            Get(ref dbh, ref dtd, ref sn, out dcd);
+        }
+        internal static void Get
+        (
+            ref IDatabaseHandler? dbh,
+            ref String? sSchemaName,
+            ref String? sTableName,
+            ref String? sn,
+            out DatabaseColumnDescriptor? dcd
+        )
+        {
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref dbh, ref sSchemaName, ref sTableName, out dtd);
+            Get(ref dbh, ref dtd, ref sn, out dcd);
+        }
+        internal static void Get
+        (
+            ref IDatabaseHandler? dbh,
+            ref DatabaseTableDescriptor? dtd,
+            ref String? sn,
+            out DatabaseColumnDescriptor? dcd
+        )
+        {
+            Task<DatabaseColumnDescriptor?> t = GetAsync(dbh, dtd, sn);
+            t.Wait();
+            dcd = t.Result;
+        }
+        internal static async Task<DatabaseColumnDescriptor?> GetAsync
+        (
+            IDatabaseHandler? dbh,
+            String? sTableName,
+            String? sn
+        )
+        {
+            return
+                await
+                    GetAsync
+                    (
+                        dbh,
+                        await
+                            DatabaseTableDescriptor.GetAsync
+                            (
+                                dbh,
+                                sTableName
+                            ),
+                        sn
+                    );
+        }
+        internal static async Task<DatabaseColumnDescriptor?> GetAsync
+        (
+            IDatabaseHandler? dbh,
+            String? sSchemaName,
+            String? sTableName,
+            String? sn
+        )
+        {
+            return
+                await
+                    GetAsync
+                    (
+                        dbh,
+                        await
+                            DatabaseTableDescriptor.GetAsync
+                            (
+                                dbh,
+                                sSchemaName,
+                                sTableName
+                            ),
+                        sn
+                    );
+        }
+        internal static async Task<DatabaseColumnDescriptor?> GetAsync
+        (
+            IDatabaseHandler? dbh,
+            DatabaseTableDescriptor? dtd,
+            String? sn
+        )
+        {
+            DatabaseColumnDescriptor[]? dcda = await GetAllAsync(dbh, dtd);
+            if (dcda == null) return null;
 
             String? shk;
             __CalculateHashKey(ref sn, out shk);
 
-            lock(__m)
+            await SemaphoreUtils.WaitSemaphoreAsync(__ss);
+
+            Metas?
+                m = __m.Get<Metas>(dtd.HashKey);
+
+            if (m == null)
             {
-                Metas?
-                    m = __m.Get<Metas>(dbtd.HashKey);
-
-                if(m == null) { dbcd = null; return; }
-
-                dbcd = m.Get<DatabaseColumnDescriptor>(shk);
+                SemaphoreUtils.ReleaseSemaphore(__ss);
+                return null;
             }
+
+            DatabaseColumnDescriptor?
+                dcd = m.Get<DatabaseColumnDescriptor>(shk);
+
+            SemaphoreUtils.ReleaseSemaphore(__ss);
+
+            return dcd;
         }
 
-        internal static void Get(ref IDatabaseHandler? dbh, ref DatabaseTableDescriptor? dbtd, out DatabaseColumnDescriptor[]? dbcda)
+        internal static void GetAll
+        (
+            ref IDatabaseHandler? dbh,
+            ref String? sTableName,
+            out DatabaseColumnDescriptor[]? dcda
+        )
         {
-            if (dbh == null || dbtd == null)
-            {
-                dbcda = null;
-                return;
-            }
-
-            lock (__m)
-            {
-                Metas?
-                    m = __m.Get<Metas>(dbtd.HashKey);
-
-                if (m != null)
-                {
-                    dbcda = m.Get<DatabaseColumnDescriptor[]>(String.Empty);
-                    return;
-                }
-
-                KeyValuePair<String, Object?>[]
-                   kvpa = new KeyValuePair<string, object?>[2];
-
-                kvpa[0] = new KeyValuePair<string, object?>(__sTableName, dbtd.TableName);
-                kvpa[1] = new KeyValuePair<string, object?>(__sTableSchema, dbtd.SchemaName);
-
-                DatabaseQueryResult
-                    dbqr = dbh.ExecuteQuery(__sSQL, kvpa);
-
-                if (dbqr.HasError)
-                {
-                    dbcda = null;
-                    return;
-                }
-
-                m = new Metas(StringComparison.OrdinalIgnoreCase);
-                __m.Set(dbtd.HashKey, m);
-
-                if (dbqr.HasData)
-                {
-                    DatabaseColumnDescriptor? dbcdi;
-                    List<DatabaseColumnDescriptor> li = new List<DatabaseColumnDescriptor>(dbqr.Data.Rows.Count);
-                    for (int i = 0; i < dbqr.Data.Rows.Count; i++)
-                    {
-                        __Get(ref dbtd, dbqr.Data.Rows[i], out dbcdi);
-                        if (dbcdi == null) continue;
-                        li.Add(dbcdi); m.Set(dbcdi.HashKey, dbcdi);
-                    }
-
-                    dbcda = li.ToArray();
-                }
-                else
-                    dbcda = null;
-
-                m.Set(String.Empty, dbcda);
-
-                dbcda = null;
-            }
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref dbh, ref sTableName, out dtd);
+            GetAll(ref dbh, ref dtd, out dcda);
         }
+        internal static void GetAll
+        (
+            ref IDatabaseHandler? dbh,
+            ref String? sSchemaName,
+            ref String? sTableName,
+            out DatabaseColumnDescriptor[]? dcda
+        )
+        {
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref dbh, ref sSchemaName, ref sTableName, out dtd);
+            GetAll(ref dbh, ref dtd, out dcda);
+        }
+        internal static void GetAll
+        (
+            ref IDatabaseHandler? dbh,
+            ref DatabaseTableDescriptor? dbtd,
+            out DatabaseColumnDescriptor[]? dcda
+        )
+        {
+            Task<DatabaseColumnDescriptor[]?> t = GetAllAsync(dbh, dbtd);
+            t.Wait();
+            dcda = t.Result;
+        }
+        internal static async Task<DatabaseColumnDescriptor[]?> GetAllAsync
+        (
+            IDatabaseHandler? dbh,
+            String? sTableName
+        )
+        {
+            return
+                await
+                    GetAllAsync
+                    (
+                        dbh,
+                        await
+                            DatabaseTableDescriptor.GetAsync
+                            (
+                                dbh,
+                                sTableName
+                            )
+                    );
+        }
+        internal static async Task<DatabaseColumnDescriptor[]?> GetAllAsync
+        (
+            IDatabaseHandler? dbh,
+            String? sSchemaName,
+            String? sTableName
+        )
+        {
+            return
+                await
+                    GetAllAsync
+                    (
+                        dbh,
+                        await
+                            DatabaseTableDescriptor.GetAsync
+                            (
+                                dbh,
+                                sSchemaName,
+                                sTableName
+                            )
+                    );
+        }
+        internal static async Task<DatabaseColumnDescriptor[]?> GetAllAsync
+        (
+            IDatabaseHandler? dbh,
+            DatabaseTableDescriptor? dtd
+        )
+        {
+            if (dbh == null || dtd == null)
+                return null;
+
+            await SemaphoreUtils.WaitSemaphoreAsync(__ss);
+
+            Metas?
+                m = __m.Get<Metas>(dtd.HashKey);
+
+            if (m != null)
+            {
+                SemaphoreUtils.ReleaseSemaphore(__ss);
+                return m.Get<DatabaseColumnDescriptor[]>(String.Empty);
+            }
+
+            KeyValuePair<String, Object?>[]
+                kvpa = new KeyValuePair<string, object?>[2];
+
+            kvpa[0] = new KeyValuePair<string, object?>(__sTableName, dtd.TableName);
+            kvpa[1] = new KeyValuePair<string, object?>(__sTableSchema, dtd.SchemaName);
+
+            DatabaseQueryResult
+                dbqr = await dbh.ExecuteQueryAsync(__sSQL, kvpa);
+
+            if (dbqr.HasError)
+            {
+                SemaphoreUtils.ReleaseSemaphore(__ss);
+                return null;
+            }
+
+            m = new Metas(StringComparison.OrdinalIgnoreCase);
+            __m.Set(dtd.HashKey, m);
+
+            DatabaseColumnDescriptor[]? dcda;
+
+            if (dbqr.HasData)
+            {
+                DatabaseColumnDescriptor? dbcdi;
+                List<DatabaseColumnDescriptor> li = new List<DatabaseColumnDescriptor>(dbqr.Data.Rows.Count);
+                for (int i = 0; i < dbqr.Data.Rows.Count; i++)
+                {
+                    __Get(ref dtd, dbqr.Data.Rows[i], out dbcdi);
+                    if (dbcdi == null) continue;
+                    li.Add(dbcdi); m.Set(dbcdi.HashKey, dbcdi);
+                }
+
+                dcda = li.ToArray();
+            }
+            else
+                dcda = null;
+
+            m.Set(String.Empty, dcda);
+
+            SemaphoreUtils.ReleaseSemaphore(__ss);
+
+            return dcda;
+        }
+
+
+
 
         private static void __Get(ref DatabaseTableDescriptor dbtd, DataRow? dr, out DatabaseColumnDescriptor? dbcd)
         {

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Serving.KaronteModule.Middlewares
 {
-    public abstract class AKaronteResponsingMiddleware<NonActionResultType>
+    public abstract class AKaronteResponsingMiddleware<ResponseType>
         : AContexizedKaronteMiddleware<KaronteResponsingContext>
     {
         protected AKaronteResponsingMiddleware(ref RequestDelegate rd) : base(ref rd) { }
@@ -32,18 +32,18 @@ namespace Kudos.Serving.KaronteModule.Middlewares
 
         protected override async Task OnBounceEnd(KaronteContext kc)
         {
-            NonActionResultType?
-                nar = ObjectUtils.Cast<NonActionResultType>(kc.ResponsingContext.NonActionResult);
+            ResponseType?
+                r = ObjectUtils.Cast<ResponseType>(kc.ResponsingContext.Response);
 
             Int32?
                 ihttpsc =
-                    OnNonActionResultTransformationToHttpResponseStatusCode(kc.ResponsingContext, nar);
+                    OnResponseToHttpResponseStatusCode(kc.ResponsingContext, r);
 
             if (ihttpsc != null)
                 kc.HttpContext.Response.StatusCode = ihttpsc.Value;
 
             Object? o =
-                OnNonActionResultTransformationToHttpResponseBody(kc.ResponsingContext, nar);
+                OnResponseToHttpResponseBody(kc.ResponsingContext, r);
 
             if (kc.JSONingContext == null) return;
 
@@ -67,8 +67,8 @@ namespace Kudos.Serving.KaronteModule.Middlewares
 
         //protected abstract NonActionResultType? OnNonActionResultCreation();
 
-        protected abstract Int32? OnNonActionResultTransformationToHttpResponseStatusCode(KaronteResponsingContext krc, NonActionResultType? nar);
+        protected abstract Int32? OnResponseToHttpResponseStatusCode(KaronteResponsingContext krc, ResponseType? r);
 
-        protected abstract Object? OnNonActionResultTransformationToHttpResponseBody(KaronteResponsingContext krc, NonActionResultType? nar);
+        protected abstract Object? OnResponseToHttpResponseBody(KaronteResponsingContext krc, ResponseType? r);
     }
 }

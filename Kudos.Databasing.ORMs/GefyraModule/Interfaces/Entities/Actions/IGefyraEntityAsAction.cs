@@ -9,7 +9,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Actions
     public interface 
         IGefyraEntityAsAction<T> 
     where 
-        T : IGefyraEntity
+        T : IGefyraSimplexizedEntity
     {
         public T As(String? sAlias);
     }

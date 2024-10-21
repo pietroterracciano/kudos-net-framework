@@ -1,26 +1,18 @@
 ﻿using Kudos.Constants;
-using Kudos.Databasing.ORMs.GefyraModule.Attributes;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
+using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
+using Kudos.Databasing.ORMs.GefyraModule.Entity;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
-using Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors;
-using Kudos.Databasing.ORMs.GefyraModule.Utils;
-using Kudos.Reflection.Utils;
 using Kudos.Types;
-using Kudos.Utils;
-using Kudos.Utils.Collections;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
+namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 {
-    public class GefyraTable
-    : 
-        AGefyraEntity<GefyraTable, GefyraTableDescriptor>, 
+    public sealed class GefyraTable
+    :
+        AGefyraComplexizedEntity<GefyraTable, GefyraTableDescriptor>,
         IGefyraTable
     {
         #region ... static ...
@@ -156,7 +148,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities
             _this = this;
             _m = new Metas(StringComparison.OrdinalIgnoreCase);
         }
-            
 
         #region Columns
 

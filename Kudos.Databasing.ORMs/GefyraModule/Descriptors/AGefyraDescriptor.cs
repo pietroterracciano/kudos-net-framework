@@ -1,20 +1,17 @@
-﻿using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Actions;
-using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities.Descriptors;
+﻿using Kudos.Databasing.ORMs.GefyraModule.Entity;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Actions;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Types;
-using Kudos.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
+namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 {
     public abstract class 
-        AGefyraEntityDescriptor
+        AGefyraDescriptor
     :
         TokenizedObject,
-        IGefyraEntityDescriptor
+        IGefyraDescriptor
     {
         private StringBuilder
             _sb;
@@ -35,7 +32,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
 
         #endregion
 
-        internal AGefyraEntityDescriptor(ref String shk, ref String sn)
+        internal AGefyraDescriptor(ref String shk, ref String sn)
         {
             _sb = _StringBuilder = new StringBuilder();
             HashKey = shk;
@@ -47,7 +44,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types.Entities.Descriptors
             String s; _GetSQL(out s); return s;
         }
 
-        string IGefyraEntityGetSQLAction.GetSQL()
+        string IGefyraGetSQLAction.GetSQL()
         {
             String s; _GetSQL(out s); return s;
         }

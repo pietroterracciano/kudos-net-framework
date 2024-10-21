@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace Kudos.Types
 {
     public class MonitorizedObject
-        : TokenizedObject
     {
         private readonly Object _lck;
 

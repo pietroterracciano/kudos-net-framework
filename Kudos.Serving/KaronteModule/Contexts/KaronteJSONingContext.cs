@@ -26,10 +26,12 @@ namespace Kudos.Serving.KaronteModule.Contexts
             SerializerOptions = kjsons.JsonSerializerOptions;
         }
 
-        //public Task<String?> SerializeAsync(object? o) { return Task.Run(() => Serialize(o)); }
-        public String? Serialize(object? o) { return JSONUtils.Serialize(o, SerializerOptions); }
+        public T? Copy<T>(T? o) { return JSONUtils.Copy(o, SerializerOptions); }
+        public Object? Copy(Object? o) { return JSONUtils.Copy(o, SerializerOptions); }
 
-        //public Task<ObjectType?> DeserializeAsync<ObjectType>(Object? o) { return Task.Run(() => Deserialize<ObjectType>(o)); }
-        public ObjectType? Deserialize<ObjectType>(Object? o) { return JSONUtils.Deserialize<ObjectType>(o, SerializerOptions); }
+        public String? Serialize(Object? o) { return JSONUtils.Serialize(o, SerializerOptions); }
+
+        public T? Deserialize<T>(String? s) { return JSONUtils.Deserialize<T>(s, SerializerOptions); }
+        public Object? Deserialize(Type? t, String? s) { return JSONUtils.Deserialize(t, s, SerializerOptions); }
     }
 }

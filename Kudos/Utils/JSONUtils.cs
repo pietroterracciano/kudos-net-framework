@@ -25,30 +25,30 @@ namespace Kudos.Utils
 
         #endregion
 
-        #region public static T? Deserialize<T>()
+        #region public static ... Deserialize...(...)
 
-        public static T? Deserialize<T>(Object? o, JsonSerializerOptions? jso = null)
+        public static T? Deserialize<T>(String? s, JsonSerializerOptions? jso = null)
         {
-            return ObjectUtils.Cast<T>(Deserialize(typeof(T), o, jso));
+            return ObjectUtils.Cast<T>(Deserialize(typeof(T), s, jso));
         }
-        public static Object? Deserialize(Type? t, Object? o, JsonSerializerOptions? jso = null)
+        public static Object? Deserialize(Type? t, String? s, JsonSerializerOptions? jso = null)
         {
             //if (DynamicUtils.IsNull(o) || t == null)
             //  return null;
 
-            if (t == null)
+            if (t == null || s == null)
                 return null;
 
-            dynamic
-                dnm = o as dynamic;
+            //dynamic
+            //    dnm = s as dynamic;
 
-            if (DynamicUtils.IsNull(o))
-                return null;
+            //if (DynamicUtils.IsNull(o))
+            //    return null;
 
             Object? o0;
             try
             {
-                o0 = JsonSerializer.Deserialize(dnm, t, jso);
+                o0 = JsonSerializer.Deserialize(s, t, jso);
             }
             catch
             {
@@ -121,6 +121,16 @@ namespace Kudos.Utils
 
         //    return default(Type);
         //}
+
+        #endregion
+
+        #region public static ... Copy...(...)
+
+        public static T? Copy<T>(T? o, JsonSerializerOptions? jso = null) { return ObjectUtils.Cast<T>(Copy(typeof(T), o, jso)); }
+        public static Object? Copy(Type? t, Object? o, JsonSerializerOptions? jso = null)
+        {
+            return Deserialize(t, Serialize(o, jso), jso);
+        }
 
         #endregion
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using Kudos.Types;
+
 namespace Kudos.Databasing.Descriptors
 {
 	public abstract class ADatabaseDescriptor

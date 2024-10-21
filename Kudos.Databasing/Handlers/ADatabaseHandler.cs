@@ -35,6 +35,7 @@ namespace Kudos.Databasing.Controllers
             DbCommandType
         > 
     :
+        SemaphorizedObject,
         IDatabaseHandler
         where DbConnectionStringBuilderType : DbConnectionStringBuilder
         where DbConnectionType : DbConnection, new()
@@ -45,9 +46,6 @@ namespace Kudos.Databasing.Controllers
 
         private DbCommandType?
             _oCommand;
-
-        private readonly Object
-            _lck;
 
         private IDatabaseHandler
             _this;
@@ -61,25 +59,40 @@ namespace Kudos.Databasing.Controllers
         {
             _this = this;
             Type = e;
-            _lck = new object();
             _eConnectionBehaviour = edcb;
             _oConnection = new DbConnectionType() { ConnectionString = csb.ToString() };
         }
 
         #region Connection
 
-        #region public DatabaseResult OpenConnection()
+        #region public ... ...DatabaseResult... OpenConnection...()
 
         public DatabaseResult OpenConnection()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnConnecting();
+            Task<DatabaseResult> tdr = OpenConnectionAsync();
+            tdr.Wait();
+            return tdr.Result;
+        }
+        public async Task<DatabaseResult> OpenConnectionAsync()
+        {
+            await _WaitSemaphoreAsync();
+            DatabaseResult dr = await _OpenConnectionAsync();
+            _ReleaseSemaphore();
+            return dr;
+        }
+        private async Task<DatabaseResult> _OpenConnectionAsync()
+        {
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
             DatabaseErrorResult? dber;
+
+            dbbr.StopOnWaiting().StartOnConnecting();
 
             if (!IsConnectionOpened())
             {
                 try
                 {
-                    _oConnection.Open();
+                    await _oConnection.OpenAsync();
                     dber = null;
                 }
                 catch (Exception e)
@@ -93,13 +106,13 @@ namespace Kudos.Databasing.Controllers
                     {
                         _oCommand = _oConnection.CreateCommand() as DbCommandType;
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         dber = new DatabaseErrorResult(ref e);
                     }
 
-                    if(
-                        dber == null 
+                    if (
+                        dber == null
                         && _oCommand == null
                     )
                         dber = new DatabaseErrorResult(CDatabaseErrorCode.InternalFailure, "Create Command is failed");
@@ -108,20 +121,12 @@ namespace Kudos.Databasing.Controllers
             else
                 dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsAlreadyOpened, "Connection is already opened");
 
+            dbbr.StopOnConnecting();
+
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        public Task<DatabaseResult> OpenConnectionAsync()
-        {
-            return Task.Run(
-                delegate ()
-                {
-                    return OpenConnection();
-                }
-            );
-        }
-
-        private void _AutoOpening()
+        private async Task _AutoOpenConnectionAsync()
         {
             if
             (
@@ -131,22 +136,39 @@ namespace Kudos.Databasing.Controllers
             )
                 return;
 
-            OpenConnection();
+            await _OpenConnectionAsync();
         }
 
         #endregion
 
-        #region public DatabaseResult CloseConnection()
+        #region public ... ...DatabaseResult... CloseConnection...()
 
         public DatabaseResult CloseConnection()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnConnecting();
+            Task<DatabaseResult> tdr = CloseConnectionAsync();
+            tdr.Wait();
+            return tdr.Result;
+        }
+        public async Task<DatabaseResult> CloseConnectionAsync()
+        {
+            await _WaitSemaphoreAsync();
+            DatabaseResult dr = await _CloseConnectionAsync();
+            _ReleaseSemaphore();
+
+            return dr;
+        }
+        private async Task<DatabaseResult> _CloseConnectionAsync()
+        {
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
             DatabaseErrorResult? dber;
+
+            dbbr.StopOnWaiting().StartOnExecuting();
 
             if (!IsConnectionClosed())
                 try
                 {
-                    _oConnection.Close();
+                    await _oConnection.CloseAsync();
                     dber = null;
                 }
                 catch (Exception e)
@@ -156,20 +178,12 @@ namespace Kudos.Databasing.Controllers
             else
                 dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsAlreadyClosed, "Connection is already closed");
 
+            dbbr.StopOnExecuting();
+
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        public Task<DatabaseResult> CloseConnectionAsync()
-        {
-            return Task.Run(
-                delegate ()
-                {
-                    return CloseConnection();
-                }
-            );
-        }
-
-        private void _AutoClosing()
+        private async Task _AutoCloseConnectionAsync()
         {
             if
             (
@@ -179,12 +193,12 @@ namespace Kudos.Databasing.Controllers
             )
                 return;
 
-            CloseConnection();
+            await _CloseConnectionAsync();
         }
 
         #endregion
 
-        #region Status
+        #region Boolean IsConnection...()
 
         public Boolean IsConnectionOpening()
         {
@@ -221,46 +235,30 @@ namespace Kudos.Databasing.Controllers
 
         #endregion
 
-        #region public Boolean ChangeSchema()
-
-        public Task<DatabaseResult> ChangeSchemaAsync(String? s) { return Task.Run(() => ChangeSchema(s)); }
-        public DatabaseResult ChangeSchema(String? s)
-        {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
-            DatabaseErrorResult? dber;
-
-            if (!IsConnectionOpened())
-                dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
-            else if(String.IsNullOrWhiteSpace(s))
-                dber = new DatabaseErrorResult(CDatabaseErrorCode.ParameterIsInvalid, "Parameter is invalid");
-            else
-                try 
-                {
-                    _oConnection.ChangeDatabase(s);
-                    dber = null;
-                } 
-                catch(Exception e)
-                {
-                    dber = new DatabaseErrorResult(ref e);
-                }
-
-            return new DatabaseResult(ref dber, ref dbbr);
-        }
-
-        #endregion
-
         #region Transaction
 
         public Boolean IsIntoTransaction()
         {
-            return _oCommand?.Transaction != null;
+            return
+                _oCommand != null
+                && _oCommand.Transaction != null;
         }
 
-        public Task<DatabaseResult> BeginTransactionAsync() { return Task.Run(BeginTransaction); }
         public DatabaseResult BeginTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
+            Task<DatabaseResult> tdr = BeginTransactionAsync();
+            tdr.Wait();
+            return tdr.Result;
+        }
+        public async Task<DatabaseResult> BeginTransactionAsync()
+        {
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
+            await _WaitSemaphoreAsync();
+
             DatabaseErrorResult? dber;
+
+            dbbr.StopOnWaiting().StartOnExecuting();
 
             if (!IsConnectionOpened())
                 dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
@@ -269,7 +267,7 @@ namespace Kudos.Databasing.Controllers
             else
                 try
                 {
-                    dber = (_oCommand.Transaction = _oConnection.BeginTransaction()) != null
+                    dber = (_oCommand.Transaction = await _oConnection.BeginTransactionAsync()) != null
                         ? null
                         : new DatabaseErrorResult(CDatabaseErrorCode.ImpossibleToBeginTransaction, "Impossible to begin Transaction");
                 }
@@ -278,14 +276,28 @@ namespace Kudos.Databasing.Controllers
                     dber = new DatabaseErrorResult(ref e);
                 }
 
+            dbbr.StopOnExecuting();
+
+            _ReleaseSemaphore();
+
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        public Task<DatabaseResult> CommitTransactionAsync() { return Task.Run(CommitTransaction); }
         public DatabaseResult CommitTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
+            Task<DatabaseResult> tdr = CommitTransactionAsync();
+            tdr.Wait();
+            return tdr.Result;
+        }
+        public async Task<DatabaseResult> CommitTransactionAsync()
+        {
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
+            await _WaitSemaphoreAsync();
+
             DatabaseErrorResult? dber;
+
+            dbbr.StopOnWaiting().StartOnExecuting();
 
             if (!IsConnectionOpened())
                 dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
@@ -294,8 +306,8 @@ namespace Kudos.Databasing.Controllers
             else
                 try
                 {
-                    _oCommand.Transaction.Commit();
-                    Transaction__DisposeAsync();
+                    await _oCommand.Transaction.CommitAsync();
+                    await _Transaction__DisposeAsync();
                     dber = null;
                 }
                 catch (Exception e)
@@ -303,14 +315,28 @@ namespace Kudos.Databasing.Controllers
                     dber = new DatabaseErrorResult(ref e);
                 }
 
+            dbbr.StopOnExecuting();
+
+            _ReleaseSemaphore();
+
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        public Task<DatabaseResult> RollbackTransactionAsync() { return Task.Run(RollbackTransaction); }
         public DatabaseResult RollbackTransaction()
         {
-            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnExecuting();
+            Task<DatabaseResult> tdr = RollbackTransactionAsync();
+            tdr.Wait();
+            return tdr.Result;
+        }
+        public async Task<DatabaseResult> RollbackTransactionAsync()
+        {
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
+            await _WaitSemaphoreAsync();
+
             DatabaseErrorResult? dber;
+
+            dbbr.StopOnWaiting().StartOnExecuting();
 
             if (!IsConnectionOpened())
                 dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
@@ -319,8 +345,8 @@ namespace Kudos.Databasing.Controllers
             else
                 try
                 {
-                    _oCommand.Transaction.Rollback();
-                    Transaction__DisposeAsync();
+                    await _oCommand.Transaction.RollbackAsync();
+                    await _Transaction__DisposeAsync();
                     dber = null;
                 }
                 catch (Exception e)
@@ -328,12 +354,16 @@ namespace Kudos.Databasing.Controllers
                     dber = new DatabaseErrorResult(ref e);
                 }
 
+            dbbr.StopOnExecuting();
+
+            _ReleaseSemaphore();
+
             return new DatabaseResult(ref dber, ref dbbr);
         }
 
-        private void Transaction__DisposeAsync()
+        private async Task _Transaction__DisposeAsync()
         {
-            try { _oCommand.Transaction.DisposeAsync(); } catch { }
+            try { await _oCommand.Transaction.DisposeAsync(); } catch { }
             _oCommand.Transaction = null;
         }
 
@@ -393,45 +423,86 @@ namespace Kudos.Databasing.Controllers
 
         #endregion
 
-        #region public DBNonQueryCommandResultModel ExecuteNonQuery
+        #region public ... ...DatabaseResult... ChangeSchema...(...)
 
-        public Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
+        public DatabaseResult ChangeSchema(String? s)
         {
-            return
-                Task.Run
-                (
-                    () =>
-                    {
-                        return ExecuteNonQuery(s, a);
-                    }
-                );
+            Task<DatabaseResult> tdr = ChangeSchemaAsync(s);
+            tdr.Wait();
+            return tdr.Result;
         }
+
+        public async Task<DatabaseResult> ChangeSchemaAsync(String? s)
+        {
+            DatabaseErrorResult? dber;
+
+            DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
+
+            await _WaitSemaphoreAsync();
+
+            dbbr.StopOnWaiting().StartOnExecuting();
+
+            if (!IsConnectionOpened())
+                dber = new DatabaseErrorResult(CDatabaseErrorCode.ConnectionIsClosed, "Connection is closed");
+            else if (String.IsNullOrWhiteSpace(s))
+                dber = new DatabaseErrorResult(CDatabaseErrorCode.ParameterIsInvalid, "Parameter is invalid");
+            else
+                try
+                {
+                    await _oConnection.ChangeDatabaseAsync(s);
+                    dber = null;
+                }
+                catch (Exception e)
+                {
+                    dber = new DatabaseErrorResult(ref e);
+                }
+
+            dbbr.StopOnWaiting().StopOnExecuting();
+
+            _ReleaseSemaphore();
+
+            return new DatabaseResult(ref dber, ref dbbr);
+        }
+
+        #endregion
+
+        #region public ... DatabaseNonQueryResult ... ExecuteNonQuery...(...)
+
         public DatabaseNonQueryResult ExecuteNonQuery(String? s, params KeyValuePair<String, Object?>[]? a)
+        {
+            Task<DatabaseNonQueryResult> t = ExecuteNonQueryAsync(s, a);
+            t.Wait();
+            return t.Result;
+        }
+        public async Task<DatabaseNonQueryResult> ExecuteNonQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
 
-            DataTable? dt;
+            await _WaitSemaphoreAsync();
+
+            dbbr.StopOnWaiting().StartOnConnecting();
+
+            await _AutoOpenConnectionAsync();
+
+            dbbr.StopOnConnecting().StartOnPreparing();
+
             DatabaseErrorResult? err;
+            Boolean b = Command__Prepare(ref s, ref a, out err);
+
+            dbbr.StopOnPreparing();
+
             Int64 lLastInsertedID;
             Int32 iUpdatedRows;
 
-            lock (_lck)
+            if (!b)
+                lLastInsertedID = iUpdatedRows = 0;
+            else
             {
-                dbbr.StopOnWaiting().StartOnConnecting();
-
-                _AutoOpening();
-
-                dbbr.StopOnConnecting().StartOnExecuting();
-
-                if (!Command__Prepare(ref s, ref a, out err))
-                {
-                    lLastInsertedID = iUpdatedRows = 0;
-                    goto END_METHOD;
-                }
+                dbbr.StartOnExecuting();
 
                 try
                 {
-                    iUpdatedRows = _oCommand.ExecuteNonQuery();
+                    iUpdatedRows = await _oCommand.ExecuteNonQueryAsync();
                     lLastInsertedID = ExecuteNonQuery_GetLastInsertedID(_oCommand);
                 }
                 catch (Exception e)
@@ -442,11 +513,11 @@ namespace Kudos.Databasing.Controllers
                 }
 
                 dbbr.StopOnExecuting();
-
-                _AutoClosing();
             }
 
-            END_METHOD:
+            await _AutoCloseConnectionAsync();
+
+            _ReleaseSemaphore();
 
             return new DatabaseNonQueryResult(ref lLastInsertedID, ref iUpdatedRows, ref err, ref dbbr);
         }
@@ -457,129 +528,172 @@ namespace Kudos.Databasing.Controllers
 
         #endregion
 
-        #region public ... ...DatabaseQueryResult... ExecuteQuery...()
-
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
-        {
-            return
-                Task.Run
-                (
-                    () =>
-                    {
-                        return ExecuteQuery(s, a);
-                    }
-                );
-        }
+        #region public ... ...DatabaseQueryResult... ExecuteQuery...(...);
+        
         public DatabaseQueryResult ExecuteQuery(String? s, params KeyValuePair<String, Object?>[]? a) { return ExecuteQuery(s, null, a); }
-        public Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32? iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? a)
-        {
-            return
-                Task.Run
-                (
-                    () =>
-                    {
-                        return ExecuteQuery(s, iExpectedRowsNumber, a);
-                    }
-                );
-        }
         public DatabaseQueryResult ExecuteQuery(String? s, Int32? iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? a)
+        {
+            Task<DatabaseQueryResult> t = ExecuteQueryAsync(s, iExpectedRowsNumber, a);
+            t.Wait();
+            return t.Result;
+        }
+        public async Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, params KeyValuePair<String, Object?>[]? a)
+        {
+            return await ExecuteQueryAsync(s, null, a);
+        }
+        public async Task<DatabaseQueryResult> ExecuteQueryAsync(String? s, Int32? iExpectedRowsNumber, params KeyValuePair<String, Object?>[]? a)
         {
             DatabaseBenchmarkResult dbbr = new DatabaseBenchmarkResult().StartOnWaiting();
 
-            DataTable? oDataTable;
+            await _WaitSemaphoreAsync();
+
+            dbbr.StopOnWaiting().StartOnConnecting();
+
+            await _AutoOpenConnectionAsync();
+
+            dbbr.StopOnConnecting().StartOnPreparing();
+
             DatabaseErrorResult? err;
+            Boolean b = Command__Prepare(ref s, ref a, out err);
 
-            lock (_lck)
+            dbbr.StopOnPreparing();
+
+            DataTable? dt;
+
+            if (!b)
+                dt = null;
+            else
             {
-                dbbr.StopOnWaiting().StartOnConnecting();
-
-                _AutoOpening();
-
-                dbbr.StopOnConnecting().StartOnExecuting();
-
-                if (!Command__Prepare(ref s, ref a, out err))
-                {
-                    oDataTable = null;
-                    goto END_METHOD;
-                }
+                dbbr.StartOnExecuting();
 
                 try
                 {
-                    DbDataReader oDataReader = _oCommand.ExecuteReader();
+                    DbDataReader oDataReader = await _oCommand.ExecuteReaderAsync();
 
                     if (oDataReader.HasRows)
                     {
-                        oDataTable = new DataTable();
+                        dt = new DataTable();
 
                         if (iExpectedRowsNumber != null && iExpectedRowsNumber > 0)
-                            oDataTable.MinimumCapacity = iExpectedRowsNumber.Value;
+                            dt.MinimumCapacity = iExpectedRowsNumber.Value;
 
-                        oDataTable.Load(oDataReader);
+                        dt.Load(oDataReader);
                     }
                     else
-                        oDataTable = null;
+                        dt = null;
 
-                    oDataReader.DisposeAsync();
+                    await oDataReader.DisposeAsync();
                 }
                 catch (Exception e)
                 {
-                    oDataTable = null;
+                    dt = null;
                     err = OnException(ref e);
                     if (err == null) err = new DatabaseErrorResult(ref e);
                 }
 
                 dbbr.StopOnExecuting();
-
-                _AutoClosing();
             }
 
-            END_METHOD:
+            await _AutoCloseConnectionAsync();
 
-            return new DatabaseQueryResult(ref oDataTable, ref err, ref dbbr);
+            _ReleaseSemaphore();
+
+            return new DatabaseQueryResult(ref dt, ref err, ref dbbr);
         }
 
         #endregion
 
-        #region public DatabaseTableDescriptor? GetTableDescriptor(...)
+        #region public ... ...DatabaseTableDescriptor?... GetTableDescriptor...(...)
 
-        public DatabaseTableDescriptor? GetTableDescriptor(String? sName) { return GetTableDescriptor(null, sName); }
+        public DatabaseTableDescriptor? GetTableDescriptor(String? sName)
+        {
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref _this, ref sName, out dtd);
+            return dtd;
+        }
         public DatabaseTableDescriptor? GetTableDescriptor(String? sSchemaName, String? sName)
         {
-            DatabaseTableDescriptor dbtd;
-            DatabaseTableDescriptor.Get(ref _this, ref sSchemaName, ref sName, out dbtd);
-            return dbtd;
+            DatabaseTableDescriptor? dtd;
+            DatabaseTableDescriptor.Get(ref _this, ref sSchemaName, ref sName, out dtd);
+            return dtd;
+        }
+        public async Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sName)
+        {
+            return await DatabaseTableDescriptor.GetAsync(_this, sName);
+        }
+        public async Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sSchemaName, String? sName)
+        {
+            return await DatabaseTableDescriptor.GetAsync(_this, sSchemaName, sName);
         }
 
         #endregion
 
-        #region public DatabaseColumnDescriptor? GetColumnDescriptor(...)
+        #region public ... ...DatabaseTableDescriptor?... GetColumnDescriptor...(...)
 
-        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName) { return GetColumnDescriptor(null, sTableName, sName); }
+        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName)
+        {
+            DatabaseColumnDescriptor? dcd;
+            DatabaseColumnDescriptor.Get(ref _this, ref sTableName, ref sName, out dcd);
+            return dcd;
+        }
         public DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName)
         {
-            return GetColumnDescriptor(GetTableDescriptor(sSchemaName, sTableName), sName);
+            DatabaseColumnDescriptor? dcd;
+            DatabaseColumnDescriptor.Get(ref _this, ref sSchemaName, ref sTableName, ref sName, out dcd);
+            return dcd;
         }
         public DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dscTable, String? sName)
         {
-            DatabaseColumnDescriptor? dbcd;
-            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, ref sName, out dbcd);
-            return dbcd;
+            DatabaseColumnDescriptor? dcd;
+            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, ref sName, out dcd);
+            return dcd;
+        }
+        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sTableName, String? sName)
+        {
+            return await DatabaseColumnDescriptor.GetAsync(_this, sTableName, sName);
+        }
+        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sSchemaName, String? sTableName, String? sName)
+        {
+            return await DatabaseColumnDescriptor.GetAsync(_this, sSchemaName, sTableName, sName);
+        }
+        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(DatabaseTableDescriptor? dscTable, String? sName)
+        {
+            return await DatabaseColumnDescriptor.GetAsync(_this, dscTable, sName);
         }
 
         #endregion
 
-        #region public DatabaseColumnDescriptor[]? GetColumnsDescriptors(...)
+        #region public ... ...DatabaseTableDescriptor[]?... GetColumnsDescriptors...(...)
 
-        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName) { return GetColumnsDescriptors(null, sTableName); }
+        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName)
+        {
+            DatabaseColumnDescriptor[]? dcda;
+            DatabaseColumnDescriptor.GetAll(ref _this, ref sTableName, out dcda);
+            return dcda;
+        }
         public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName)
         {
-            return GetColumnsDescriptors(GetTableDescriptor(sSchemaName, sTableName));
+            DatabaseColumnDescriptor[]? dcda;
+            DatabaseColumnDescriptor.GetAll(ref _this, ref sSchemaName, ref sTableName, out dcda);
+            return dcda;
         }
         public DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dscTable)
         {
-            DatabaseColumnDescriptor[]? dbcda;
-            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, out dbcda);
-            return dbcda;
+            DatabaseColumnDescriptor[]? dcda;
+            DatabaseColumnDescriptor.GetAll(ref _this, ref dscTable, out dcda);
+            return dcda;
+        }
+        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sTableName)
+        {
+            return await DatabaseColumnDescriptor.GetAllAsync(_this, sTableName);
+        }
+        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sSchemaName, String? sTableName)
+        {
+            return await DatabaseColumnDescriptor.GetAllAsync(_this, sSchemaName, sTableName);
+        }
+        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(DatabaseTableDescriptor? dscTable)
+        {
+            return await DatabaseColumnDescriptor.GetAllAsync(_this, dscTable);
         }
 
         #endregion
@@ -588,15 +702,13 @@ namespace Kudos.Databasing.Controllers
 
         public void Dispose()
         {
-            if(_oCommand != null) try {_oCommand.Dispose(); } catch { }
-            if (_oConnection != null) try { _oConnection.Dispose(); } catch { }
+            DisposeAsync().Wait();
         }
 
-        public async Task<ValueTask> DisposeAsync()
+        public async Task DisposeAsync()
         {
             if (_oCommand != null) try { await _oCommand.DisposeAsync(); } catch { }
             if (_oConnection != null) try { await _oConnection.DisposeAsync(); } catch { }
-            return ValueTask.CompletedTask;
         }
 
         #endregion

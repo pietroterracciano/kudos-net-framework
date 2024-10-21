@@ -20,18 +20,21 @@ namespace Kudos.Databasing.Results
         public TimeSpan ElapsedTimeOnWaiting { get; private set; }
         public TimeSpan ElapsedTimeOnConnecting { get; private set; }
         public TimeSpan ElapsedTimeOnExecuting { get; private set; }
+        public TimeSpan ElapsedTimeOnPreparing { get; private set; }
 
         private readonly Stopwatch
             _swOnConnecting,
             _swOnExecuting,
-            _swOnWaiting;
+            _swOnWaiting,
+            _swOnPreparing;
 
         internal DatabaseBenchmarkResult()
         {
             _swOnWaiting = new Stopwatch();
             _swOnExecuting = new Stopwatch();
             _swOnConnecting = new Stopwatch();
-            ElapsedTimeOnWaiting = ElapsedTimeOnConnecting = ElapsedTimeOnExecuting = TimeSpan.Zero;
+            _swOnPreparing = new Stopwatch();
+            ElapsedTimeOnPreparing = ElapsedTimeOnWaiting = ElapsedTimeOnConnecting = ElapsedTimeOnExecuting = TimeSpan.Zero;
         }
 
         internal DatabaseBenchmarkResult StartOnWaiting()
@@ -43,6 +46,12 @@ namespace Kudos.Databasing.Results
         internal DatabaseBenchmarkResult StartOnConnecting()
         {
             _swOnConnecting.Start();
+            return this;
+        }
+
+        internal DatabaseBenchmarkResult StartOnPreparing()
+        {
+            _swOnPreparing.Start();
             return this;
         }
 
@@ -63,6 +72,17 @@ namespace Kudos.Databasing.Results
             {
                 _swOnWaiting.Stop();
                 ElapsedTimeOnWaiting = _swOnWaiting.Elapsed;
+            }
+
+            return this;
+        }
+
+        internal DatabaseBenchmarkResult StopOnPreparing()
+        {
+            if (_swOnPreparing.IsRunning)
+            {
+                _swOnPreparing.Stop();
+                ElapsedTimeOnWaiting = _swOnPreparing.Elapsed;
             }
 
             return this;
@@ -92,7 +112,7 @@ namespace Kudos.Databasing.Results
 
         internal DatabaseBenchmarkResult Stop()
         {
-            return StopOnWaiting().StopOnConnecting().StopOnExecuting();
+            return StopOnWaiting().StopOnConnecting().StopOnPreparing().StopOnExecuting();
         }
     }
 }
