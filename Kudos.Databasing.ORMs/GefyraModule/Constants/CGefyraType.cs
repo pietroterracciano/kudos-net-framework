@@ -9,7 +9,8 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Constants
 		public static readonly Type
 			IGefyraTable = typeof(IGefyraTable),
 			IGefyraColumn = typeof(IGefyraColumn),
-			EGefyraJoin = typeof(EGefyraJoin);
+			EGefyraJoin = typeof(EGefyraJoin),
+            EGefyraPost = typeof(EGefyraPost);
     }
 }
 

@@ -3,7 +3,7 @@
     "Kudos.Serving": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:57807",
+      "applicationUrl": "http://localhost:22731",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

@@ -194,19 +194,50 @@ namespace Kudos.Databasing.ORMs.GefyraModule
 
         #region Fit
 
+        public static void FitInPlace<T>(IDatabaseHandler? dbh, T? o)
+        {
+            FitInPlace(dbh, o, CBindingFlags.PublicInstance);
+        }
+        public static void FitInPlace<T>(IDatabaseHandler? dbh, T? o, BindingFlags bf)
+        {
+            Task t = FitAsyncInPlace(dbh, o, bf);
+            t.Wait();
+        }
         public static T? Fit<T>(IDatabaseHandler? dbh, T? o)
         {
-            Task<T?> t = FitAsync(dbh, o);
+            return Fit(dbh, o, CBindingFlags.PublicInstance);
+        }
+        public static T? Fit<T>(IDatabaseHandler? dbh, T? o, BindingFlags bf)
+        {
+            Task<T?> t = FitAsync(dbh, o, bf);
             t.Wait();
             return t.Result;
         }
+        public static async Task FitAsyncInPlace<T>(IDatabaseHandler? dbh, T? o)
+        {
+            await __FitAsync(dbh, o, CBindingFlags.PublicInstance, true);
+        }
+        public static async Task FitAsyncInPlace<T>(IDatabaseHandler? dbh, T? o, BindingFlags bf)
+        {
+            await __FitAsync(dbh, o, bf, true);
+        }
         public static async Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? o)
         {
-            return await __FitAsync(dbh, o, null);
+            return await FitAsync<T>(dbh, o, CBindingFlags.PublicInstance);
         }
-        private static async Task<T?> __FitAsync<T>(IDatabaseHandler? dbh, T? o, Boolean? bInPlace = null)
+        public static async Task<T?> FitAsync<T>(IDatabaseHandler? dbh, T? o, BindingFlags bf)
+        {
+            return await __FitAsync(dbh, o, bf, null);
+        }
+        private static async Task<T?> __FitAsync<T>
+        (
+            IDatabaseHandler? dbh,
+            T? o,
+            BindingFlags bf,
+            Boolean? bInPlace = null
+        )
         { 
-            if (dbh == null)
+            if (dbh == null || o == null)
                 return bInPlace != null && bInPlace.Value ? o : default(T);
 
             IGefyraTable
@@ -220,12 +251,12 @@ namespace Kudos.Databasing.ORMs.GefyraModule
                 o0 = o;
             else
             {
-                o0 = ReflectionUtils.Copy(o, CBindingFlags.Instance);
+                o0 = ReflectionUtils.Copy(o, bf);
                 if (o0 == null) return o0;
             }
 
             MemberInfo[]?
-                mia = ReflectionUtils.GetMembers<T>(CBindingFlags.Instance);
+                mia = ReflectionUtils.GetMembers<T>(bf);
 
             if (mia == null)
                 return o0;
@@ -268,7 +299,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule
                         : NumericUtils.ParseToNNType(dbcd.DataTypeDescriptor.DeclaringType);
             else
                 tDeclaring = dbcd.DataTypeDescriptor.DeclaringType;
-            
+
             oOut = ObjectUtils.Parse(tDeclaring, oIn);
 
             #region UInt16
@@ -366,6 +397,10 @@ namespace Kudos.Databasing.ORMs.GefyraModule
                 if (i != null) oOut = StringUtils.Truncate(oOut as String, i.Value);
             }
             #endregion
+            #region Char
+            else if (tDeclaring == CType.Char || tDeclaring == CType.NullableChar)
+                oOut = oOut as Char?;
+            #endregion
 
             if (oOut == null)
                 oOut = dbcd.DefaultValue;
@@ -414,8 +449,8 @@ namespace Kudos.Databasing.ORMs.GefyraModule
             else if (tDeclaring == CType.String)
                 oOut = String.Empty;
             #endregion
-            #region String
-            else if (tDeclaring == CType.Char)
+            #region Char
+            else if (tDeclaring == CType.Char || tDeclaring == CType.NullableChar)
                 oOut = CCharacter.Null;
             #endregion
 

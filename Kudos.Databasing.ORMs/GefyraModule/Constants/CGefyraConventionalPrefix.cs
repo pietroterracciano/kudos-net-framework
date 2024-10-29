@@ -15,6 +15,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Constants
         {
             internal static readonly String
                 Object = "o",
+                Char = "c",
                 Boolean = "b",
                 String = "s",
                 UInt16 = "ushr",

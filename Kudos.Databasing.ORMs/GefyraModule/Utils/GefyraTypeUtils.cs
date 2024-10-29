@@ -29,7 +29,8 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Utils
 
                 { CType.Single, CGefyraConventionalPrefix.Member.Single },
                 { CType.Double, CGefyraConventionalPrefix.Member.Double },
-                { CType.Decimal, CGefyraConventionalPrefix.Member.Decimal }
+                { CType.Decimal, CGefyraConventionalPrefix.Member.Decimal },
+                { CType.Char, CGefyraConventionalPrefix.Member.Char }
             };
         }
 

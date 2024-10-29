@@ -455,7 +455,7 @@ namespace Kudos.Reflection.Utils
 
         #region public static Boolean SetMemberValue(...)
 
-        public static bool SetMemberValue(object? o, MemberInfo? mi, object? ov, bool bForceValueCompatibility = true)
+        public static bool SetMemberValue(object? o, MemberInfo? mi, object? ov, bool bForceValueCompatibility = false)
         {
             if (mi != null)
                 switch (mi.MemberType)
@@ -946,13 +946,37 @@ namespace Kudos.Reflection.Utils
 
         #region public static ... Copy<...>()
 
-        public static T? Copy<T>(T? o, BindingFlags bf = CBindingFlags.PublicInstance)
+        public static T? Copy<T>(T? o)
+        {
+            return Copy<T>(o, CBindingFlags.PublicInstance);
+        }
+        public static T? Copy<T>(T? o, BindingFlags bf)
+        {
+            return Copy<T>(o, bf, null);
+        }
+        public static T? Copy<T>(T? o, params MemberInfo?[]? aMembersToCopy)
+        {
+            return Copy<T>(o, CBindingFlags.PublicInstance, aMembersToCopy);
+        }
+        public static T? Copy<T>(T? o, BindingFlags bf, params MemberInfo?[]? aMembersToCopy)
         {
             if (o == null) return default(T);
             T? o0 = ReflectionUtils.InvokeConstructor<T>(ReflectionUtils.GetConstructor(o.GetType(), bf));
-            return Copy(ref o, ref o0, bf) ? o0 : default(T);
+            return Copy(ref o, ref o0, bf, aMembersToCopy) ? o0 : default(T);
         }
-        public static Boolean Copy<T>(ref T? oIn, ref T? oOut, BindingFlags bf = CBindingFlags.PublicInstance)
+        public static Boolean Copy<T>(ref T? oIn, ref T? oOut)
+        {
+            return Copy<T>(ref oIn, ref oOut, CBindingFlags.PublicInstance);
+        }
+        public static Boolean Copy<T>(ref T? oIn, ref T? oOut, BindingFlags bf)
+        {
+            return Copy<T>(ref oIn, ref oOut, bf, null);
+        }
+        public static Boolean Copy<T>(ref T? oIn, ref T? oOut, params MemberInfo?[]? aMembersToCopy)
+        {
+            return Copy<T>(ref oIn, ref oOut, CBindingFlags.PublicInstance, aMembersToCopy);
+        }
+        public static Boolean Copy<T>(ref T? oIn, ref T? oOut, BindingFlags bf, params MemberInfo?[]? aMembersToCopy)
         {
             if (oIn == null || oOut == null)
                 return false;
@@ -966,16 +990,31 @@ namespace Kudos.Reflection.Utils
             if (a == null)
                 return true;
 
+            HashSet<String>? hsMembersToCopy;
+
+            if (aMembersToCopy != null)
+            {
+                hsMembersToCopy = new HashSet<string>(aMembersToCopy.Length);
+                for (int i = 0; i < aMembersToCopy.Length; i++)
+                {
+                    if (aMembersToCopy[i] == null) continue;
+                    hsMembersToCopy.Add(aMembersToCopy[i].Name);
+                }
+            }
+            else
+                hsMembersToCopy = null;
+
             Type? ti, ti0;
             Object? oi;
             for (int i = 0; i < a.Length; i++)
             {
+                if (hsMembersToCopy != null && !hsMembersToCopy.Contains(a[i].Name)) continue;
                 ti = ReflectionUtils.GetMemberValueType(a[i]);
                 if (ti == null) continue;
                 oi = ReflectionUtils.GetMemberValue(oIn, a[i]);
                 ti0 = Nullable.GetUnderlyingType(ti);
                 if (ti0 != null) ti = ti0;
-                if (!ti.IsPrimitive) oi = JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
+                if (!ti.IsPrimitive) Copy(ref oi, ref oi, bf);  //JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
                 ReflectionUtils.SetMemberValue(oOut, a[i], oi, false);
             }
 
