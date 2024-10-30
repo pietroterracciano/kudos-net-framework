@@ -11,6 +11,7 @@ namespace Kudos.Constants
         public static readonly Char
             Null = '\0',
             At = '@',
+            Gate = '#',
             Asterisk = '*',
             Dot = '.',
             DoubleDot = ':',
