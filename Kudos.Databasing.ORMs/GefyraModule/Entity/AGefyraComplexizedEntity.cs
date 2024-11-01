@@ -4,18 +4,19 @@ using System.Text;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Actions;
+using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Entity
 {
     public abstract class
-        AGefyraComplexizedEntity<EntityType, DescriptorType>
+        AGefyraComplexizedEntity<EntityType, DescriptorType, DatabaseDescriptorType>
     :
         AGefyraSimplexizedEntity<EntityType>,
         IGefyraComplexizedEntity
     where
-        EntityType : AGefyraComplexizedEntity<EntityType, DescriptorType>
+        EntityType : AGefyraComplexizedEntity<EntityType, DescriptorType, DatabaseDescriptorType>
     where
-        DescriptorType : IGefyraDescriptor
+        DescriptorType : AGefyraDescriptor<DatabaseDescriptorType>
     {
         private /*readonly*/ StringBuilder
             _sb;
@@ -23,14 +24,14 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
             _sSQL;
         private readonly Metas
             _mAlias;
-        protected readonly DescriptorType
-            _Descriptor;
+        internal readonly DescriptorType
+            Descriptor;
         private EntityType
             _this;
 
         #region Name
 
-        public string Name { get { return _Descriptor.Name; } }
+        public string Name { get { return Descriptor.Name; } }
 
         #endregion
 
@@ -41,9 +42,15 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
 
         #endregion
 
-        #region HashKey
+        #region IsIgnored
 
-        public override string HashKey { get { return _Descriptor.HashKey; } }
+        public override Boolean IsIgnored { get { return Descriptor.IsIgnored; } }
+
+        #endregion
+
+        #region IsInvalid
+
+        public override Boolean IsInvalid { get { return Descriptor.IsInvalid; } }
 
         #endregion
 
@@ -51,14 +58,14 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
         {
             _sb = et._sb;
             _mAlias = et._mAlias;
-            _Descriptor = et._Descriptor;
+            Descriptor = et.Descriptor;
             HasAlias = !String.IsNullOrWhiteSpace(Alias = sa);
         }
         protected AGefyraComplexizedEntity(ref DescriptorType dsc) : this()
         {
             _sb = new StringBuilder();
             _mAlias = new Metas(StringComparison.OrdinalIgnoreCase);
-            _Descriptor = dsc;
+            Descriptor = dsc;
         }
 
         private AGefyraComplexizedEntity() { _this = this as EntityType; }
@@ -80,7 +87,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
                 if (_sSQL == null)
                 {
                     _sb.Clear();
-                    _sb.Append(_Descriptor.GetSQL());
+                    _sb.Append(Descriptor.GetSQL());
                     _OnGetSQL(ref _sb);
                     _sSQL = _sb.ToString();
                 }

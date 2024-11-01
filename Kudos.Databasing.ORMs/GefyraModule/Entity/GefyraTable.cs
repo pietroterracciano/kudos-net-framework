@@ -1,4 +1,5 @@
 ﻿using Kudos.Constants;
+using Kudos.Databasing.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Entity;
@@ -12,7 +13,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 {
     public sealed class GefyraTable
     :
-        AGefyraComplexizedEntity<GefyraTable, GefyraTableDescriptor>,
+        AGefyraComplexizedEntity<GefyraTable, GefyraTableDescriptor, DatabaseTableDescriptor>,
         IGefyraTable
     {
         #region ... static ...
@@ -20,6 +21,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
         // TableDescriptorHashKey -> IGefyraTable
         private static readonly Metas
             __m;
+
         internal static readonly GefyraTable
             Invalid,
             Ignored;
@@ -123,15 +125,15 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 
         #region SchemaName
 
-        public string? SchemaName { get { return _Descriptor.SchemaName; } }
-        public bool HasSchemaName { get { return _Descriptor.HasSchemaName; } }
+        public string? SchemaName { get { return Descriptor.SchemaName; } }
+        public bool HasSchemaName { get { return Descriptor.HasSchemaName; } }
 
         #endregion
 
         #region DeclaringType
 
-        public Type? DeclaringType { get { return _Descriptor.DeclaringType; } }
-        public Boolean HasDeclaringType { get { return _Descriptor.HasSchemaName; } }
+        public Type? DeclaringType { get { return Descriptor.DeclaringType; } }
+        public Boolean HasDeclaringType { get { return Descriptor.HasSchemaName; } }
 
         #endregion
 
@@ -167,7 +169,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
         )
         {
             GefyraColumnDescriptor gcd;
-            _Descriptor.RequestColumnDescriptor(ref mi, out gcd);
+            Descriptor.RequestColumnDescriptor(ref mi, out gcd);
             RequestColumn(ref gcd, out gc);
         }
 
@@ -178,7 +180,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
         )
         {
             GefyraColumnDescriptor gcd;
-            _Descriptor.RequestColumnDescriptor(ref sn, out gcd);
+            Descriptor.RequestColumnDescriptor(ref sn, out gcd);
             RequestColumn(ref gcd, out gc);
         }
 
@@ -190,7 +192,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
         )
         {
             GefyraColumnDescriptor gcd;
-            _Descriptor.RequestColumnDescriptor(ref mi, ref sn, out gcd);
+            Descriptor.RequestColumnDescriptor(ref mi, ref sn, out gcd);
             RequestColumn(ref gcd, out gc);
         }
 
@@ -215,7 +217,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 
         protected override void _OnAs(ref GefyraTable gti, ref string? sa, out GefyraTable? gto)
         {
-            if (gti == Invalid || String.IsNullOrWhiteSpace(sa)) { gto = null; return; }
+            if (gti.IsInvalid || gti.IsIgnored || String.IsNullOrWhiteSpace(sa)) { gto = null; return; }
             gto = new GefyraTable(ref gti, ref sa);
         }
 

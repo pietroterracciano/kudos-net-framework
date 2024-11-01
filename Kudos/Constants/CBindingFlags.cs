@@ -17,6 +17,7 @@ namespace Kudos.Constants
             NonPublicStatic = BindingFlags.NonPublic | BindingFlags.Static,
             NonPublic = NonPublicInstance | NonPublicStatic,
             Instance = PublicInstance | NonPublicInstance,
+            InstanceProperty = PublicInstance | NonPublicInstance,
             All = Public | NonPublic;
     }
 }

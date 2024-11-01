@@ -1,4 +1,5 @@
 ﻿using Kudos.Constants;
+using Kudos.Databasing.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Entity;
@@ -11,7 +12,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 {
     public sealed class GefyraColumn
     :
-        AGefyraComplexizedEntity<GefyraColumn, GefyraColumnDescriptor>,
+        AGefyraComplexizedEntity<GefyraColumn, GefyraColumnDescriptor, DatabaseColumnDescriptor>,
         IGefyraColumn
     {
         #region ... static ...
@@ -38,14 +39,14 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 
         #region DeclaringMember
 
-        public MemberInfo? DeclaringMember { get { return _Descriptor.DeclaringMember; } }
-        public Boolean HasDeclaringMember { get { return _Descriptor.HasDeclaringMember; } }
+        public MemberInfo? DeclaringMember { get { return Descriptor.DeclaringMember; } }
+        public Boolean HasDeclaringMember { get { return Descriptor.HasDeclaringMember; } }
 
         #endregion
 
         #region IsSpecial
 
-        public Boolean IsSpecial { get { return _Descriptor.IsSpecial; } }
+        public Boolean IsSpecial { get { return Descriptor.IsSpecial; } }
 
         #endregion
 
@@ -60,7 +61,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 
         protected override void _OnAs(ref GefyraColumn gci, ref string? sa, out GefyraColumn? gco)
         {
-            if (gci == Invalid || String.IsNullOrWhiteSpace(sa)) { gco = null; return; }
+            if (gci.IsIgnored || gci.IsInvalid || String.IsNullOrWhiteSpace(sa)) { gco = null; return; }
             gco = new GefyraColumn(ref gci, ref sa);
         }
 
@@ -69,7 +70,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
             if (DeclaringTable.HasAlias)
                 sb
                     .Replace(
-                        _Descriptor.DeclaringTableDescriptor.GetSQL(),
+                        Descriptor.DeclaringTableDescriptor.GetSQL(),
                         CCharacter.BackTick + DeclaringTable.Alias + CCharacter.BackTick
                     );
 

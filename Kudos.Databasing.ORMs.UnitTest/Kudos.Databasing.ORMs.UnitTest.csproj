@@ -9,5 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kudos.Databasing.ORMs\Kudos.Databasing.ORMs.csproj" />
+    <ProjectReference Include="..\Kudos.Databasing\Kudos.Databasing.csproj" />
   </ItemGroup>
 </Project>

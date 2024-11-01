@@ -1,4 +1,5 @@
 ﻿using Kudos.Constants;
+using Kudos.Databasing.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Attributes;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
@@ -16,7 +17,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
     public sealed class
         GefyraTableDescriptor
     :
-        AGefyraDescriptor,
+        AGefyraDescriptor<DatabaseTableDescriptor>,
         IGefyraTableDescriptor
     {
         #region ... static ...
@@ -266,6 +267,18 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
         #endregion
 
+        #region IsInvalid
+
+        public override Boolean IsInvalid { get { return this == Invalid; } }
+
+        #endregion
+
+        #region IsIgnored
+
+        public override Boolean IsIgnored { get { return this == Ignored; } }
+
+        #endregion
+
         // MemberInfo -> IGefyraColumnDescriptor
         private readonly Dictionary<MemberInfo, GefyraColumnDescriptor>
             _d;
@@ -319,7 +332,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
             if 
             (
                 mi == null 
-                || !(MemberTypes.Property | MemberTypes.Field).HasFlag(ReflectionUtils.GetMemberType(mi))
+                || !CGefyraMemberTypes.FieldProperty.HasFlag(ReflectionUtils.GetMemberType(mi))
                 || mi.DeclaringType != DeclaringType
             )
             {

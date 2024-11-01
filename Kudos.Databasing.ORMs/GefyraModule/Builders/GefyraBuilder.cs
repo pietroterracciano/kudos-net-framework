@@ -1,6 +1,7 @@
 ﻿using Kudos.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Builts;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
+using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Enums;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces;
@@ -126,8 +127,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         private Boolean _Append(ref IGefyraTable? gt)
         {
-            if (gt == null) { _Append(GefyraTable.Invalid.GetSQL()); return false; }
-            else if (gt == GefyraTable.Ignored) return false;
+            if (gt == null) { _Append(GefyraTableDescriptor.Invalid.GetSQL()); return false; }
             _Append(gt.GetSQL()); return true;
         }
 
@@ -145,8 +145,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         private void _Append(ref IGefyraColumn? gc)
         {
-            if (gc == null) { _Append(GefyraColumn.Invalid.GetSQL()); return; }
-            else if (gc == GefyraColumn.Ignored) return;
+            if (gc == null) { _Append(GefyraColumnDescriptor.Invalid.GetSQL()); return; }
             _Append(gc.GetSQL()); _lgcConsumed.Add(gc);
         }
 

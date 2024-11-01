@@ -42,6 +42,8 @@
     <None Remove="GefyraModule\Interfaces\Entities\Actions\" />
     <None Remove="GefyraModule\Descriptors\" />
     <None Remove="GefyraModule\Interfaces\Actions\" />
+    <None Remove="GefyraModule\Interfaces\Contexts\" />
+    <Compile Remove="GefyraModule\Entity\GefyraJoin.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +99,7 @@
     <Compile Include="GefyraModule\Enums\EGefyraPost.cs" />
     <Compile Include="GefyraModule\Enums\EGefyraAgainst.cs" />
     <Compile Include="GefyraModule\Contexts\GefyraContext.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraClausole.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
@@ -114,5 +117,6 @@
     <Folder Include="GefyraModule\Interfaces\Entities\Actions\" />
     <Folder Include="GefyraModule\Descriptors\" />
     <Folder Include="GefyraModule\Interfaces\Actions\" />
+    <Folder Include="GefyraModule\Interfaces\Contexts\" />
   </ItemGroup>
 </Project>

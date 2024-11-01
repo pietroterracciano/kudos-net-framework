@@ -16,7 +16,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
 	{
         #region DeclaringColumn
 
-        public IGefyraColumn DeclaringColumn { get; private set; }
+        public AGefyraColumn DeclaringColumn { get; private set; }
 
         #endregion
 

@@ -16,6 +16,7 @@ using Kudos.Databasing.ORMs.GefyraModule.Contexts;
 using Kudos.Databasing.ORMs.GefyraModule.Entities;
 using Kudos.Databasing.ORMs.GefyraModule.Enums;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Builders;
+using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Contexts;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
 using Kudos.Reflection.Utils;
 using Kudos.Types;
@@ -46,9 +47,9 @@ namespace Kudos.Databasing.ORMs.GefyraModule
 
         #region public static IGefyraContext RequestContext()
 
-        public static GefyraContext<T> RequestBuilder<T>()
+        public static IGefyraContext<T> RequestContext<T>(IDatabaseHandler? dh)
         {
-            return new GefyraContext<T>();
+            return new GefyraContext<T>(ref dh);
         }
 
         #endregion
@@ -141,10 +142,10 @@ namespace Kudos.Databasing.ORMs.GefyraModule
             if (dr == null)
                 return null;
 
-            IGefyraTable
-                gt = Gefyra.RequestTable(t);
+            GefyraTable gt;
+            GefyraTable.Request(ref t, out gt);
 
-            if (gt == GefyraTable.Invalid)
+            if (gt.IsIgnored || gt.IsInvalid)
                 return null;
 
             Object?
@@ -181,7 +182,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule
                 if (gci == null)
                     gci = gt.RequestColumn(dr.Table.Columns[i].ColumnName);
 
-                if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember)
+                if (gci.IsInvalid || gci.IsIgnored || !gci.HasDeclaringMember)
                     continue;
 
                 ReflectionUtils.SetMemberValue(o, gci.DeclaringMember, DataRowUtils.GetValue(dr, i), true);
@@ -240,12 +241,12 @@ namespace Kudos.Databasing.ORMs.GefyraModule
             if (dbh == null || o == null)
                 return bInPlace != null && bInPlace.Value ? o : default(T);
 
-            IGefyraTable
-                gt = Gefyra.RequestTable<T>();
+            GefyraTable gt;
+            GefyraTable.Request<T>(out gt);
 
             T? o0;
 
-            if (gt == GefyraTable.Invalid)
+            if (gt.IsIgnored || gt.IsInvalid)
                 return bInPlace != null && bInPlace.Value ? o : default(T);
             else if (bInPlace != null && bInPlace.Value)
                 o0 = o;
@@ -268,7 +269,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule
             for (int i=0; i<mia.Length; i++)
             {
                 gci = gt.RequestColumn(mia[i].Name);
-                if (gci == GefyraColumn.Invalid || !gci.HasDeclaringMember) continue;
+                if (gci.IsInvalid || gci.IsIgnored || !gci.HasDeclaringMember) continue;
                 dbcdi = await dbh.GetColumnDescriptorAsync(gci.DeclaringTable.SchemaName, gci.DeclaringTable.Name, gci.Name);
                 if (dbcdi == null) continue;
                 oi = ReflectionUtils.GetMemberValue(o, mia[i]);

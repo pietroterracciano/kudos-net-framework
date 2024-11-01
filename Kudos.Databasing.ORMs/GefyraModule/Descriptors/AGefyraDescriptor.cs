@@ -1,4 +1,5 @@
-﻿using Kudos.Databasing.ORMs.GefyraModule.Entity;
+﻿using Kudos.Databasing.Descriptors;
+using Kudos.Databasing.ORMs.GefyraModule.Entity;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Actions;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Types;
@@ -8,7 +9,7 @@ using System.Text;
 namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 {
     public abstract class 
-        AGefyraDescriptor
+        AGefyraDescriptor<DatabaseDescriptorType>
     :
         TokenizedObject,
         IGefyraDescriptor
@@ -28,7 +29,31 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
         #region HashKey
 
-        public string HashKey { get; private set; }
+        internal string HashKey { get; private set; }
+
+        #endregion
+
+        #region IsInvalid
+
+        public abstract Boolean IsInvalid { get; }
+
+        #endregion
+
+        #region IsIgnored
+
+        public abstract Boolean IsIgnored { get; }
+
+        #endregion
+
+        #region DatabaseDescriptor
+
+        private DatabaseDescriptorType? _ddt;
+        internal DatabaseDescriptorType? DatabaseDescriptor
+        {
+            get { return _ddt; }
+            set { HasDatabaseDescriptor = (_ddt = value) != null; }
+        }
+        internal Boolean HasDatabaseDescriptor { get; private set; }
 
         #endregion
 

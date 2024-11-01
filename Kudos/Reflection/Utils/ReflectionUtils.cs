@@ -1014,7 +1014,14 @@ namespace Kudos.Reflection.Utils
                 oi = ReflectionUtils.GetMemberValue(oIn, a[i]);
                 ti0 = Nullable.GetUnderlyingType(ti);
                 if (ti0 != null) ti = ti0;
-                if (!ti.IsPrimitive) Copy(ref oi, ref oi, bf);  //JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
+
+                if
+                (
+                    !ti.IsPrimitive
+                    && ti != CType.String
+                )
+                    Copy(ref oi, ref oi, bf);  //JSONUtils.Deserialize(ti, JSONUtils.Serialize(oi));
+
                 ReflectionUtils.SetMemberValue(oOut, a[i], oi, false);
             }
 

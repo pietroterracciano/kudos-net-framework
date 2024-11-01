@@ -1,4 +1,5 @@
 ﻿using Kudos.Constants;
+using Kudos.Databasing.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
 using System;
@@ -12,7 +13,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
     public sealed class
         GefyraColumnDescriptor
     :
-        AGefyraDescriptor,
+        AGefyraDescriptor<DatabaseColumnDescriptor>,
         IGefyraColumnDescriptor,
         IGefyraDeclaringTableDescriptorDescriptor
     {
@@ -48,6 +49,18 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
         #region IsSpecial
 
         public Boolean IsSpecial { get; private set; }
+
+        #endregion
+
+        #region IsInvalid
+
+        public override Boolean IsInvalid { get { return this == Invalid; } }
+
+        #endregion
+
+        #region IsIgnored
+
+        public override Boolean IsIgnored { get { return this == Ignored; } }
 
         #endregion
 

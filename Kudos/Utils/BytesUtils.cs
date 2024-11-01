@@ -1,4 +1,5 @@
-﻿using Kudos.Enums;
+﻿using Kudos.Encoders;
+using Kudos.Enums;
 using Kudos.Utils.Collections;
 using Kudos.Utils.Texts;
 using System;
@@ -96,6 +97,31 @@ namespace Kudos.Utils
         public static Byte[]? ConvertFromBase16(String? s)
         {
             if (s != null) try { return Convert.FromHexString(s); } catch { }
+            return null;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Base32
+
+        #region public static Byte[]? ConvertToBase32()
+
+        public static Byte[]? ConvertToBase32(Byte[]? a) { return ConvertToBase32(a, Encoding.UTF8); }
+        public static Byte[]? ConvertToBase32(Byte[]? a, Encoding? enc) { return Parse(StringUtils.ConvertToBase32(a), enc); }
+        public static Byte[]? ConvertToBase32(String? s) { return ConvertToBase32(s, Encoding.UTF8); }
+        public static Byte[]? ConvertToBase32(String? s, Encoding? enc) { return Parse(StringUtils.ConvertToBase32(s, enc), enc); }
+
+        #endregion
+
+        #region public static Byte[]? ConvertFromBase32()
+
+        public static Byte[]? ConvertFromBase32(Byte[]? a) { return ConvertFromBase32(a, Encoding.UTF8); }
+        public static Byte[]? ConvertFromBase32(Byte[]? a, Encoding? enc) { return ConvertFromBase32(StringUtils.Parse(a, enc)); }
+        public static Byte[]? ConvertFromBase32(String? s)
+        {
+            if (s != null) try { return Base32Encoder.ToBytes(s); } catch { }
             return null;
         }
 

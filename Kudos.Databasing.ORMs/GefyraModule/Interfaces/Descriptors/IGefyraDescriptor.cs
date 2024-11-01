@@ -6,7 +6,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Descriptors
         IGefyraDescriptor
     :
         IGefyraNameDescriptor,
-        IGefyraHashKeyDescriptor,
         IGefyraGetSQLAction
     {
     }

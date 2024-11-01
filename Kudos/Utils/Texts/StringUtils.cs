@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Kudos.Constants;
+using Kudos.Encoders;
 using Kudos.Enums;
 using Kudos.Utils.Numerics;
 
@@ -157,6 +158,33 @@ namespace Kudos.Utils.Texts
         public static string? ConvertFromBase16(string? s, Encoding? enc) { return Parse(BytesUtils.ConvertFromBase16(s), enc); }
         public static string? ConvertFromBase16(byte[]? a) { return ConvertFromBase16(a, Encoding.UTF8); }
         public static string? ConvertFromBase16(byte[]? a, Encoding? enc) { return Parse(BytesUtils.ConvertFromBase16(a, enc), enc); }
+
+        #endregion
+
+        #endregion
+
+        #region Base32
+
+        #region public static String? ConvertToBase32()
+
+        public static string? ConvertToBase32(string? s) { return ConvertToBase32(s, Encoding.UTF8); }
+        public static string? ConvertToBase32(string? s, Encoding? enc) { return ConvertToBase32(BytesUtils.Parse(s, enc)); }
+        public static string? ConvertToBase32(byte[]? a)
+        {
+            if (a != null)
+                try { return Base32Encoder.ToString(a); } catch { }
+
+            return null;
+        }
+
+        #endregion
+
+        #region public static String? ConvertFromBase32()
+
+        public static string? ConvertFromBase32(string? s) { return ConvertFromBase32(s, Encoding.UTF8); }
+        public static string? ConvertFromBase32(string? s, Encoding? enc) { return Parse(BytesUtils.ConvertFromBase32(s), enc); }
+        public static string? ConvertFromBase32(byte[]? a) { return ConvertFromBase32(a, Encoding.UTF8); }
+        public static string? ConvertFromBase32(byte[]? a, Encoding? enc) { return Parse(BytesUtils.ConvertFromBase32(a, enc), enc); }
 
         #endregion
 
