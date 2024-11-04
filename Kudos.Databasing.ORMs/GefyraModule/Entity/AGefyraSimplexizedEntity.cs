@@ -13,17 +13,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
     where
         EntityType : AGefyraSimplexizedEntity<EntityType>
     {
-        #region IsInvalid
-
-        public abstract Boolean IsInvalid { get; }
-
-        #endregion
-
-        #region IsIgnored
-
-        public abstract Boolean IsIgnored { get; }
-
-        #endregion
     }
 }
 

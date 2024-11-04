@@ -13,6 +13,8 @@ namespace Kudos.Constants
     public static class CType
     {
         public static readonly Type
+            Action = typeof(Action),
+            Delegate = typeof(Delegate),
             Object = typeof(Object),
             NullableInt16 = typeof(Int16?),
             Int16 = typeof(Int16),

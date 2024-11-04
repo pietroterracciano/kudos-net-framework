@@ -60,14 +60,47 @@ namespace Kudos.Utils
 
             if (o != null)
             {
-                if (t.IsEnum) return EnumUtils.Parse(t, o);
-                try { return Convert.ChangeType(o, t); } catch { }
+                if (t.Equals(o.GetType())) return o;
+                else if (t.IsEnum) return EnumUtils.Parse(t, o);
+                else try { return Convert.ChangeType(o, t); } catch { }
             }
 
             Boolean
                 bIsNullable = !bForceNotNullable && (!t.IsValueType || t0 != null);
 
             return !bIsNullable ? ReflectionUtils.CreateInstance(t) : o;
+        }
+
+        #endregion
+
+        #region public static Object? ChangeType(...)
+
+        public static T? ChangeType<T>(Object? o) { return Cast<T>(ChangeType(typeof(T), o)); }
+        public static Object? ChangeType(Type? t, Object? o)
+        {
+            if (t == null || o == null)
+                return null;
+
+            Type
+                to = o.GetType();
+
+            if (to.Equals(t))
+                return o;
+
+            Type?
+                t0 = TypeUtils.GetUnderlying(t);
+
+            if (t0 != null)
+            {
+                t = t0;
+                if (to.Equals(t))
+                    return o;
+            }
+
+            if (t.IsEnum) return EnumUtils.Parse(t, o);
+            else try { return Convert.ChangeType(o, t); } catch { }
+
+            return null;
         }
 
         #endregion

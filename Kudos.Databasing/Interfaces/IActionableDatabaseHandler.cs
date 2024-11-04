@@ -43,19 +43,19 @@ namespace Kudos.Databasing.Interfaces
         Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sTableName);
         Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sSchemaName, String? sTableName);
 
-        DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName);
-        DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName);
-        DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dbtd, String? sName);
-        Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sTableName, String? sName);
-        Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sSchemaName, String? sTableName, String? sName);
-        Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(DatabaseTableDescriptor? dtd, String? sName);
+        //DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName);
+        //DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName);
+        //DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dbtd, String? sName);
+        //Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sTableName, String? sName);
+        //Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sSchemaName, String? sTableName, String? sName);
+        //Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(DatabaseTableDescriptor? dtd, String? sName);
 
-        DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName);
-        DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName);
-        DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dbtd);
-        Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sTableName);
-        Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sSchemaName, String? sTableName);
-        Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(DatabaseTableDescriptor? dtd);
+        //DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName);
+        //DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName);
+        //DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dbtd);
+        //Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sTableName);
+        //Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sSchemaName, String? sTableName);
+        //Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(DatabaseTableDescriptor? dtd);
 
         public Task DisposeAsync();
     }

@@ -6,12 +6,11 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Constants
 	internal static class CGefyraBindingFlags
 	{
         internal static readonly BindingFlags
-            OnGetMembedrs =
+            Members =
                 BindingFlags.Public
                 | BindingFlags.Instance
                 | BindingFlags.SetProperty
-                | BindingFlags.SetField
-                | BindingFlags.DeclaredOnly;
+                | BindingFlags.SetField;
     }
 
     /*

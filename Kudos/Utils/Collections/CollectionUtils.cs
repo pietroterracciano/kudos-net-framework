@@ -20,6 +20,7 @@ namespace Kudos.Utils.Collections
 
         #endregion
 
+
         #region public static Type? GetArgumentType(...)
 
         public static Type? GetArgumentType(ICollection? o)

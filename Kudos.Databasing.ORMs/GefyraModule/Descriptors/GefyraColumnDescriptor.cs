@@ -13,29 +13,12 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
     public sealed class
         GefyraColumnDescriptor
     :
-        AGefyraDescriptor<DatabaseColumnDescriptor>,
-        IGefyraColumnDescriptor,
-        IGefyraDeclaringTableDescriptorDescriptor
+        AGefyraDescriptor,//<DatabaseColumnDescriptor>,
+        IGefyraColumnDescriptor
     {
-        #region ... static ...
-
-        internal static readonly GefyraColumnDescriptor
-            Invalid,
-            Ignored;
-
-        static GefyraColumnDescriptor()
-        {
-            String sn = "!GefyraInvalidColumn!";
-            GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Invalid);
-            sn = "!GefyraIgnoredColumn!";
-            GefyraTableDescriptor.Invalid.RequestColumnDescriptor(ref sn, out Ignored);
-        }
-
-        #endregion
-
         #region DeclaringTableDescriptor
 
-        public IGefyraTableDescriptor DeclaringTableDescriptor { get; private set; }
+        internal GefyraTableDescriptor DeclaringTableDescriptor { get; private set; }
 
         #endregion
 
@@ -49,18 +32,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
         #region IsSpecial
 
         public Boolean IsSpecial { get; private set; }
-
-        #endregion
-
-        #region IsInvalid
-
-        public override Boolean IsInvalid { get { return this == Invalid; } }
-
-        #endregion
-
-        #region IsIgnored
-
-        public override Boolean IsIgnored { get { return this == Ignored; } }
 
         #endregion
 

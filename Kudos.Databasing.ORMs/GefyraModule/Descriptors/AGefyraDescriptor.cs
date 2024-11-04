@@ -9,7 +9,7 @@ using System.Text;
 namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 {
     public abstract class 
-        AGefyraDescriptor<DatabaseDescriptorType>
+        AGefyraDescriptor//<DatabaseDescriptorType>
     :
         TokenizedObject,
         IGefyraDescriptor
@@ -33,29 +33,17 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
         #endregion
 
-        #region IsInvalid
+        //#region DatabaseDescriptor
 
-        public abstract Boolean IsInvalid { get; }
+        //private DatabaseDescriptorType? _ddt;
+        //internal DatabaseDescriptorType? DatabaseDescriptor
+        //{
+        //    get { return _ddt; }
+        //    set { HasDatabaseDescriptor = (_ddt = value) != null; }
+        //}
+        //internal Boolean HasDatabaseDescriptor { get; private set; }
 
-        #endregion
-
-        #region IsIgnored
-
-        public abstract Boolean IsIgnored { get; }
-
-        #endregion
-
-        #region DatabaseDescriptor
-
-        private DatabaseDescriptorType? _ddt;
-        internal DatabaseDescriptorType? DatabaseDescriptor
-        {
-            get { return _ddt; }
-            set { HasDatabaseDescriptor = (_ddt = value) != null; }
-        }
-        internal Boolean HasDatabaseDescriptor { get; private set; }
-
-        #endregion
+        //#endregion
 
         internal AGefyraDescriptor(ref String shk, ref String sn)
         {

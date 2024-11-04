@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Enums
 {
-    [Flags]
     internal enum EGefyraClausole
     {
-        Insert
+        Insert, // C
+        Select, // R
+        Update, // U
+        Delete, // D
+
+        Join,
+        Where,
+        Limit
     }
 }

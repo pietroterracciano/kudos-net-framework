@@ -28,6 +28,7 @@
     <None Remove="Converters\" />
     <None Remove="Reflection\Utils\" />
     <None Remove="Encoders\" />
+    <None Remove="Utils\Expressions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />
@@ -35,5 +36,6 @@
     <Folder Include="Converters\" />
     <Folder Include="Reflection\Utils\" />
     <Folder Include="Encoders\" />
+    <Folder Include="Utils\Expressions\" />
   </ItemGroup>
 </Project>

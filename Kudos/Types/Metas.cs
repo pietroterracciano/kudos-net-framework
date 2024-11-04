@@ -34,7 +34,9 @@ namespace Kudos.Types
             return b != null && b.Value;
         }
 
+        public bool Set(String? s) { return Set(s, null); }
         public bool Set(String? s, Object? o) { return Set(s, o, _e); }
+        public bool Set(String? s, StringComparison e) { return Set(s, null, e); }
         public bool Set(String? s, Object? o, StringComparison e)
         {
             if (!_Normalize(ref s, ref e)) return false;

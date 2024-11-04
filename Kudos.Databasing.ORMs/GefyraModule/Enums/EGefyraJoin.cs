@@ -2,7 +2,7 @@
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Enums
 {
-	public enum EGefyraJoin
+	internal enum EGefyraJoin
 	{
 		Left,
         Right,

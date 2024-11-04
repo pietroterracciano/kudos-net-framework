@@ -434,7 +434,7 @@ namespace Kudos.Reflection.Utils
         public static bool SetPropertyValue(object? o, PropertyInfo? pi, object? oValue, bool bForceValueCompatibility = true)
         {
             if (o != null && pi != null && pi.SetMethod != null)
-                try { pi.SetValue(o, bForceValueCompatibility ? ObjectUtils.Parse(pi.PropertyType, oValue) : oValue); return true; } catch { }
+                try { pi.SetValue(o, bForceValueCompatibility ? ObjectUtils.ChangeType(pi.PropertyType, oValue) : oValue); return true; } catch { }
 
             return false;
         }
@@ -446,7 +446,7 @@ namespace Kudos.Reflection.Utils
         public static bool SetFieldValue(object? o, FieldInfo? fi, object? oValue, bool bForceValueCompatibility = true)
         {
             if (o != null && fi != null)
-                try { fi.SetValue(o, bForceValueCompatibility ? ObjectUtils.Parse(fi.FieldType, oValue) : oValue); return true; } catch { }
+                try { fi.SetValue(o, bForceValueCompatibility ? ObjectUtils.ChangeType(fi.FieldType, oValue) : oValue); return true; } catch { }
 
             return false;
         }
@@ -455,7 +455,7 @@ namespace Kudos.Reflection.Utils
 
         #region public static Boolean SetMemberValue(...)
 
-        public static bool SetMemberValue(object? o, MemberInfo? mi, object? ov, bool bForceValueCompatibility = false)
+        public static bool SetMemberValue(object? o, MemberInfo? mi, object? ov, bool bForceValueCompatibility = true)
         {
             if (mi != null)
                 switch (mi.MemberType)

@@ -16,7 +16,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
     where
         EntityType : AGefyraComplexizedEntity<EntityType, DescriptorType, DatabaseDescriptorType>
     where
-        DescriptorType : AGefyraDescriptor<DatabaseDescriptorType>
+        DescriptorType : AGefyraDescriptor//<DatabaseDescriptorType>
     {
         private /*readonly*/ StringBuilder
             _sb;
@@ -39,18 +39,6 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entity
 
         public String? Alias { get; private set; }
         public Boolean HasAlias { get; private set; }
-
-        #endregion
-
-        #region IsIgnored
-
-        public override Boolean IsIgnored { get { return Descriptor.IsIgnored; } }
-
-        #endregion
-
-        #region IsInvalid
-
-        public override Boolean IsInvalid { get { return Descriptor.IsInvalid; } }
 
         #endregion
 

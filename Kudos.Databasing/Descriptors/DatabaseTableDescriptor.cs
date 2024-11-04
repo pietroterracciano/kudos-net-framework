@@ -205,17 +205,40 @@ namespace Kudos.Databasing.Descriptors
 
         #endregion
 
+        private readonly Metas
+            _m;
+        private DatabaseColumnDescriptor[]?
+            _dcda;
         public readonly String
             SchemaName;
         public readonly String
             TableName;
 
-        public static object ThreadUtils { get; private set; }
-
         internal DatabaseTableDescriptor(ref String ssn, ref String sn, ref String shk) : base(ref shk)
         {
+            _m = new Metas(StringComparison.OrdinalIgnoreCase);
             SchemaName = ssn;
             TableName = sn;
+        }
+
+        internal void Eject(DatabaseColumnDescriptor[]? dcda)
+        {
+            if (dcda == null) return;
+            lock (_m)
+            {
+                _dcda = dcda;
+                for (int i = 0; i < dcda.Length; i++) _m.Set(dcda[i].Name, dcda[i]);
+            }
+        }
+
+        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sn)
+        { 
+            lock (_m) { return _m.Get<DatabaseColumnDescriptor>(sn); }
+        }
+
+        public DatabaseColumnDescriptor[]? GetColumnsDescriptors()
+        {
+            lock (_m) { return _dcda; }
         }
     }
 }

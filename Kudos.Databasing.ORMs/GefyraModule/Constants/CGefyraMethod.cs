@@ -9,8 +9,8 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Constants
     internal static class CGefyraMethod
     {
         // COLUMN ---> ``
-        public const String
-            Equals = "Equals",
-            Contains = "Contains";
+        internal static readonly String
+            Equals = nameof(Equals),
+            Contains = nameof(Contains);
     }
 }

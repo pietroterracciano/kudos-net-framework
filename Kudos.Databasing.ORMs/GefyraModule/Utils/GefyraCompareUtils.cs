@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Kudos.Databasing.ORMs.GefyraModule.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Enums;
+using Kudos.Utils;
 
 namespace Kudos.Databasing.ORMs.GefyraModule.Utils
 {
     internal static class GefyraCompareUtils
     {
         private static readonly Dictionary<EGefyraCompare, String>
-            __d;
+            __degc2s;
+
+        private static readonly Dictionary<ExpressionType, EGefyraCompare>
+            __det2egc;
 
         static GefyraCompareUtils()
         {
-            __d = new Dictionary<EGefyraCompare, String>()
+            __degc2s = new Dictionary<EGefyraCompare, String>()
             {
                 { EGefyraCompare.Equal, CGefyraClausole.Equal },
                 { EGefyraCompare.NotEqual, CGefyraClausole.NotEqual },
@@ -25,11 +30,28 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Utils
                 { EGefyraCompare.In, CGefyraClausole.In },
                 { EGefyraCompare.NotIn, CGefyraClausole.NotIn }
             };
+
+            __det2egc = new Dictionary<ExpressionType, EGefyraCompare>()
+            {
+                { ExpressionType.Not, EGefyraCompare.NotEqual },
+                { ExpressionType.Equal, EGefyraCompare.Equal },
+                { ExpressionType.NotEqual, EGefyraCompare.NotEqual },
+                { ExpressionType.GreaterThan, EGefyraCompare.GreaterThan },
+                { ExpressionType.GreaterThanOrEqual, EGefyraCompare.GreaterThanOrEqual },
+                { ExpressionType.LessThan, EGefyraCompare.LessThan },
+                { ExpressionType.LessThanOrEqual, EGefyraCompare.LessThanOrEqual }
+            };
         }
 
         internal static void GetString(ref EGefyraCompare e, out String? s)
         {
-            __d.TryGetValue(e, out s);
+            __degc2s.TryGetValue(e, out s);
+        }
+
+        internal static void GetEnum(ref ExpressionType expt, out EGefyraCompare? egc)
+        {
+            EGefyraCompare egc0;
+            egc = __det2egc.TryGetValue(expt, out egc0) ? egc0 : null;
         }
     }
 }

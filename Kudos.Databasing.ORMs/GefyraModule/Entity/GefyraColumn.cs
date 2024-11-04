@@ -4,6 +4,7 @@ using Kudos.Databasing.ORMs.GefyraModule.Constants;
 using Kudos.Databasing.ORMs.GefyraModule.Descriptors;
 using Kudos.Databasing.ORMs.GefyraModule.Entity;
 using Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities;
+using Kudos.Types;
 using System;
 using System.Reflection;
 using System.Text;
@@ -17,17 +18,55 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
     {
         #region ... static ...
 
-        internal static readonly GefyraColumn
-            Invalid,
-            Ignored;
+        #region internal static void Get<...>(...)
 
-        static GefyraColumn()
+        internal static void Get
+        (
+            ref GefyraColumnDescriptor? gcd,
+            out GefyraColumn? gc
+        )
         {
-            String sn = "!GefyraInvalidColumn!";
-            GefyraTable.Invalid.RequestColumn(ref sn, out Invalid);
-            sn = "!GefyraIgnoredColumn!";
-            GefyraTable.Ignored.RequestColumn(ref sn, out Ignored);
+            if (gcd == null) { gc = null; return; }
+            GefyraTable? gt;
+            GefyraTable.Get(ref gcd, out gt);
+            gt.GetColumn(ref gcd, out gc);
         }
+
+        internal static void Get<T>
+        (
+            ref String? sn,
+            out GefyraColumn? gc
+        )
+        {
+            GefyraTable? gt;
+            GefyraTable.Get<T>(out gt);
+            Get(ref gt, ref sn, out gc);
+        }
+
+        internal static void Get
+        (
+            ref Type? t,
+            ref String? sn,
+            out GefyraColumn? gc
+        )
+        {
+            GefyraTable? gt;
+            GefyraTable.Get(ref t, out gt);
+            Get(ref gt, ref sn, out gc);
+        }
+
+        internal static void Get
+        (
+            ref GefyraTable? gt,
+            ref String? sn,
+            out GefyraColumn? gc
+        )
+        {
+            if (gt == null) { gc = null; return; }
+            gt.GetColumn(ref sn, out gc);
+        }
+
+        #endregion
 
         #endregion
 
@@ -61,7 +100,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Entities
 
         protected override void _OnAs(ref GefyraColumn gci, ref string? sa, out GefyraColumn? gco)
         {
-            if (gci.IsIgnored || gci.IsInvalid || String.IsNullOrWhiteSpace(sa)) { gco = null; return; }
+            if (String.IsNullOrWhiteSpace(sa)) { gco = null; return; }
             gco = new GefyraColumn(ref gci, ref sa);
         }
 

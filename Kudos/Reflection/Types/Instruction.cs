@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kudos.Reflection.Types
 {
-    public class Instruction
+    public sealed class Instruction
     {
         public readonly Object? Info;
         public readonly OpCode KeyOpCode;

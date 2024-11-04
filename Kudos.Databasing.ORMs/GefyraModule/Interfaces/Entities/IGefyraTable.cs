@@ -10,7 +10,8 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities
         IGefyraComplexizedEntity,
         IGefyraTableDescriptor,
         IGefyraEntityAsAction<GefyraTable>,
-        IGefyraEntityRequestColumnAction
+        IGefyraEntityGetColumnAction,
+        IGefyraEntityGetColumnsAction
     {
     }
 }

@@ -22,7 +22,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Utils
 
         internal static void GetString(ref EGefyraPost e, out String? s)
         {
-            __d.TryGetValue(e, out s);
+            if (!__d.TryGetValue(e, out s)) s = null;
         }
     }
 }

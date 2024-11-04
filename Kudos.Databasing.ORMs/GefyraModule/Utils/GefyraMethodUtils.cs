@@ -12,15 +12,19 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Utils
 {
     internal static class GefyraMethodUtils
     {
-        public static EGefyraMethod? From(MethodInfo? oMethodInfo)
+        public static EGefyraMethod? GetEnum(MethodInfo? mi)
         {
-            if(oMethodInfo != null)
-            {
-                String sMethodInfo = oMethodInfo.ToString();
+            if (mi == null)
+                return null;
 
-                if (sMethodInfo.Contains(CGefyraMethod.Contains))
+            String?
+                s = mi.ToString();
+
+            if (s != null)
+            {     
+                if (s.Contains(CGefyraMethod.Contains, StringComparison.OrdinalIgnoreCase))
                     return EGefyraMethod.Contains;
-                else if (sMethodInfo.Contains(CGefyraMethod.Equals))
+                else if (s.Contains(CGefyraMethod.Equals, StringComparison.OrdinalIgnoreCase))
                     return EGefyraMethod.Equals;
             }
 

@@ -8,9 +8,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Entities
     public interface
         IGefyraSimplexizedEntity
     :
-        ITokenizedObject,
-        IGefyraIsIgnoredDescriptor,
-        IGefyraIsInvalidDescriptor
+        ITokenizedObject
     {
     }
 }

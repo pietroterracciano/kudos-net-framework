@@ -12,7 +12,13 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Interfaces.Clausoles
     public interface
         IGefyraJoinClausole
     {
-        IGefyraJoinClausoleBuilder Join(EGefyraJoin e, IGefyraTable? gt);
-        IGefyraJoinClausoleBuilder Join(EGefyraJoin e, Action<IGefyraSelectClausole>? actgsc);
+        IGefyraJoinClausoleBuilder LeftJoin(IGefyraTable? gt);
+        IGefyraJoinClausoleBuilder LeftJoin(Action<IGefyraSelectClausole>? actgsc);
+        IGefyraJoinClausoleBuilder RightJoin(IGefyraTable? gt);
+        IGefyraJoinClausoleBuilder RightJoin(Action<IGefyraSelectClausole>? actgsc);
+        IGefyraJoinClausoleBuilder InnerJoin(IGefyraTable? gt);
+        IGefyraJoinClausoleBuilder InnerJoin(Action<IGefyraSelectClausole>? actgsc);
+        IGefyraJoinClausoleBuilder FullJoin(IGefyraTable? gt);
+        IGefyraJoinClausoleBuilder FullJoin(Action<IGefyraSelectClausole>? actgsc);
     }
 }

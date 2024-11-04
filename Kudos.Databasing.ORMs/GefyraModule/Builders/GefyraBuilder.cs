@@ -15,6 +15,7 @@ using Kudos.Utils.Collections;
 using Kudos.Utils.Numerics;
 using Kudos.Utils.Texts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -127,7 +128,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         private Boolean _Append(ref IGefyraTable? gt)
         {
-            if (gt == null) { _Append(GefyraTableDescriptor.Invalid.GetSQL()); return false; }
+            if (gt == null) return false;
             _Append(gt.GetSQL()); return true;
         }
 
@@ -145,7 +146,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         private void _Append(ref IGefyraColumn? gc)
         {
-            if (gc == null) { _Append(GefyraColumnDescriptor.Invalid.GetSQL()); return; }
+            if (gc == null) return;
             _Append(gc.GetSQL()); _lgcConsumed.Add(gc);
         }
 
@@ -309,7 +310,16 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         #region IGefyraJoinClausole
 
-        public IGefyraJoinClausoleBuilder Join(EGefyraJoin e, IGefyraTable? gt)
+        public IGefyraJoinClausoleBuilder LeftJoin(IGefyraTable? gt) { return _Join(EGefyraJoin.Left, ref gt); }
+        public IGefyraJoinClausoleBuilder LeftJoin(Action<IGefyraSelectClausole>? act) { return _Join(EGefyraJoin.Left, ref act); }
+        public IGefyraJoinClausoleBuilder RightJoin(IGefyraTable? gt) { return _Join(EGefyraJoin.Right, ref gt); }
+        public IGefyraJoinClausoleBuilder RightJoin(Action<IGefyraSelectClausole>? act) { return _Join(EGefyraJoin.Right, ref act); }
+        public IGefyraJoinClausoleBuilder InnerJoin(IGefyraTable? gt) { return _Join(EGefyraJoin.Inner, ref gt); }
+        public IGefyraJoinClausoleBuilder InnerJoin(Action<IGefyraSelectClausole>? act) { return _Join(EGefyraJoin.Inner, ref act); }
+        public IGefyraJoinClausoleBuilder FullJoin(IGefyraTable? gt) { return _Join(EGefyraJoin.Full, ref gt); }
+        public IGefyraJoinClausoleBuilder FullJoin(Action<IGefyraSelectClausole>? act) { return _Join(EGefyraJoin.Full, ref act); }
+
+        private IGefyraJoinClausoleBuilder _Join(EGefyraJoin e, ref IGefyraTable? gt)
         {
             _Append(ref e);
             _Append(CCharacter.Space);
@@ -320,7 +330,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
             return this;
         }
 
-        public IGefyraJoinClausoleBuilder Join(EGefyraJoin e, Action<IGefyraSelectClausole>? actgsc)
+        private IGefyraJoinClausoleBuilder _Join(EGefyraJoin e, ref Action<IGefyraSelectClausole>? actgsc)
         {
             _Append(ref e); _Append(CCharacter.Space); _Append(CGefyraClausole.Join); _Append(CCharacter.Space);
             _Append(CCharacter.LeftRoundBracket); _Append(CCharacter.Space);
@@ -606,10 +616,50 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
 
         private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref object? o)
         {
-            _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
-            _AppendColumnOrParameter(ref gc, ref o); _Append(CCharacter.Space);
+            ICollection? c = o as ICollection;
+            if (c == null)
+            {
+                _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
+                _AppendColumnOrParameter(ref gc, ref o); _Append(CCharacter.Space);
+                return this;
+            }
+
+            Boolean bIsJointly = e == EGefyraCompare.In || e == EGefyraCompare.NotIn;
+
+            if(bIsJointly)
+            {
+                _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
+            }
+
+            _Append(CCharacter.LeftRoundBracket);
+
+            IEnumerator eor = c.GetEnumerator();
+            Object? oi;
+            UInt16 i = 0;
+
+            while (eor.MoveNext())
+            {
+                if (!bIsJointly)
+                {
+                    if (i > 0) { Or(); _Append(CCharacter.Space); }
+                    _Append(ref gc); _Append(CCharacter.Space); _Append(ref e); _Append(CCharacter.Space);
+                }
+                else if (i > 0)
+                {
+                    _Append(CCharacter.Comma); _Append(CCharacter.Space);
+                }
+
+                oi = eor.Current;
+                _AppendColumnOrParameter(ref gc, ref oi); _Append(CCharacter.Space);
+
+                i++;
+            }
+
+            _Append(CCharacter.RightRoundBracket);
+            
             return this;
         }
+
 
         private GefyraBuilder _Compare(ref IGefyraColumn? gc, ref EGefyraCompare e, ref Action<IGefyraSelectClausole>? act)
         {
@@ -751,8 +801,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Builders
         {
             String s; Int32 i;
             CalculateCurrentParameterMetas(out s, out i);
-            if (gc == null) gc = GefyraColumn.Invalid;
-            _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
+            if (gc != null) _lgp.Add(new GefyraParameter(ref gc, ref i, ref s, ref o));
             _Append(s);
         }
 

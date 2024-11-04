@@ -44,6 +44,8 @@
     <None Remove="GefyraModule\Interfaces\Actions\" />
     <None Remove="GefyraModule\Interfaces\Contexts\" />
     <Compile Remove="GefyraModule\Entity\GefyraJoin.cs" />
+    <None Remove="GefyraModule\Sockets\" />
+    <None Remove="GefyraModule\Interfaces\Contexts\Actions\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,7 +78,6 @@
     <Compile Remove="GefyraModule\Utils\GefyraActionUtils.cs" />
     <Compile Remove="GefyraModule\Utils\GefyraActuatorUtils.cs" />
     <Compile Remove="GefyraModule\Utils\GefyraClausoleUtils.cs" />
-    <Compile Remove="GefyraModule\Utils\GefyraMethodUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -100,6 +101,8 @@
     <Compile Include="GefyraModule\Enums\EGefyraAgainst.cs" />
     <Compile Include="GefyraModule\Contexts\GefyraContext.cs" />
     <Compile Include="GefyraModule\Enums\EGefyraClausole.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraJunction.cs" />
+    <Compile Include="GefyraModule\Enums\EGefyraMethod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kudos\Kudos.csproj" />
@@ -109,8 +112,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GefyraModule\Interfaces\Commands\" />
-    <Folder Include="GefyraModule\Models\Contexts\" />
     <Folder Include="GefyraModule\Contexts\" />
     <Folder Include="GefyraModule\Interfaces\Descriptors\" />
     <Folder Include="GefyraModule\Entity\" />
@@ -118,5 +119,7 @@
     <Folder Include="GefyraModule\Descriptors\" />
     <Folder Include="GefyraModule\Interfaces\Actions\" />
     <Folder Include="GefyraModule\Interfaces\Contexts\" />
+    <Folder Include="GefyraModule\Sockets\" />
+    <Folder Include="GefyraModule\Interfaces\Contexts\Actions\" />
   </ItemGroup>
 </Project>

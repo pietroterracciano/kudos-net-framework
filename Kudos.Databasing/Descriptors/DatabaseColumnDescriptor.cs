@@ -581,7 +581,8 @@ namespace Kudos.Databasing.Descriptors
             #region DefaultValue
 
             oDefaultValue = DataRowUtils.GetValue(dr, __sColumnDefault);
-            //oDefaultValue = ObjectUtils.Parse(dbdtd.SimplexType, oDefaultValue);
+            Object? oDefaultValue0 = ObjectUtils.ChangeType(dbdtd.DeclaringType, oDefaultValue);
+            if (oDefaultValue0 != null) oDefaultValue = oDefaultValue0;
 
             #endregion
 

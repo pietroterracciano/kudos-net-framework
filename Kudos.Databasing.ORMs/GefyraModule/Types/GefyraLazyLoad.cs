@@ -8,12 +8,18 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Types
     internal class GefyraLazyLoad
     {
         internal readonly EGefyraClausole Clausole;
-        internal readonly Object? PayLoad;
+        private readonly Object?[]? _oa;
 
-        internal GefyraLazyLoad(ref EGefyraClausole eClausole, Object? o)
+        //internal GefyraLazyLoad(EGefyraClausole egc) : this(egc, null) { }
+        internal GefyraLazyLoad(EGefyraClausole egc, Object? o, params Object?[]? oa)
         {
-            Clausole = eClausole;
-            PayLoad = o;
+            Clausole = egc;
+            _oa = ArrayUtils.Append(o, oa);
+        }
+
+        internal T? GetPayLoad<T>(Int32 i)
+        {
+            return ArrayUtils.GetValue<T>(_oa, i);
         }
     }
 }

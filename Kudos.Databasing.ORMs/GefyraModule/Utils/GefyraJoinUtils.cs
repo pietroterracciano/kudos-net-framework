@@ -25,9 +25,9 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Utils
             };
         }
 
-        internal static void GetString(ref EGefyraJoin e, out String? s)
+        internal static void GetString(ref EGefyraJoin egj, out String? s)
         {
-            __d.TryGetValue(e, out s);
+            if (!__d.TryGetValue(egj, out s)) s = null;
         }
     }
 }

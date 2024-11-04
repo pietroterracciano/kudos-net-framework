@@ -17,7 +17,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
     public sealed class
         GefyraTableDescriptor
     :
-        AGefyraDescriptor<DatabaseTableDescriptor>,
+        AGefyraDescriptor,//<DatabaseTableDescriptor>,
         IGefyraTableDescriptor
     {
         #region ... static ...
@@ -31,14 +31,11 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
         private static readonly StringBuilder
             __sb;
         // Type -> IGefyraTableDescriptor
-        private static readonly Dictionary<Type, GefyraTableDescriptor>
+        private static readonly Dictionary<Type, GefyraTableDescriptor?>
             __d;
         // TableDescriptorHashKey -> IGefyraTableDescriptor
         private static readonly Metas
             __m;
-        internal static readonly GefyraTableDescriptor
-            Invalid,
-            Ignored;
 
         static GefyraTableDescriptor()
         {
@@ -47,28 +44,23 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
             __ssnPrefix = "sn";
             __snPrefix = "n";
 
-            __d = new Dictionary<Type, GefyraTableDescriptor>();
+            __d = new Dictionary<Type, GefyraTableDescriptor?>();
             __sb = new StringBuilder();
             __m = new Metas(StringComparison.OrdinalIgnoreCase);
-
-            String sn = "!GefyraInvalidTable!";
-            Request(ref sn, out Invalid);
-            sn = "!GefyraIgnoredTable!";
-            Request(ref sn, out Ignored);
         }
 
-        #region internal static void Request<...>(...)
+        #region internal static void Get<...>(...)
 
-        internal static void Request<T>(out GefyraTableDescriptor gtd)
+        internal static void Get<T>(out GefyraTableDescriptor? gtd)
         {
             Type t = typeof(T);
-            Request(ref t, out gtd);
+            Get(ref t, out gtd);
         }
-        internal static void Request(ref Type? t, out GefyraTableDescriptor gtd)
+        internal static void Get(ref Type? t, out GefyraTableDescriptor? gtd)
         {
             if (t == null) 
             { 
-                gtd = Invalid; 
+                gtd = null; 
                 return; 
             }
 
@@ -76,7 +68,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
             lock (__d)
             {
-                if (__d.TryGetValue(t, out gtd) && gtd != null)
+                if (__d.TryGetValue(t, out gtd))
                     return;
 
                 GefyraTableAttribute?
@@ -90,7 +82,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
                 if(gta == null)
                 {
-                    __d[t] = gtd = Ignored;
+                    __d[t] = gtd = null;
                     return;
                 }
 
@@ -113,7 +105,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
                 #endregion
 
-                Request(ref t, ref ssn, ref sn, out gtd);
+                _Get(ref t, ref ssn, ref sn, out gtd);
                 __d[t] = gtd;
             }
 
@@ -127,41 +119,41 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
             //#endregion
         }
 
-        internal static void Request
+        internal static void Get
         (
             ref String? sn,
-            out GefyraTableDescriptor gtd
+            out GefyraTableDescriptor? gtd
         )
         {
             String? ssn = null;
-            Request(ref ssn, ref sn, out gtd);
+            Get(ref ssn, ref sn, out gtd);
         }
-        internal static void Request
-        (
-            ref Type? t,
-            ref String? sn,
-            out GefyraTableDescriptor gtd
-        )
-        {
-            String? ssn = null;
-            Request(ref t, ref ssn, ref sn, out gtd);
-        }
-        internal static void Request
+        internal static void Get
         (
             ref String? ssn,
             ref String? sn,
-            out GefyraTableDescriptor gtd
+            out GefyraTableDescriptor? gtd
         )
         {
             Type? t = null;
-            Request(ref t, ref ssn, ref sn, out gtd);
+            _Get(ref t, ref ssn, ref sn, out gtd);
         }
-        internal static void Request
+        private static void _Get
+        (
+            ref Type? t,
+            ref String? sn,
+            out GefyraTableDescriptor? gtd
+        )
+        {
+            String? ssn = null;
+            _Get(ref t, ref ssn, ref sn, out gtd);
+        }
+        private static void _Get
         (
             ref Type? t,
             ref String? ssn, 
             ref String? sn,
-            out GefyraTableDescriptor gtd
+            out GefyraTableDescriptor? gtd
         )
         {
             __OverrideNamesIfPossible(ref ssn, ref ssn, ref sn);
@@ -171,7 +163,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
             __CalculateHashKey(ref ssn, ref sn, out s);
             if (s == null)
             {
-                gtd = Invalid;
+                gtd = null;
                 return;
             }
 
@@ -267,32 +259,28 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
         #endregion
 
-        #region IsInvalid
-
-        public override Boolean IsInvalid { get { return this == Invalid; } }
-
-        #endregion
-
-        #region IsIgnored
-
-        public override Boolean IsIgnored { get { return this == Ignored; } }
-
-        #endregion
-
         // MemberInfo -> IGefyraColumnDescriptor
-        private readonly Dictionary<MemberInfo, GefyraColumnDescriptor>
+        private readonly Dictionary<MemberInfo, GefyraColumnDescriptor?>
             _d;
         // ColumnDescriptorHashKey -> IGefyraColumnDescriptor
         private readonly Metas
             _m;
+
+        private GefyraColumnDescriptor[]?
+            _gcda;
+
+        private readonly List<GefyraColumnDescriptor>
+            _l;
+
         private GefyraTableDescriptor
             _this;
 
         private GefyraTableDescriptor(ref String shk, ref Type dt, ref String? ssn, ref String sn) : base(ref shk, ref sn)
         {
             _this = this;
-            _d = new Dictionary<MemberInfo, GefyraColumnDescriptor>();
+            _d = new Dictionary<MemberInfo, GefyraColumnDescriptor?>();
             _m = new Metas(StringComparison.OrdinalIgnoreCase);
+            _l = new List<GefyraColumnDescriptor>();
 
             HasDeclaringType = (DeclaringType = dt) != null;
             SchemaName = ssn;
@@ -310,33 +298,41 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
             #region Calcolo i ColumnDescriptor dei Members recuperati in precedenza e li inserisco nella cache interna
 
-            GefyraColumnDescriptor
+            GefyraColumnDescriptor?
                 gcdi;
 
             for (int i=0; i<mia.Length; i++)
-                RequestColumnDescriptor(ref mia[i], out gcdi);
+                GetColumnDescriptor(ref mia[i], out gcdi);
 
             #endregion
         }
 
         #region ColumnDescriptors
 
-        #region internal void RequestColumnDescriptor(...)
+        #region internal void GetColumnsDescritors(...)
 
-        internal void RequestColumnDescriptor
+        internal void GetColumnsDescriptors(out GefyraColumnDescriptor[]? gcda)
+        {
+            lock (_l) { gcda = _gcda != null ? _gcda : (_gcda = _l.ToArray()); }
+        }
+
+        #endregion
+
+        #region internal void GetColumnDescriptor(...)
+
+        internal void GetColumnDescriptor
         (
             ref MemberInfo? mi, 
-            out GefyraColumnDescriptor gcd
+            out GefyraColumnDescriptor? gcd
         )
         {
-            if 
+            if
             (
-                mi == null 
-                || !CGefyraMemberTypes.FieldProperty.HasFlag(ReflectionUtils.GetMemberType(mi))
+                mi == null
                 || mi.DeclaringType != DeclaringType
             )
             {
-                gcd = GefyraColumnDescriptor.Invalid;
+                gcd = null;
                 return;
             }
 
@@ -344,7 +340,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
             lock (_d)
             {
-                if (_d.TryGetValue(mi, out gcd) && gcd != null)
+                if (_d.TryGetValue(mi, out gcd))
                     return;
 
                 GefyraColumnAttribute?
@@ -360,7 +356,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
                 {
                     #region Aggiungo il ColumnDescriptor al dictionary d di cache
 
-                    _d[mi] = gcd = GefyraColumnDescriptor.Ignored;
+                    _d[mi] = gcd = null;
 
                     #endregion
 
@@ -390,7 +386,7 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
 
                 #region Richiedo un ColumnDescriptor per mi,sn
 
-                RequestColumnDescriptor(ref mi, ref sn, out gcd);
+                _GetColumnDescriptor(ref mi, ref sn, out gcd);
 
                 #endregion
 
@@ -401,50 +397,57 @@ namespace Kudos.Databasing.ORMs.GefyraModule.Descriptors
                 #endregion
             }
 
-            #region Richiedo un ColumnDescriptor per sn (forzo la sua aggiunta alla cache interna)
+            //#region Richiedo un ColumnDescriptor per sn (forzo la sua aggiunta alla cache interna)
 
-            GefyraColumnDescriptor gcd0;
-            sn = mi.Name;
-            RequestColumnDescriptor(ref mi, ref sn, out gcd0);
+            //GefyraColumnDescriptor? gcd0;
+            //sn = mi.Name;
+            //_GetColumnDescriptor(ref mi, ref sn, out gcd0);
 
-            #endregion
+            //#endregion
         }
 
-        internal void RequestColumnDescriptor
+        internal void GetColumnDescriptor
         (
             ref String? sn,
-            out GefyraColumnDescriptor gcd
+            out GefyraColumnDescriptor? gcd
         )
         {
             MemberInfo? mi = ReflectionUtils.GetMember(DeclaringType, sn, CBindingFlags.Instance);
-            RequestColumnDescriptor(ref mi, out gcd);
-            if (gcd != GefyraColumnDescriptor.Invalid) return;
-            RequestColumnDescriptor(ref mi, ref sn, out gcd);
+            if (mi != null) GetColumnDescriptor(ref mi, out gcd);
+            else _GetColumnDescriptor(ref mi, ref sn, out gcd);
         }
-        internal void RequestColumnDescriptor
+
+        private void _GetColumnDescriptor
         (
             ref MemberInfo? mi,
             ref String? sn,
-            out GefyraColumnDescriptor gcd
+            out GefyraColumnDescriptor? gcd
         )
         {
             String? s;
             _CalculateColumnDescriptorHashKey(ref sn, out s);
             if (s == null)
             {
-                gcd = GefyraColumnDescriptor.Invalid;
+                gcd = null;
                 return;
             }
 
             lock (_m)
             {
                 gcd = _m.Get<GefyraColumnDescriptor>(s);
+                if (gcd != null) return;
+                _m.Set(s, gcd = new GefyraColumnDescriptor(ref s, ref _this, ref mi, ref sn));
+                //if (gcd != null && !gcd.HasDeclaringMember && mi != null)
+                //    gcd = null;
 
-                if (gcd != null && !gcd.HasDeclaringMember && mi != null)
-                    gcd = null;
-
-                if (gcd == null)
-                    _m.Set(s, gcd = new GefyraColumnDescriptor(ref s, ref _this, ref mi, ref sn));
+                //if (gcd == null)
+                //{
+                lock (_l)
+                {
+                    _l.Add(gcd);
+                    _gcda = null;
+                }
+                //}
             }
         }
 

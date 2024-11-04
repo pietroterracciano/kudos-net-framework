@@ -609,94 +609,105 @@ namespace Kudos.Databasing.Controllers
         {
             DatabaseTableDescriptor? dtd;
             DatabaseTableDescriptor.Get(ref _this, ref sName, out dtd);
-            return dtd;
+            Task<DatabaseTableDescriptor?> t = _FinalizeTableDescriptorAsync(dtd);
+            t.Wait();
+            return t.Result;
         }
         public DatabaseTableDescriptor? GetTableDescriptor(String? sSchemaName, String? sName)
         {
             DatabaseTableDescriptor? dtd;
             DatabaseTableDescriptor.Get(ref _this, ref sSchemaName, ref sName, out dtd);
-            return dtd;
+            Task<DatabaseTableDescriptor?> t = _FinalizeTableDescriptorAsync(dtd);
+            t.Wait();
+            return t.Result;
         }
+
         public async Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sName)
         {
-            return await DatabaseTableDescriptor.GetAsync(_this, sName);
+            return await _FinalizeTableDescriptorAsync(await DatabaseTableDescriptor.GetAsync(_this, sName));
         }
         public async Task<DatabaseTableDescriptor?> GetTableDescriptorAsync(String? sSchemaName, String? sName)
         {
-            return await DatabaseTableDescriptor.GetAsync(_this, sSchemaName, sName);
+            return await _FinalizeTableDescriptorAsync(await DatabaseTableDescriptor.GetAsync(_this, sSchemaName, sName));
+        }
+
+        private async Task<DatabaseTableDescriptor?> _FinalizeTableDescriptorAsync(DatabaseTableDescriptor? dtd)
+        {
+            if (dtd != null) dtd.Eject(await DatabaseColumnDescriptor.GetAllAsync(_this, dtd));
+            return dtd;
         }
 
         #endregion
 
-        #region public ... ...DatabaseTableDescriptor?... GetColumnDescriptor...(...)
+        //#region public ... ...DatabaseTableDescriptor?... GetColumnDescriptor...(...)
 
-        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName)
-        {
-            DatabaseColumnDescriptor? dcd;
-            DatabaseColumnDescriptor.Get(ref _this, ref sTableName, ref sName, out dcd);
-            return dcd;
-        }
-        public DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName)
-        {
-            DatabaseColumnDescriptor? dcd;
-            DatabaseColumnDescriptor.Get(ref _this, ref sSchemaName, ref sTableName, ref sName, out dcd);
-            return dcd;
-        }
-        public DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dscTable, String? sName)
-        {
-            DatabaseColumnDescriptor? dcd;
-            DatabaseColumnDescriptor.Get(ref _this, ref dscTable, ref sName, out dcd);
-            return dcd;
-        }
-        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sTableName, String? sName)
-        {
-            return await DatabaseColumnDescriptor.GetAsync(_this, sTableName, sName);
-        }
-        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sSchemaName, String? sTableName, String? sName)
-        {
-            return await DatabaseColumnDescriptor.GetAsync(_this, sSchemaName, sTableName, sName);
-        }
-        public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(DatabaseTableDescriptor? dscTable, String? sName)
-        {
-            return await DatabaseColumnDescriptor.GetAsync(_this, dscTable, sName);
-        }
+        //public DatabaseColumnDescriptor? GetColumnDescriptor(String? sTableName, String? sName)
+        //{
+        //    DatabaseColumnDescriptor? dcd;
+        //    DatabaseColumnDescriptor.Get(ref _this, ref sTableName, ref sName, out dcd);
+        //    return dcd;
+        //}
+        //public DatabaseColumnDescriptor? GetColumnDescriptor(String? sSchemaName, String? sTableName, String? sName)
+        //{
+        //    DatabaseColumnDescriptor? dcd;
+        //    DatabaseColumnDescriptor.Get(ref _this, ref sSchemaName, ref sTableName, ref sName, out dcd);
+        //    return dcd;
+        //}
+        //public DatabaseColumnDescriptor? GetColumnDescriptor(DatabaseTableDescriptor? dscTable, String? sName)
+        //{
+        //    DatabaseColumnDescriptor? dcd;
+        //    DatabaseColumnDescriptor.Get(ref _this, ref dscTable, ref sName, out dcd);
+        //    return dcd;
+        //}
+        //public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sTableName, String? sName)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAsync(_this, sTableName, sName);
+        //}
+        //public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(String? sSchemaName, String? sTableName, String? sName)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAsync(_this, sSchemaName, sTableName, sName);
+        //}
+        //public async Task<DatabaseColumnDescriptor?> GetColumnDescriptorAsync(DatabaseTableDescriptor? dscTable, String? sName)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAsync(_this, dscTable, sName);
+        //}
 
-        #endregion
+        //#endregion
 
-        #region public ... ...DatabaseTableDescriptor[]?... GetColumnsDescriptors...(...)
+        //#region public ... ...DatabaseTableDescriptor[]?... GetColumnsDescriptors...(...)
 
-        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName)
-        {
-            DatabaseColumnDescriptor[]? dcda;
-            DatabaseColumnDescriptor.GetAll(ref _this, ref sTableName, out dcda);
-            return dcda;
-        }
-        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName)
-        {
-            DatabaseColumnDescriptor[]? dcda;
-            DatabaseColumnDescriptor.GetAll(ref _this, ref sSchemaName, ref sTableName, out dcda);
-            return dcda;
-        }
-        public DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dscTable)
-        {
-            DatabaseColumnDescriptor[]? dcda;
-            DatabaseColumnDescriptor.GetAll(ref _this, ref dscTable, out dcda);
-            return dcda;
-        }
-        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sTableName)
-        {
-            return await DatabaseColumnDescriptor.GetAllAsync(_this, sTableName);
-        }
-        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sSchemaName, String? sTableName)
-        {
-            return await DatabaseColumnDescriptor.GetAllAsync(_this, sSchemaName, sTableName);
-        }
-        public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(DatabaseTableDescriptor? dscTable)
-        {
-            return await DatabaseColumnDescriptor.GetAllAsync(_this, dscTable);
-        }
+        //public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sTableName)
+        //{
+        //    DatabaseColumnDescriptor[]? dcda;
+        //    DatabaseColumnDescriptor.GetAll(ref _this, ref sTableName, out dcda);
+        //    return dcda;
+        //}
+        //public DatabaseColumnDescriptor[]? GetColumnsDescriptors(String? sSchemaName, String? sTableName)
+        //{
+        //    DatabaseColumnDescriptor[]? dcda;
+        //    DatabaseColumnDescriptor.GetAll(ref _this, ref sSchemaName, ref sTableName, out dcda);
+        //    return dcda;
+        //}
+        //public DatabaseColumnDescriptor[]? GetColumnsDescriptors(DatabaseTableDescriptor? dscTable)
+        //{
+        //    DatabaseColumnDescriptor[]? dcda;
+        //    DatabaseColumnDescriptor.GetAll(ref _this, ref dscTable, out dcda);
+        //    return dcda;
+        //}
+        //public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sTableName)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAllAsync(_this, sTableName);
+        //}
+        //public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(String? sSchemaName, String? sTableName)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAllAsync(_this, sSchemaName, sTableName);
+        //}
+        //public async Task<DatabaseColumnDescriptor[]?> GetColumnsDescriptorsAsync(DatabaseTableDescriptor? dscTable)
+        //{
+        //    return await DatabaseColumnDescriptor.GetAllAsync(_this, dscTable);
+        //}
 
-        #endregion
+        //#endregion
 
         #region Dispose()
 
